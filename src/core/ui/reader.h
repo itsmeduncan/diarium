@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 
+#include "core/edition/clippings.h"
 #include "core/edition/edition.h"
 #include "core/render/page_renderer.h"
 #include "core/text/font_pack.h"
@@ -27,9 +28,10 @@
 namespace rsspaper {
 
 enum class ReaderMode : uint8_t {
-  Browse,    // the ledes, the front page, and the colophon that ends them
-  Story,     // the full text of a story you opened
-  Sections,  // the jump list
+  Browse,     // the ledes, the front page, and the colophon that ends them
+  Story,      // the full text of a story you opened
+  Sections,   // the jump list
+  Clippings,  // stories you folded the corner of
 };
 
 // The last browse page is the colophon: it says the paper has ended, and why
@@ -50,6 +52,11 @@ class Reader {
  public:
   Reader(const Edition& edition, const FontPack& fonts, Hal hal,
          ReaderPolicy policy = ReaderPolicy());
+
+  // Loads saved clippings from storage. Absent or unreadable is not an error:
+  // you simply have none.
+  void load_clippings(const std::string& path);
+  const class Clippings& clippings() const { return clippings_; }
 
   // Draws the current page and pushes it to the panel.
   void render();
@@ -77,11 +84,22 @@ class Reader {
   bool back();
   bool toggle_sections();
   bool jump_to_section(size_t index);
+  bool toggle_clippings_view();
+  // Folds the corner of whatever is under the finger, or of the open story.
+  // Returns true if it is now saved.
+  bool toggle_clipping_at(int x, int y);
 
  private:
   void set_page(size_t page, bool context_change);
   RefreshMode choose_refresh(bool context_change);
   void render_section_overlay();
+  void render_clippings();
+  // Row geometry, shared by hit-testing and drawing so a tap can never
+  // land on a different row than the one under the finger.
+  size_t section_row_at(int y) const;
+  size_t clipping_row_at(int y) const;
+  void save_clippings();
+  Clipping clipping_for(const StoryRef& story) const;
 
   const Edition& edition_;
   const FontPack& fonts_;
@@ -96,6 +114,8 @@ class Reader {
   size_t return_page_ = 0;
   size_t story_index_ = 0;
   bool have_story_ = false;
+  class Clippings clippings_;
+  std::string clippings_path_;
   int partials_since_full_ = 0;
   bool needs_render_ = true;
   // Set when the next render shows a wholly different page, so it gets a full

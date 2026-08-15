@@ -72,8 +72,12 @@ struct ComposeStats {
 // reader never pages into a 40-page essay by accident, and the paper still
 // ends.
 struct StoryRef {
+  // The item's dedup key. Stable across editions, which is what lets a
+  // clipping saved on Tuesday find its story again on Thursday.
+  uint64_t key = 0;
   std::string title;
   std::string section;
+  std::string source;
   size_t lede_page = 0;    // browse page the lede appears on
   Rect lede_bounds;        // where to tap
   size_t first_page = 0;   // where the full text starts

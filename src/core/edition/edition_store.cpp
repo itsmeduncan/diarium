@@ -141,8 +141,10 @@ std::string serialize_edition(const Edition& ed) {
 
   put_u32(out, static_cast<uint32_t>(ed.stories.size()));
   for (const StoryRef& s : ed.stories) {
+    put_i64(out, static_cast<int64_t>(s.key));
     put_str(out, s.title);
     put_str(out, s.section);
+    put_str(out, s.source);
     put_u32(out, static_cast<uint32_t>(s.lede_page));
     put_i32(out, s.lede_bounds.x);
     put_i32(out, s.lede_bounds.y);
@@ -234,8 +236,10 @@ bool deserialize_edition(const std::string& blob, Edition* out,
   if (!r.plausible_count(story_count, 33)) return fail("story table is corrupt");
   for (uint32_t i = 0; i < story_count && r.ok(); ++i) {
     StoryRef s;
+    s.key = static_cast<uint64_t>(r.i64());
     s.title = r.str();
     s.section = r.str();
+    s.source = r.str();
     s.lede_page = r.u32();
     s.lede_bounds.x = r.i32();
     s.lede_bounds.y = r.i32();

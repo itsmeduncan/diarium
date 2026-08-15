@@ -38,6 +38,7 @@ support follows — tracked on the
 | Hyphenation (Liang/TeX patterns)  | working — justified text is now viable            |
 | OPML import                       | working                                           |
 | Edition persistence               | working — compose once, read from storage         |
+| Clippings                         | working — fold a corner, it survives the edition  |
 | HTTP fetcher with conditional GET | not started                                       |
 | Inkplate 6FLICK target            | not started                                       |
 
@@ -89,6 +90,7 @@ the device will run — and every refresh writes a frame:
 make read
 #  n  turn the page      1-9  open the Nth story here
 #  b  back               s    section list
+#  h  fold this corner   c    clippings
 ```
 
 It reports what the panel would have spent: partial refreshes are ~225 ms,

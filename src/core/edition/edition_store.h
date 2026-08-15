@@ -22,7 +22,9 @@
 namespace rsspaper {
 
 constexpr uint32_t kEditionMagic = 0x45505352;  // "RSPE"
-constexpr uint16_t kEditionVersion = 1;
+// 2: StoryRef gained a stable key and a source, so a clipping can find
+// its story again in a later edition.
+constexpr uint16_t kEditionVersion = 2;
 
 std::string serialize_edition(const Edition& edition);
 
