@@ -11,7 +11,10 @@
 
 CXX      ?= c++
 CXXFLAGS ?= -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Wshadow
-INCLUDES  = -Isrc -Ithird_party -Ithird_party/stb -Ithird_party/doctest
+# third_party is -isystem: vendored headers must not spray warnings over
+# ours, and we are not going to patch stb.
+INCLUDES  = -Isrc -isystem third_party -isystem third_party/stb \
+            -isystem third_party/doctest
 BUILD     = build
 BIN       = bin
 
@@ -46,7 +49,7 @@ check: $(BIN)/rsspaper-tests
 	$(BIN)/rsspaper-tests
 
 fontgen: $(BIN)/fontgen
-$(BIN)/fontgen: $(FONT_OBJS)
+$(BIN)/fontgen: $(FONT_OBJS) $(CORE_OBJS)
 	@mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 

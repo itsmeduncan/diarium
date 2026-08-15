@@ -24,17 +24,19 @@ file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS test/*.cpp)
 file(GLOB FONTGEN_SOURCES CONFIGURE_DEPENDS tools/fontgen/*.cpp)
 
 add_library(rsspaper_core STATIC ${CORE_SOURCES})
-target_include_directories(rsspaper_core PUBLIC src third_party)
+target_include_directories(rsspaper_core PUBLIC src)
+# SYSTEM so vendored headers don't spray warnings over ours.
+target_include_directories(rsspaper_core SYSTEM PUBLIC third_party)
 
 add_executable(rsspaper-sim ${SIM_SOURCES})
 target_link_libraries(rsspaper-sim PRIVATE rsspaper_core)
-target_include_directories(rsspaper-sim PRIVATE third_party/stb)
+target_include_directories(rsspaper-sim SYSTEM PRIVATE third_party/stb)
 
 if(TEST_SOURCES)
   enable_testing()
   add_executable(rsspaper-tests ${TEST_SOURCES})
   target_link_libraries(rsspaper-tests PRIVATE rsspaper_core)
-  target_include_directories(rsspaper-tests PRIVATE third_party/doctest)
+  target_include_directories(rsspaper-tests SYSTEM PRIVATE third_party/doctest)
   # Tests read test/fixtures relative to the repository root.
   add_test(NAME unit
            COMMAND rsspaper-tests
@@ -44,7 +46,7 @@ endif()
 if(FONTGEN_SOURCES)
   add_executable(fontgen ${FONTGEN_SOURCES})
   target_link_libraries(fontgen PRIVATE rsspaper_core)
-  target_include_directories(fontgen PRIVATE third_party/stb)
+  target_include_directories(fontgen SYSTEM PRIVATE third_party/stb)
 
   # Bake the font pack as part of the build so the simulator always has one.
   set(FONT_PACK ${CMAKE_BINARY_DIR}/literata.rfp)

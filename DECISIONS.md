@@ -43,13 +43,27 @@ Windows-1252. A malformed feed should cost one story, never the edition.
 `XmlPullParser::saw_recoverable_error()` reports when a tolerance rule fired so
 the fixture corpus can be audited.
 
-### 5. Bounded memory everywhere, enforced by construction
+### 5. Bounded memory everywhere — and what the number actually is
 
 No buffer scales with document size. Names, attribute values, text chunks,
 blocks per item and bytes per block all have caps in `XmlLimits` / `HtmlLimits`.
-The parser's own footprint is roughly 16 KB regardless of feed size; the item
-store is separately bounded by `max_items`. Budget from the brief was <64 KB
-above the item store for a 2 MB feed.
+
+Measured peak heap, excluding retained items (`operator new` accounting, sink
+discards each item immediately):
+
+| feed | peak | note |
+|---|---|---|
+| daringfireball.atom.xml | 12 KB | the parser floor |
+| nasa.rss.xml | 27 KB | ~30 blocks per item |
+| astralcodexten.rss.xml | 167 KB | one 47,000-character article |
+
+The parser's own footprint is ~12 KB and genuinely does not scale with feed
+size. The 167 KB is a *single item's blocks under construction* — real, and
+larger than the brief's "<64 KB above the item store", depending on whether
+the item being built counts as the item store. On 8 MB of PSRAM it costs
+nothing, so the limits are left alone and the number is recorded honestly
+rather than the claim being trimmed to fit. Tightening `max_block_bytes` and
+`max_total_bytes` would cap it at the price of truncating long essays.
 
 ### 6. Titles get a second decoding pass
 
@@ -99,6 +113,56 @@ a build-time decision, which is where it belongs.
 
 4-bit alpha is not a compromise — the panel renders 3-bit greyscale, so the
 fourth bit is already more than the hardware can show. It halves the pack.
+
+### 11. Advances are stored in 1/16 px, not whole pixels
+
+Rounding each glyph advance to an integer accumulates up to half a pixel of
+error per character. Over a 65-character measure that is enough drift to make
+justified text visibly uneven and to make measured line widths disagree with
+drawn ones. Positions stay in subpixel units through line breaking and are
+rounded once, at blit time.
+
+### 12. Kerning is currently absent, and it is stb's fault, not the font's
+
+Literata ships GPOS with no legacy `kern` table. `stb_truetype.h:2522` reads
+`if (lookupType != 2) continue` — it handles PairPos lookups directly but skips
+Extension (type 9) lookups, which is how modern fonts wrap their kerning. All
+nine baked faces produce **zero** kern pairs; AV, Ta, Wa, To and P. all measure
+unkerned.
+
+Survivable at 27 px body, not at a 66 px lead headline. The pack format already
+carries a kern table, so the fix is confined to `tools/fontgen`: follow
+Extension lookups and resolve the pair adjustment ourselves. Build-time only,
+no runtime cost, no new dependency. Not done yet.
+
+### 13. The front page has a banner frame
+
+A newspaper lead headline spans the page and its story continues down column
+one. Uniform columns cannot express that, so `PageTemplate` grows a
+`banner_height`: a full-width frame that is simply first in the frame list, so
+the normal fill-frames-in-order logic puts the lead in it. The banner is sized
+by measuring the lead's own elements, not by a guessed constant, and capped at
+5/8 of the page below the nameplate so teasers still fit.
+
+### 14. A front page is one page
+
+Flowing every section's teasers onto the front-page template produced a
+five-page "front page", which is a contradiction. Overflow is dropped — and
+counted in `ComposeStats::front_page_overflow`, which the simulator prints.
+Silently losing stories is exactly the failure a calm reader can't detect.
+
+### 15. Lead headlines are fitted to the measure
+
+A long headline at 66 px ran to four lines and became the entire page.
+`fit_lead_headline` drops to the 44 px display size when the title won't sit in
+two lines — which is what newspapers have always done, rather than setting
+every lead at one size and hoping.
+
+### 16. Image placeholders are caption lines, not boxes
+
+A framed box is the obvious placeholder, but NASA's feed carries twenty images
+per item and twenty empty boxes make the page unreadable. Images render as a
+marked caption line (▣ + alt text). Real decoding replaces one function.
 
 ---
 
