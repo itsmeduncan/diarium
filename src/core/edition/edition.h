@@ -23,6 +23,9 @@ struct ComposeOptions {
   std::string title = "RSSpaper";
   // Hard ceiling on the whole edition. A paper that never ends is a feed.
   size_t max_items = 40;
+  // Stories every section gets before any section gets more. Without this the
+  // budget is spent in section order and the last section can vanish entirely.
+  size_t min_per_section = 2;
   // Stories older than this are stale news, however recently they appeared in
   // the feed.
   int max_age_days = 3;

@@ -218,3 +218,107 @@ TEST_CASE("an empty edition composes to nothing rather than crashing") {
   CHECK(ed.stories.empty());
   CHECK(ed.browse_page_count == 0);
 }
+
+TEST_CASE("every section gets a share of the budget") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  // Three sections, the first far busier than the rest. Spending the budget
+  // in section order would leave the last with nothing.
+  Section busy{"Technology", {}};
+  for (int i = 0; i < 20; ++i) {
+    busy.items.push_back(story("Tech " + std::to_string(i), 10, 3));
+  }
+  Section middle{"World", {}};
+  for (int i = 0; i < 6; ++i) {
+    middle.items.push_back(story("World " + std::to_string(i), 10, 3));
+  }
+  Section last{"Miscellany", {}};
+  for (int i = 0; i < 6; ++i) {
+    last.items.push_back(story("Misc " + std::to_string(i), 10, 3));
+  }
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  opts.max_items = 12;
+  opts.min_per_section = 2;
+
+  const Edition ed = compose_edition({busy, middle, last}, *fonts, opts);
+
+  size_t tech = 0, world = 0, misc = 0;
+  for (const StoryRef& s : ed.stories) {
+    if (s.section == "Technology") ++tech;
+    if (s.section == "World") ++world;
+    if (s.section == "Miscellany") ++misc;
+  }
+  CHECK(ed.stats.items_published == 12);
+  CHECK(tech + world + misc == 12);
+  CHECK(tech >= 2);
+  CHECK(world >= 2);
+  CHECK(misc >= 2);  // the whole point: the back pages still exist
+  CHECK(ed.stats.dropped_over_budget == 20 + 6 + 6 - 12);
+}
+
+TEST_CASE("a small section doesn't hoard budget it can't use") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  Section big{"Technology", {}};
+  for (int i = 0; i < 10; ++i) {
+    big.items.push_back(story("Tech " + std::to_string(i), 10, 3));
+  }
+  Section tiny{"Weather", {}};
+  tiny.items.push_back(story("Only story", 10, 3));
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  opts.max_items = 8;
+  opts.min_per_section = 3;  // more than Weather has
+
+  const Edition ed = compose_edition({big, tiny}, *fonts, opts);
+  CHECK(ed.stats.items_published == 8);
+
+  size_t weather = 0;
+  for (const StoryRef& s : ed.stories) {
+    if (s.section == "Weather") ++weather;
+  }
+  CHECK(weather == 1);  // it gets what it has, not what the floor allows
+}
+
+TEST_CASE("the budget keeps the newest stories, not the first in the feed") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  // A feed that lists its oldest story first. Cutting to the budget before
+  // sorting would keep exactly the wrong three.
+  Section s{"Technology", {}};
+  for (int day = 1; day <= 6; ++day) {
+    s.items.push_back(story("Day " + std::to_string(day), day, 3));
+  }
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  opts.max_items = 3;
+  opts.min_per_section = 0;
+
+  const Edition ed = compose_edition({s}, *fonts, opts);
+  REQUIRE(ed.stories.size() == 3);
+  CHECK(ed.stories[0].title == "Day 6");
+  CHECK(ed.stories[1].title == "Day 5");
+  CHECK(ed.stories[2].title == "Day 4");
+}
+
+TEST_CASE("a zero budget produces no edition rather than a broken one") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  opts.max_items = 0;
+  const Edition ed = compose_edition(two_sections(), *fonts, opts);
+  CHECK(ed.stories.empty());
+  CHECK(ed.stats.items_published == 0);
+}
