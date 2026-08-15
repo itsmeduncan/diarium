@@ -336,11 +336,66 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
     }
   }
 
+  // --- the colophon: the last page, which says the paper has ended --------
+  const size_t colophon_element = ledes.size();
+  {
+    FlowElement end = element(TextRole::SectionHead, "That's the paper.");
+    end.page_break_before = true;
+    ledes.push_back(std::move(end));
+
+    std::string line = format_masthead_date(opts.now);
+    if (!line.empty()) line += "  ·  ";
+    line += std::to_string(ed.stats.items_published) + " stories";
+    if (opts.feeds_configured > 0) {
+      const size_t ok = opts.feeds_configured >= opts.feed_problems.size()
+                            ? opts.feeds_configured - opts.feed_problems.size()
+                            : 0;
+      line += "  ·  " + std::to_string(ok) + " of " +
+              std::to_string(opts.feeds_configured) + " feeds";
+    }
+    ledes.push_back(element(TextRole::Byline, line));
+
+    if (!opts.feed_problems.empty()) {
+      ledes.push_back(element(
+          TextRole::LedeKicker,
+          opts.feed_problems.size() == 1
+              ? "One feed didn't answer"
+              : std::to_string(opts.feed_problems.size()) +
+                    " feeds didn't answer"));
+      for (const FeedProblem& problem : opts.feed_problems) {
+        std::string text = problem.source;
+        if (!problem.reason.empty()) text += " — " + problem.reason;
+        ledes.push_back(element(TextRole::LedeText, text));
+      }
+    }
+
+    // Held-over stories, so a thin paper explains itself.
+    const size_t held = ed.stats.dropped_over_budget;
+    if (held > 0) {
+      ledes.push_back(element(
+          TextRole::LedeText,
+          std::to_string(held) +
+              (held == 1 ? " story was held over for space."
+                         : " stories were held over for space.")));
+    }
+    if (ed.stats.truncated_published > 0) {
+      ledes.push_back(element(
+          TextRole::LedeText,
+          std::to_string(ed.stats.truncated_published) + " of " +
+              std::to_string(ed.stats.items_published) +
+              " stories are excerpts, because that is all their publisher's "
+              "feed carries."));
+    }
+  }
+
   PageTemplate lede_tmpl;
   lede_tmpl.columns = 1;
   std::vector<Placement> lede_placements;
   paginator.paginate(ledes, lede_tmpl, &ed.pages, &lede_placements);
   ed.browse_page_count = ed.pages.size();
+  ed.colophon_page = colophon_element < lede_placements.size()
+                         ? lede_placements[colophon_element].page
+                         : (ed.pages.empty() ? 0 : ed.pages.size() - 1);
 
   for (const std::pair<std::string, size_t>& start : section_starts) {
     const size_t page = start.second < lede_placements.size()
@@ -421,6 +476,8 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
       for (const Edition::SectionMark& m : ed.section_marks) {
         if (i >= m.first_page) p.folio_left = m.name;
       }
+      // The colophon belongs to no section, so it wears the paper's name.
+      if (i == ed.colophon_page && !p.is_front_page) p.folio_left = ed.title;
     } else {
       // Inside a story the folio says where you are in *that* story, not in
       // the edition: the edition's page count is not what you're reading.

@@ -225,14 +225,16 @@ TEST_CASE("the reader turns pages and stops at the end of the paper") {
     CHECK(reader.next_page());
     CHECK(reader.current_page() == i);
   }
-  // One past the last browse page is the end of the paper, not page zero of
-  // the story text.
-  CHECK(reader.next_page());
-  CHECK(reader.mode() == ReaderMode::End);
+  // The last browse page is the colophon, which says the paper has ended.
+  // There is nothing past it — and crucially not page one of the story text,
+  // which is what a naive "page_ + 1" would walk into.
+  CHECK(reader.current_page() == ed.colophon_page);
   CHECK_FALSE(reader.next_page());
+  CHECK(reader.current_page() == ed.colophon_page);
+  CHECK(reader.mode() == ReaderMode::Browse);
 
   CHECK(reader.previous_page());
-  CHECK(reader.mode() == ReaderMode::Browse);
+  CHECK(reader.current_page() == ed.colophon_page - 1);
 }
 
 TEST_CASE("you cannot page backwards off the front") {

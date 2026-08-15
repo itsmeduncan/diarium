@@ -210,13 +210,22 @@ TEST_CASE("stale stories are dropped and counted") {
   CHECK(ed.stories[0].title == "fresh");
 }
 
-TEST_CASE("an empty edition composes to nothing rather than crashing") {
+TEST_CASE("an edition with no stories is one page that explains itself") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
   const Edition ed = compose_edition({}, *fonts, ComposeOptions());
-  CHECK(ed.pages.empty());
+
+  // Not zero pages: a device that woke up, found nothing, and showed a blank
+  // screen is indistinguishable from a device that is broken.
   CHECK(ed.stories.empty());
-  CHECK(ed.browse_page_count == 0);
+  CHECK(ed.browse_page_count == 1);
+  CHECK(ed.colophon_page == 0);
+
+  std::string text;
+  for (const Line& line : ed.pages[0].lines) {
+    for (const PositionedRun& r : line.runs) text += r.text + " ";
+  }
+  CHECK(text.find("0 stories") != std::string::npos);
 }
 
 TEST_CASE("every section gets a share of the budget") {
@@ -321,4 +330,72 @@ TEST_CASE("a zero budget produces no edition rather than a broken one") {
   const Edition ed = compose_edition(two_sections(), *fonts, opts);
   CHECK(ed.stories.empty());
   CHECK(ed.stats.items_published == 0);
+}
+
+TEST_CASE("the paper ends with a colophon that says so") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  opts.feeds_configured = 4;
+  const Edition ed = compose_edition(two_sections(), *fonts, opts);
+
+  // It is the last page you can flip to, and it belongs to no section.
+  REQUIRE(ed.browse_page_count > 0);
+  CHECK(ed.colophon_page == ed.browse_page_count - 1);
+  CHECK(ed.pages[ed.colophon_page].folio_left == ed.title);
+  for (const Edition::SectionMark& m : ed.section_marks) {
+    CHECK(m.first_page < ed.colophon_page);
+  }
+
+  // No story's lede lives on it — it is an ending, not an index page.
+  for (const StoryRef& s : ed.stories) {
+    CHECK(s.lede_page != ed.colophon_page);
+  }
+}
+
+TEST_CASE("a feed that failed is named on the colophon") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  opts.feeds_configured = 4;
+  opts.feed_problems.push_back(FeedProblem{"The Missing Times", "timed out"});
+  opts.feed_problems.push_back(FeedProblem{"Nothing Daily", "404"});
+
+  const Edition ed = compose_edition(two_sections(), *fonts, opts);
+
+  // Gather the text of the colophon page.
+  std::string text;
+  for (const Line& line : ed.pages[ed.colophon_page].lines) {
+    for (const PositionedRun& r : line.runs) text += r.text + " ";
+  }
+  CHECK(text.find("The Missing Times") != std::string::npos);
+  CHECK(text.find("timed out") != std::string::npos);
+  CHECK(text.find("Nothing Daily") != std::string::npos);
+  CHECK(text.find("2 of 4 feeds") != std::string::npos);
+}
+
+TEST_CASE("a clean run does not invent problems to report") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  opts.max_items = 100;  // nothing held over
+  opts.feeds_configured = 2;
+  const Edition ed = compose_edition(two_sections(), *fonts, opts);
+
+  std::string text;
+  for (const Line& line : ed.pages[ed.colophon_page].lines) {
+    for (const PositionedRun& r : line.runs) text += r.text + " ";
+  }
+  CHECK(text.find("didn't answer") == std::string::npos);
+  CHECK(text.find("held over") == std::string::npos);
+  CHECK(text.find("2 of 2 feeds") != std::string::npos);
 }

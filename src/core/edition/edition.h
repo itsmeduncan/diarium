@@ -18,6 +18,15 @@ struct Section {
   std::vector<Item> items;
 };
 
+// A feed that didn't make it into the edition, and why. Today's paper being
+// thinner than yesterday's is something the reader should be able to notice —
+// silently omitting a section is exactly the failure a calm device makes
+// invisible.
+struct FeedProblem {
+  std::string source;  // the feed's name, or its URL if we never got a name
+  std::string reason;  // "timed out", "404", "no fixture" — short, for print
+};
+
 struct ComposeOptions {
   Epoch now = kNoDate;
   std::string title = "RSSpaper";
@@ -33,6 +42,10 @@ struct ComposeOptions {
   Align body_alignment = Align::Left;
   // How many section headlines the front page lists per section.
   size_t front_page_per_section = 2;
+  // How many feeds were configured, and which of them failed. Both appear on
+  // the colophon.
+  size_t feeds_configured = 0;
+  std::vector<FeedProblem> feed_problems;
 };
 
 // What the edition dropped and why. Printed by the simulator and worth
@@ -76,6 +89,9 @@ struct Edition {
   // Pages [0, browse_page_count) are the edition you flip through. Everything
   // after is story text, reachable only by selection.
   size_t browse_page_count = 0;
+  // The last browse page: it says the paper has ended and why it is the
+  // length it is. Belongs to no section.
+  size_t colophon_page = 0;
 
   std::vector<StoryRef> stories;
 
