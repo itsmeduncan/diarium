@@ -34,8 +34,10 @@ constexpr RoleStyle kStyles[static_cast<size_t>(TextRole::Count)] = {
     {FaceId::BodyBold, 34, 0, 2, 0, 0, Align::Left, 9, 9},
     // LedeText
     {FaceId::Meta, 27, 0, 6, 0, 0, Align::Left, 9, 9},
-    // Body
-    {FaceId::Body, 36, 0, 0, 0, 0, Align::Left, 2, 2},
+    // Body. The first line of every paragraph but the story's opener is
+    // indented one em — with no space between paragraphs, that indent is the
+    // only thing telling a reader where one ends and the next begins.
+    {FaceId::Body, 36, 0, 0, 27, 0, Align::Left, 2, 2},
     // ListItem: hanging indent, marker drawn in the left margin.
     {FaceId::Body, 36, 2, 2, 0, 30, Align::Left, 2, 2},
     // Quote: indented both sides and set in italic, no quotation marks —

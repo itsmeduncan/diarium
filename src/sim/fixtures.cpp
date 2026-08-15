@@ -198,6 +198,7 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
   compose_opts.max_age_days = config.edition.max_age_days;
   compose_opts.front_page_columns = config.edition.front_page_columns;
   compose_opts.body_alignment = config.edition.body_alignment;
+  compose_opts.hyphenate = config.edition.hyphenate;
   compose_opts.feeds_configured = config.feeds.size();
   compose_opts.feed_problems = local.feed_problems;
 

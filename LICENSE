@@ -25,5 +25,10 @@ SOFTWARE.
 Third-party material bundled in this repository keeps its own terms:
 
   assets/fonts/        Literata — SIL Open Font License 1.1, see OFL.txt
+  assets/hyphenation/  hyph-en-us.tex — Copyright (C) 1990, 2004, 2005
+                       Gerard D.C. Kuiken. Copying and distribution of that
+                       file, with or without modification, are permitted in
+                       any medium without royalty provided the copyright
+                       notice and this notice are preserved.
   third_party/stb/     stb_truetype.h, stb_image_write.h — public domain
   third_party/doctest/ doctest.h — MIT

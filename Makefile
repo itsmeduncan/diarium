@@ -22,15 +22,17 @@ CORE_SRCS := $(shell find src/core -name '*.cpp' 2>/dev/null | sort)
 SIM_SRCS  := $(shell find src/sim src/hal -name '*.cpp' 2>/dev/null | sort)
 TEST_SRCS := $(shell find test -name '*.cpp' 2>/dev/null | sort)
 FONT_SRCS := $(shell find tools/fontgen -name '*.cpp' 2>/dev/null | sort)
+HYPH_SRCS := $(shell find tools/hyphgen -name '*.cpp' 2>/dev/null | sort)
 
 CORE_OBJS := $(CORE_SRCS:%.cpp=$(BUILD)/%.o)
 SIM_OBJS  := $(SIM_SRCS:%.cpp=$(BUILD)/%.o)
 TEST_OBJS := $(TEST_SRCS:%.cpp=$(BUILD)/%.o)
 FONT_OBJS := $(FONT_SRCS:%.cpp=$(BUILD)/%.o)
+HYPH_OBJS := $(HYPH_SRCS:%.cpp=$(BUILD)/%.o)
 
 FONT_PACK := $(BUILD)/literata.rfp
 
-.PHONY: all sim tests check fonts edition core clean fmt portability
+.PHONY: all sim tests check fonts hyphgen edition core clean fmt portability
 all: sim tests fonts
 
 core: $(CORE_OBJS)
@@ -54,6 +56,12 @@ portability:
 
 fontgen: $(BIN)/fontgen
 $(BIN)/fontgen: $(FONT_OBJS) $(CORE_OBJS)
+	@mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# Development-only: the generated table is checked in, so no build needs this.
+hyphgen: $(BIN)/hyphgen
+$(BIN)/hyphgen: $(HYPH_OBJS) $(CORE_OBJS)
 	@mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 

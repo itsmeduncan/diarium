@@ -163,6 +163,9 @@ bool parse_feeds_toml(const std::string& text, FeedList* out,
           return fail("front_page_columns must be between 1 and 4");
         }
         out->edition.front_page_columns = static_cast<int>(n);
+      } else if (key == "hyphenate") {
+        out->edition.hyphenate = !(value == "false" || value == "no" ||
+                                   value == "0" || value == "off");
       } else if (key == "body_alignment") {
         if (value == "justified" || value == "justify") {
           out->edition.body_alignment = Align::Justify;

@@ -40,6 +40,7 @@ struct ComposeOptions {
   int max_age_days = 3;
   int front_page_columns = 2;
   Align body_alignment = Align::Left;
+  bool hyphenate = true;
   // How many section headlines the front page lists per section.
   size_t front_page_per_section = 2;
   // How many feeds were configured, and which of them failed. Both appear on

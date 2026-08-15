@@ -35,6 +35,7 @@ support follows — tracked on the
 | Desktop simulator (PNG output)    | working — 8-bit, 3-bit and 1-bit dithered         |
 | HAL (six interfaces)              | working — simulator implements all six            |
 | Reader UI (gestures, page turns)  | working — open a story, come back, jump sections  |
+| Hyphenation (Liang/TeX patterns)  | working — justified text is now viable            |
 | OPML import                       | working                                           |
 | Edition persistence               | working — compose once, read from storage         |
 | HTTP fetcher with conditional GET | not started                                       |
@@ -152,5 +153,8 @@ when the device does.
 
 MIT. See [LICENSE](LICENSE).
 
-Bundled third-party material keeps its own terms: [Literata](assets/fonts/)
-(SIL Open Font License 1.1) and [stb](third_party/stb/) (public domain).
+Bundled third-party material keeps its own terms:
+[Literata](assets/fonts/) (SIL Open Font License 1.1),
+[hyphenation patterns](assets/hyphenation/) (all-permissive, notice
+preserved), [stb](third_party/stb/) (public domain) and
+[doctest](third_party/doctest/) (MIT).
