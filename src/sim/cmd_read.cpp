@@ -16,6 +16,8 @@
 #include "core/base/str.h"
 #include "core/config/feeds_config.h"
 #include "core/edition/edition.h"
+#include "core/edition/edition_store.h"
+#include "core/io/file_byte_source.h"
 #include "core/feed/feed_parser.h"
 #include "core/text/font_pack.h"
 #include "core/ui/reader.h"
@@ -104,12 +106,30 @@ int cmd_read(const std::vector<std::string>& args) {
     return 1;
   }
 
-  FixtureComposeOptions fixture_opts;
-  fixture_opts.fixtures_dir = fixtures_dir;
-  fixture_opts.fresh = true;
-  FixtureComposeReport report;
-  const Edition ed =
-      compose_from_fixtures(config, fonts, fixture_opts, &report);
+  // Prefer a saved edition, which is what the device does: composition
+  // happened at wake, and reading it again should cost nothing.
+  Edition ed;
+  const std::string load_path = flag(args, "--edition", "out/edition.rspe");
+  std::string blob;
+  bool loaded = false;
+  if (!has_flag(args, "--recompose") && read_file(load_path, &blob)) {
+    std::string load_error;
+    if (deserialize_edition(blob, &ed, &load_error)) {
+      loaded = true;
+      std::printf("loaded %s (%zu KB, no re-parse, no re-layout)\n",
+                  load_path.c_str(), blob.size() / 1024);
+    } else {
+      std::fprintf(stderr, "read: %s — composing instead\n",
+                   load_error.c_str());
+    }
+  }
+  if (!loaded) {
+    FixtureComposeOptions fixture_opts;
+    fixture_opts.fixtures_dir = fixtures_dir;
+    fixture_opts.fresh = true;
+    FixtureComposeReport report;
+    ed = compose_from_fixtures(config, fonts, fixture_opts, &report);
+  }
   if (ed.pages.empty()) {
     std::fprintf(stderr, "read: the edition is empty\n");
     return 1;

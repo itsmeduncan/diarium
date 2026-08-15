@@ -10,6 +10,8 @@
 #include "core/base/datetime.h"
 #include "core/config/feeds_config.h"
 #include "core/edition/edition.h"
+#include "core/edition/edition_store.h"
+#include "core/io/file_byte_source.h"
 #include "core/render/page_renderer.h"
 #include "core/text/font_pack.h"
 #include "sim/commands.h"
@@ -127,6 +129,20 @@ int cmd_compose(const std::vector<std::string>& args) {
   std::printf("  wrote %zu %s to %s/ (%s)\n", last,
               all_pages ? "pages" : "browse pages", out_dir.c_str(),
               depth_flag.c_str());
+
+  // Save the composed edition. On the device this is what makes reading cheap:
+  // compose once at wake, then every page turn is a blit from storage rather
+  // than a re-parse and a re-layout.
+  const std::string save_path = flag(args, "--save", out_dir + "/edition.rspe");
+  if (save_path != "-") {
+    const std::string blob = serialize_edition(ed);
+    if (!write_file(save_path, blob)) {
+      std::fprintf(stderr, "compose: cannot write %s\n", save_path.c_str());
+      return 1;
+    }
+    std::printf("  saved the edition to %s (%zu KB for %zu pages)\n",
+                save_path.c_str(), blob.size() / 1024, ed.pages.size());
+  }
 
   if (has_flag(args, "--index")) {
     std::printf("\n  lede page  tap region        story pages  title\n");
