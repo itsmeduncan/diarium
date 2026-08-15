@@ -22,6 +22,8 @@ void usage() {
                "page PNGs\n"
                "  read     [--config F] [--out D]   interactive reader over a "
                "composed edition\n"
+               "  opml     <subs.opml>...           import subscriptions as "
+               "feeds.toml\n"
                "\n"
                "Common flags:\n"
                "  --fonts  PATH   font pack (default build/literata.rfp)\n"
@@ -42,6 +44,7 @@ int main(int argc, char** argv) {
   if (cmd == "parse") return rsspaper::sim::cmd_parse(args);
   if (cmd == "compose") return rsspaper::sim::cmd_compose(args);
   if (cmd == "read") return rsspaper::sim::cmd_read(args);
+  if (cmd == "opml") return rsspaper::sim::cmd_opml(args);
   if (cmd == "-h" || cmd == "--help" || cmd == "help") {
     usage();
     return 0;

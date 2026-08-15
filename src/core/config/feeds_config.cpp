@@ -21,12 +21,45 @@ bool split_assignment(const std::string& line, std::string* key,
 
 // Unquotes a basic string; leaves bare values alone. Trailing comments after
 // a value are stripped, which TOML allows and people write.
+//
+// Escapes are honoured inside double quotes, because the writer emits them:
+// a section named `Odd "Section"` or a URL with a quote in its query string
+// round-trips only if both halves agree. Literal (single-quoted) strings take
+// no escapes, per TOML.
 std::string unquote(const std::string& raw) {
   std::string v = raw;
-  if (v.size() >= 2 && ((v.front() == '"' && v.back() == '"') ||
-                        (v.front() == '\'' && v.back() == '\''))) {
+
+  if (v.size() >= 2 && v.front() == '\'' && v.back() == '\'') {
     return v.substr(1, v.size() - 2);
   }
+
+  if (v.size() >= 2 && v.front() == '"' && v.back() == '"') {
+    const std::string body = v.substr(1, v.size() - 2);
+    std::string out;
+    out.reserve(body.size());
+    for (size_t i = 0; i < body.size(); ++i) {
+      if (body[i] != '\\' || i + 1 >= body.size()) {
+        out.push_back(body[i]);
+        continue;
+      }
+      const char esc = body[++i];
+      switch (esc) {
+        case 'n': out.push_back('\n'); break;
+        case 't': out.push_back('\t'); break;
+        case 'r': out.push_back('\r'); break;
+        case '"': out.push_back('"'); break;
+        case '\\': out.push_back('\\'); break;
+        // An escape we don't implement is passed through intact rather than
+        // silently eaten, so nothing is lost that a later version could read.
+        default:
+          out.push_back('\\');
+          out.push_back(esc);
+          break;
+      }
+    }
+    return out;
+  }
+
   const size_t hash = v.find('#');
   if (hash != std::string::npos) v = trim(v.substr(0, hash));
   return v;

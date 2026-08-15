@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+  <head>
+    <title>Subscriptions</title>
+    <dateCreated>Sat, 15 Aug 2026 08:00:00 GMT</dateCreated>
+  </head>
+  <body>
+    <outline text="Technology" title="Technology">
+      <outline type="rss" text="Daring Fireball" title="Daring Fireball"
+               xmlUrl="https://daringfireball.net/feeds/main"
+               htmlUrl="https://daringfireball.net/"/>
+      <outline type="rss" text="The Verge"
+               xmlUrl="https://www.theverge.com/rss/index.xml"/>
+      <outline text="Nested deeper">
+        <outline type="rss" text="Simon Willison"
+                 xmlUrl="https://simonwillison.net/atom/everything/"/>
+      </outline>
+    </outline>
+    <outline text="World news">
+      <outline type="rss" text="BBC News"
+               xmlUrl="https://feeds.bbci.co.uk/news/rss.xml"/>
+      <!-- the same feed again, as re-exported subscription lists often do -->
+      <outline type="rss" text="BBC News (duplicate)"
+               xmlUrl="https://feeds.bbci.co.uk/news/rss.xml"/>
+    </outline>
+    <outline type="rss" text="xkcd" xmlUrl="https://xkcd.com/rss.xml"/>
+    <outline text="An empty folder"/>
+    <outline type="link" text="Not a feed at all" htmlUrl="https://example.com/"/>
+  </body>
+</opml>

@@ -16,6 +16,7 @@ std::vector<std::string> positionals(const std::vector<std::string>& args);
 int cmd_parse(const std::vector<std::string>& args);
 int cmd_compose(const std::vector<std::string>& args);
 int cmd_read(const std::vector<std::string>& args);
+int cmd_opml(const std::vector<std::string>& args);
 
 }  // namespace sim
 }  // namespace rsspaper

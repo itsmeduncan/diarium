@@ -103,9 +103,13 @@ section = "Technology"
 max_items = 6
 ```
 
-OPML import is [issue #14](https://github.com/itsmeduncan/rsspaper/issues/14);
-the config module is shaped so a converter drops in without touching anything
-downstream.
+Already have a subscription list? Import it. Folders become sections, and
+nesting collapses to the outermost folder — a reader's sub-folders are
+refinements, not sections:
+
+```sh
+./bin/rsspaper-sim opml subscriptions.opml --out config/feeds.toml
+```
 
 ## Non-goals
 
