@@ -35,6 +35,8 @@ support follows — tracked on the
 | Desktop simulator (PNG output)    | working — 8-bit, 3-bit and 1-bit dithered         |
 | HAL (six interfaces)              | working — simulator implements all six            |
 | Reader UI (gestures, page turns)  | working — open a story, come back, jump sections  |
+| OPML import                       | working                                           |
+| Edition persistence               | working — compose once, read from storage         |
 | HTTP fetcher with conditional GET | not started                                       |
 | Inkplate 6FLICK target            | not started                                       |
 
