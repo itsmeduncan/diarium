@@ -40,6 +40,7 @@ Inspect the parser's view of a feed — the fastest way to diagnose a feed bug:
 
 ```sh
 ./bin/rsspaper-sim parse --verbose --max 5 test/fixtures/feeds/theverge.atom.xml
+./bin/rsspaper-sim opml test/fixtures/opml/subscriptions.opml
 ```
 
 Tests read `test/fixtures/` by relative path, so **run them from the repository
