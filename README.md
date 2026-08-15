@@ -22,7 +22,8 @@ URLs you configured. Nothing phones home, because there is no home to phone.
 
 Early. The desktop simulator and the parsing/layout core are being built first,
 because the page is the product and the page needs to be looked at. Hardware
-support follows.
+support follows — tracked on the
+[1.0.0 milestone](https://github.com/itsmeduncan/rsspaper/milestone/1).
 
 | Piece                             | State                                             |
 | --------------------------------- | ------------------------------------------------- |
@@ -102,8 +103,9 @@ section = "Technology"
 max_items = 6
 ```
 
-OPML import is a near-term follow-up; the config module is shaped so a
-converter drops in without touching anything downstream.
+OPML import is [issue #14](https://github.com/itsmeduncan/rsspaper/issues/14);
+the config module is shaped so a converter drops in without touching anything
+downstream.
 
 ## Non-goals
 
@@ -116,21 +118,29 @@ rather than guessed.
 ## Repository layout
 
 ```
-src/core/     portable C++17 — no Arduino, compiles on desktop
-  xml/        streaming pull parser
-  feed/       RSS/Atom → items
-  html/       HTML → block model
-  text/       font pack, glyph metrics
-  layout/     line breaking, pagination
-  render/     framebuffer, page drawing, dithering
-  edition/    composer, dedup, persistence
-  config/     feeds.toml
-src/hal/      hardware abstraction — the only portability seam
-src/sim/      desktop harness: PNG output, keyboard "touch"
-src/device/   Inkplate 6FLICK target
-tools/fontgen TTF → runtime font pack
-test/         unit tests and a corpus of real feeds
+src/core/               portable C++17 — no Arduino, compiles on desktop
+  base/                 strings, UTF-8, dates
+  io/                   ByteSource: the one input abstraction
+  xml/                  streaming pull parser, entities
+  feed/                 RSS/Atom → items
+  html/                 HTML → block model
+  text/                 font pack, glyph metrics, fallbacks
+  layout/               line breaking, pagination, the type scale
+  render/               framebuffer and page drawing
+  edition/              composer, seen-store dedup
+  config/               feeds.toml
+  ui/                   gesture recognition, the reader
+src/hal/                hardware abstraction — the only portability seam
+src/sim/                desktop harness: PNG output, keyboard "touch"
+tools/fontgen/          TTF → runtime font pack, including GPOS kerning
+tools/check-portability.sh   CI gate on the seam above
+test/                   unit tests and a corpus of real feeds
 ```
+
+`src/device/` — the Inkplate target — does not exist yet; see the milestone
+below. Dithering to the panel's bit depths currently lives in `src/sim/`,
+because so far only the simulator needs it; it moves into `src/core/render/`
+when the device does.
 
 ## Licence
 

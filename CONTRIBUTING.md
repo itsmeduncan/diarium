@@ -18,8 +18,9 @@ Features that are good ideas for a different product are still no.
 ## Working on it
 
 ```sh
-make check                       # unit tests
+make check                       # unit tests + the portability gate
 make edition                     # render pages from the fixture feeds
+make read                        # read the paper from the keyboard
 ./bin/rsspaper-sim parse f.xml   # see what the parser makes of a feed
 ```
 
@@ -30,7 +31,9 @@ above the HAL, and it writes PNGs you can actually look at.
 
 - **Nothing above the HAL includes a platform header.** If a change to
   `src/core/` needs `Arduino.h`, the design is wrong — the capability belongs
-  behind an interface in `src/hal/hal.h`.
+  behind an interface in `src/hal/hal.h`. `tools/check-portability.sh` enforces
+  this and runs in CI; `core/ui/reader` is the single deliberate exception,
+  since driving the display is its job.
 - **Nothing scales with input size.** Every buffer that touches feed data has a
   cap. If you add one, add its limit to the relevant `*Limits` struct.
 - **Parsers recover, they don't fail.** A malformed feed costs one story, never

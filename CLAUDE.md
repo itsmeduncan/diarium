@@ -21,6 +21,8 @@ make sim                  # bin/rsspaper-sim
 make tests && make check  # build and run the unit tests
 make fonts                # build/literata.rfp from assets/fonts/*.ttf
 make edition              # compose from fixtures into out/ as PNGs
+make read                 # drive the reader from the keyboard
+make portability          # the no-platform-headers gate (also part of check)
 make clean
 
 cmake -B build && cmake --build build   # same targets; what CI runs
@@ -85,6 +87,13 @@ Key boundaries worth understanding before changing anything:
   `itunes:summary` never reach the article body.
 - **`core/text/faces.h`** is the type palette, shared by `tools/fontgen` and
   the runtime so a pack can't disagree with the code that reads it.
+  `fallback_codepoint` decides what happens to a character the face lacks:
+  substitute, drop, or tofu. Everything routes through `Face::resolve`, so
+  measuring and drawing can't disagree about what a glyph costs.
+- **`core/ui/`** is the top of the portable stack. `gesture.h` turns touch
+  points into intentions — note that release coordinates are ignored, because
+  a released panel reports none — and `reader.h` is the only thing in
+  `src/core/` allowed to drive the HAL.
 
 ### Invariants
 
@@ -94,6 +103,8 @@ Key boundaries worth understanding before changing anything:
 - **Parsers recover, they never abort.** A malformed feed costs one story.
 - **Sizes are physical.** The panel is ~212 PPI; 27 px body text is ~9.2 pt.
   Choosing sizes that look right on a monitor produces large print on device.
+- **No platform headers above `src/hal/`.** `tools/check-portability.sh`
+  enforces it, runs in `make check`, and gates CI.
 
 ## Conventions
 

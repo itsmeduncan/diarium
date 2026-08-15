@@ -218,11 +218,17 @@ Everything else in the core takes data and returns data.
 
 ## Open questions
 
-- **Body weight on e-ink**: Regular may render thin on a reflective panel.
-  Literata Medium as the body face is a one-line change in `faces.cpp` if the
-  rendered pages look weak.
-- **Hyphenation**: still a stub. Justified text in the narrow front-page
-  columns will want real hyphenation (Liang/TeX patterns, ~25 KB for English).
-  Ragged-right is the default, so this is not urgent.
-- **Section budget**: `max_items` is spent in section order, so a low ceiling
-  can drop a whole trailing section. A per-section floor would be fairer.
+Tracked as issues, so there is one place to update rather than two:
+
+- [#17](https://github.com/itsmeduncan/rsspaper/issues/17) — body weight on a
+  reflective panel. Literata Regular may render thin; Medium is a one-line
+  change in `faces.cpp`. Needs hardware, not a monitor.
+- [#13](https://github.com/itsmeduncan/rsspaper/issues/13) — hyphenation is
+  still a stub interface. Ragged-right is the default precisely because of it.
+- [#12](https://github.com/itsmeduncan/rsspaper/issues/12) — `max_items` is
+  spent in section order, so a low ceiling can drop a whole trailing section.
+- [#7](https://github.com/itsmeduncan/rsspaper/issues/7) — the refresh policy
+  exists but `partial_turns_before_full` is a guess until it can be measured.
+
+The full list is the
+[1.0.0 milestone](https://github.com/itsmeduncan/rsspaper/milestone/1).
