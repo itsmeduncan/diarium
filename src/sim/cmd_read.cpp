@@ -37,6 +37,8 @@ void print_help() {
       "  1-9         open the Nth story on this page   (tap a lede)\n"
       "  b           back to where you were     (swipe up in the overlay)\n"
       "  s           section list               (swipe down)\n"
+      "  c           clippings\n"
+      "  h           hold — fold this story's corner   (long press)\n"
       "  t X Y       tap an exact point, for checking hit regions\n"
       "  ?           this help\n"
       "  q           quit\n"
@@ -152,6 +154,7 @@ int cmd_read(const std::vector<std::string>& args) {
   hal.http = &http;
 
   Reader reader(ed, fonts, hal);
+  reader.load_clippings("clippings.dat");
   reader.render();
 
   std::printf("RSSpaper — %s\n", format_masthead_date(ed.date).c_str());
@@ -194,6 +197,19 @@ int cmd_read(const std::vector<std::string>& args) {
       changed = true;
     } else if (cmd == "b") {
       changed = reader.back();
+    } else if (cmd == "c") {
+      changed = reader.toggle_clippings_view();
+    } else if (cmd == "h" || cmd[0] == 'h') {
+      // A long press where the first lede is, or on the open story.
+      int hx = kPageWidth / 2, hy = kPageHeight / 2;
+      if (!ledes.empty()) {
+        hx = ledes[0]->lede_bounds.x + ledes[0]->lede_bounds.w / 2;
+        hy = ledes[0]->lede_bounds.y + ledes[0]->lede_bounds.h / 2;
+      }
+      const bool saved = reader.toggle_clipping_at(hx, hy);
+      std::printf("  %s (%zu clipped)\n", saved ? "clipped" : "unclipped",
+                  reader.clippings().size());
+      changed = true;
     } else if (cmd[0] == 't') {
       int x = 0, y = 0;
       if (std::sscanf(cmd.c_str(), "t %d %d", &x, &y) == 2) {

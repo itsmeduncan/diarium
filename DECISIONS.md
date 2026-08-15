@@ -241,6 +241,22 @@ telling a reader where one ends and the next begins — and running paragraphs
 together, which is what the type scale did until now, made body text a slab.
 One em, and none on the paragraph that opens a story.
 
+### 25. Clippings are a folded corner, not a service
+
+No tags, no folders, no sync, no export, no unread state. A saved story keeps
+its headline, where it came from, and when you saved it, and survives the
+edition it was cut from. The list is capped — a folder that only grows is a
+slow leak on a device with no eviction policy — and the oldest falls off.
+
+`StoryRef` gained a stable key (the item's dedup key) so a clipping saved on
+Tuesday can find its story again in Thursday's edition. Tapping one that isn't
+in the current edition does nothing: it still has its headline, but there is
+nothing to turn to. That bumped the edition format to version 2.
+
+Row geometry for both overlays lives in one constant per view, used by the
+drawing and the hit test, because a tap landing on the row above the one under
+your finger is the kind of bug that only shows up on hardware.
+
 ---
 
 ## Open questions

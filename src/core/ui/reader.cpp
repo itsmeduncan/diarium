@@ -1,6 +1,7 @@
 #include "core/ui/reader.h"
 
 #include "core/base/str.h"
+#include "core/edition/clippings.h"
 #include "core/layout/type_scale.h"
 
 namespace rsspaper {
@@ -39,7 +40,9 @@ void Reader::set_page(size_t page, bool context_change) {
 }
 
 bool Reader::next_page() {
-  if (mode_ == ReaderMode::Sections) return false;
+  if (mode_ == ReaderMode::Sections || mode_ == ReaderMode::Clippings) {
+    return false;
+  }
 
   if (mode_ == ReaderMode::Story) {
     const StoryRef* s = open_story();
@@ -62,7 +65,9 @@ bool Reader::next_page() {
 }
 
 bool Reader::previous_page() {
-  if (mode_ == ReaderMode::Sections) return false;
+  if (mode_ == ReaderMode::Sections || mode_ == ReaderMode::Clippings) {
+    return false;
+  }
 
   if (mode_ == ReaderMode::Story) {
     const StoryRef* s = open_story();
@@ -96,6 +101,12 @@ bool Reader::open_story_at(int x, int y) {
 }
 
 bool Reader::back() {
+  if (mode_ == ReaderMode::Clippings) {
+    mode_ = ReaderMode::Browse;
+    needs_render_ = true;
+    pending_context_change_ = true;
+    return true;
+  }
   if (mode_ == ReaderMode::Sections) {
     mode_ = have_story_ ? ReaderMode::Story : ReaderMode::Browse;
     needs_render_ = true;
@@ -107,6 +118,71 @@ bool Reader::back() {
   mode_ = ReaderMode::Browse;
   have_story_ = false;
   set_page(return_page_, true);
+  return true;
+}
+
+void Reader::load_clippings(const std::string& path) {
+  clippings_path_ = path;
+  if (hal_.storage == nullptr) return;
+  std::string blob;
+  if (!hal_.storage->read(path, &blob)) return;  // none saved yet
+  std::string error;
+  Clippings loaded;
+  if (deserialize_clippings(blob, &loaded, &error)) clippings_ = loaded;
+}
+
+void Reader::save_clippings() {
+  if (hal_.storage == nullptr || clippings_path_.empty()) return;
+  hal_.storage->write(clippings_path_, serialize_clippings(clippings_));
+}
+
+Clipping Reader::clipping_for(const StoryRef& story) const {
+  Clipping c;
+  c.key = story.key;
+  c.title = story.title;
+  c.section = story.section;
+  c.source = story.source;
+  c.saved = hal_.clock != nullptr ? hal_.clock->now() : edition_.date;
+  c.published = edition_.date;
+  return c;
+}
+
+bool Reader::toggle_clipping_at(int x, int y) {
+  const StoryRef* target = nullptr;
+  if (mode_ == ReaderMode::Story) {
+    target = open_story();
+  } else if (mode_ == ReaderMode::Browse) {
+    target = edition_.story_at(page_, x, y);
+  } else if (mode_ == ReaderMode::Clippings) {
+    // In the list, a long press takes it back out again.
+    const size_t row = clipping_row_at(y);
+    if (row < clippings_.all().size()) {
+      clippings_.remove(clippings_.all()[row].key);
+      save_clippings();
+      needs_render_ = true;
+      pending_context_change_ = true;
+    }
+    return false;
+  }
+  if (target == nullptr) return false;
+
+  const bool saved = clippings_.toggle(clipping_for(*target));
+  save_clippings();
+  needs_render_ = true;
+  pending_context_change_ = true;
+  return saved;
+}
+
+bool Reader::toggle_clippings_view() {
+  if (mode_ == ReaderMode::Clippings) {
+    mode_ = ReaderMode::Browse;
+    needs_render_ = true;
+    pending_context_change_ = true;
+    return true;
+  }
+  mode_ = ReaderMode::Clippings;
+  needs_render_ = true;
+  pending_context_change_ = true;
   return true;
 }
 
@@ -136,25 +212,39 @@ bool Reader::handle(const GestureEvent& event) {
     case Gesture::SwipeDown:
       return toggle_sections();
     case Gesture::SwipeUp:
-      return mode_ == ReaderMode::Sections ? back() : false;
+      return (mode_ == ReaderMode::Sections || mode_ == ReaderMode::Clippings)
+                 ? back()
+                 : false;
     case Gesture::Tap:
       if (mode_ == ReaderMode::Sections) {
-        // The overlay lists sections down the page; pick by row.
-        const int row_height = 64;
-        const int first_y = 180;
-        if (event.y >= first_y) {
-          const size_t index =
-              static_cast<size_t>((event.y - first_y) / row_height);
-          return jump_to_section(index);
-        }
+        const size_t rows = edition_.section_marks.size();
+        const size_t index = section_row_at(event.y);
+        if (index == rows) return toggle_clippings_view();  // the last row
+        if (index < rows) return jump_to_section(index);
         return back();
+      }
+      if (mode_ == ReaderMode::Clippings) {
+        const size_t row = clipping_row_at(event.y);
+        if (row >= clippings_.all().size()) return back();
+        // Open it if this edition still carries the story; a clipping from
+        // last Tuesday has a headline but nothing to turn to.
+        const uint64_t key = clippings_.all()[row].key;
+        for (size_t i = 0; i < edition_.stories.size(); ++i) {
+          if (edition_.stories[i].key != key) continue;
+          story_index_ = i;
+          have_story_ = true;
+          return_page_ = edition_.stories[i].lede_page;
+          mode_ = ReaderMode::Story;
+          set_page(edition_.stories[i].first_page, true);
+          return true;
+        }
+        return false;
       }
       if (mode_ == ReaderMode::Story) return false;
       return open_story_at(event.x, event.y);
     case Gesture::LongPress:
-      // Clippings land here (issue #10). Deliberately inert for now rather
-      // than doing something surprising.
-      return false;
+      toggle_clipping_at(event.x, event.y);
+      return true;
     case Gesture::None:
       return false;
   }
@@ -175,6 +265,81 @@ bool Reader::tick() {
   return true;
 }
 
+namespace {
+constexpr int kOverlayFirstY = 180;
+constexpr int kOverlayRowHeight = 64;
+// A clipping is two lines — headline and provenance — so its rows are taller
+// than a section's, and the hit test has to use the same number the drawing
+// does or a tap lands on the neighbour.
+constexpr int kClippingRowHeight = 86;
+}  // namespace
+
+size_t Reader::section_row_at(int y) const {
+  if (y < kOverlayFirstY) return static_cast<size_t>(-1);
+  return static_cast<size_t>((y - kOverlayFirstY) / kOverlayRowHeight);
+}
+
+size_t Reader::clipping_row_at(int y) const {
+  if (y < kOverlayFirstY) return static_cast<size_t>(-1);
+  return static_cast<size_t>((y - kOverlayFirstY) / kClippingRowHeight);
+}
+
+void Reader::render_clippings() {
+  Framebuffer& fb = hal_.display->framebuffer();
+  fb.fill(kPaper);
+
+  const Face& head = fonts_.face(FaceId::Head);
+  const Face& body = fonts_.face(FaceId::BodyBold);
+  const Face& meta = fonts_.face(FaceId::Meta);
+
+  int y = 70;
+  if (head.valid()) {
+    fb.draw_text(head, "Clippings", kSideMargin * kSubpixel, y, kInk);
+    y += head.descent() + 24;
+    fb.fill_rect(kSideMargin, y, kPageWidth - 2 * kSideMargin, 2, kInk);
+  }
+
+  if (clippings_.empty() && meta.valid()) {
+    fb.draw_text(meta,
+                 "Nothing saved yet. Hold a story to fold its corner over.",
+                 kSideMargin * kSubpixel, kOverlayFirstY + meta.ascent(), 110);
+  }
+
+  y = kOverlayFirstY;
+  for (const Clipping& c : clippings_.all()) {
+    if (y + kClippingRowHeight > kPageHeight - 60) break;
+    if (body.valid()) {
+      std::string title = c.title;
+      // One line: the list is a list, not a page of headlines.
+      while (!title.empty() &&
+             body.measure(title) >
+                 (kPageWidth - 2 * kSideMargin - 40) * kSubpixel) {
+        title.resize(title.size() - 1);
+      }
+      if (title != c.title && title.size() > 1) {
+        title.resize(title.size() - 1);
+        title += "\xE2\x80\xA6";
+      }
+      fb.draw_text(body, title, kSideMargin * kSubpixel, y + body.ascent(),
+                   kInk);
+    }
+    if (meta.valid()) {
+      std::string sub = c.source;
+      if (!c.section.empty()) sub += sub.empty() ? c.section : "  ·  " + c.section;
+      if (c.saved != kNoDate) sub += "  ·  saved " + format_short_date(c.saved);
+      fb.draw_text(meta, sub, kSideMargin * kSubpixel,
+                   y + body.ascent() + meta.ascent() + 6, 100);
+    }
+    y += kClippingRowHeight;
+    fb.fill_rect(kSideMargin, y - 22, kPageWidth - 2 * kSideMargin, 1, 205);
+  }
+
+  if (meta.valid()) {
+    fb.draw_text(meta, "Hold a clipping to remove it  ·  swipe up to go back",
+                 kSideMargin * kSubpixel, kPageHeight - 40, 120);
+  }
+}
+
 void Reader::render_section_overlay() {
   Framebuffer& fb = hal_.display->framebuffer();
   fb.fill(kPaper);
@@ -190,8 +355,8 @@ void Reader::render_section_overlay() {
     fb.fill_rect(kSideMargin, y, kPageWidth - 2 * kSideMargin, 2, kInk);
   }
 
-  y = 180;
-  const int row_height = 64;
+  y = kOverlayFirstY;
+  const int row_height = kOverlayRowHeight;
   for (size_t i = 0; i < edition_.section_marks.size(); ++i) {
     const Edition::SectionMark& m = edition_.section_marks[i];
     if (y + row_height > kPageHeight - 60) break;
@@ -209,6 +374,13 @@ void Reader::render_section_overlay() {
     fb.fill_rect(kSideMargin, y - 18, kPageWidth - 2 * kSideMargin, 1, 190);
   }
 
+  // Clippings sit at the end of the list: the only other place to go.
+  if (body.valid() && y + row_height <= kPageHeight - 60) {
+    const std::string label =
+        "Clippings (" + std::to_string(clippings_.size()) + ")";
+    fb.draw_text(body, label, kSideMargin * kSubpixel, y + body.ascent(), kInk);
+  }
+
   if (meta.valid()) {
     const std::string hint = "Swipe up or tap the heading to go back";
     fb.draw_text(meta, hint, kSideMargin * kSubpixel, kPageHeight - 40, 120);
@@ -221,6 +393,8 @@ void Reader::render() {
 
   if (mode_ == ReaderMode::Sections) {
     render_section_overlay();
+  } else if (mode_ == ReaderMode::Clippings) {
+    render_clippings();
   } else {
     if (page_ >= edition_.pages.size()) return;
     renderer_.render(edition_.pages[page_], &hal_.display->framebuffer());
@@ -243,6 +417,8 @@ std::string Reader::position() const {
   switch (mode_) {
     case ReaderMode::Sections:
       return "sections";
+    case ReaderMode::Clippings:
+      return "clippings (" + std::to_string(clippings_.size()) + ")";
     case ReaderMode::Story: {
       const StoryRef* s = open_story();
       if (s == nullptr) return "story";

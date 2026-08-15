@@ -329,8 +329,10 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
       }
 
       StoryRef ref;
+      ref.key = it.dedup_key();
       ref.title = it.title;
       ref.section = s.name;
+      ref.source = it.source_name;
       ref.truncated = it.looks_truncated();
       ed.stories.push_back(std::move(ref));
 
