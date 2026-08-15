@@ -27,11 +27,14 @@
 namespace rsspaper {
 
 enum class ReaderMode : uint8_t {
-  Browse,    // the ledes: front page and section pages
+  Browse,    // the ledes, the front page, and the colophon that ends them
   Story,     // the full text of a story you opened
   Sections,  // the jump list
-  End,       // you have reached the end of the paper
 };
+
+// The last browse page is the colophon: it says the paper has ended, and why
+// it is the length it is. That is a composed page rather than a special screen
+// so it persists with the edition and needs no rendering of its own.
 
 struct ReaderPolicy {
   // Partial refreshes between full ones. E-ink ghosting accumulates; this is

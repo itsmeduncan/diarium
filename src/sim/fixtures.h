@@ -46,6 +46,8 @@ struct FixtureComposeReport {
   size_t dropped_seen = 0;
   Epoch date = kNoDate;
   std::vector<std::string> problems;
+  // The same failures, in the shape the colophon prints.
+  std::vector<FeedProblem> feed_problems;
 };
 
 Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,

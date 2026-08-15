@@ -59,12 +59,14 @@ int cmd_compose(const std::vector<std::string>& args) {
   for (const std::string& problem : report.problems) {
     std::fprintf(stderr, "compose: %s (skipping)\n", problem.c_str());
   }
-  if (ed.pages.empty()) {
+  if (ed.stats.items_published == 0) {
+    // Still rendered: the colophon says there were no stories and why, which
+    // is what the device would show. A blank screen is indistinguishable from
+    // a broken one.
     std::fprintf(stderr,
-                 "compose: the edition is empty — every story was filtered "
-                 "out. Try --fresh to ignore the seen-store, or raise "
-                 "max_age_days.\n");
-    return 1;
+                 "compose: no stories made the edition — try --fresh to ignore "
+                 "the seen-store, or raise max_age_days. Writing the colophon "
+                 "anyway.\n");
   }
 
   const PageRenderer renderer(fonts);

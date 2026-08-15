@@ -54,30 +54,15 @@ bool Reader::next_page() {
     return true;
   }
 
-  if (page_ + 1 >= edition_.browse_page_count) {
-    // The last page of the paper. Say so rather than silently doing nothing —
-    // "you are finished" is the whole product.
-    if (mode_ != ReaderMode::End) {
-      mode_ = ReaderMode::End;
-      needs_render_ = true;
-      pending_context_change_ = true;
-      return true;
-    }
-    return false;
-  }
+  // The last browse page is the colophon, which already says the paper has
+  // ended. There is nothing after it.
+  if (page_ + 1 >= edition_.browse_page_count) return false;
   set_page(page_ + 1, false);
   return true;
 }
 
 bool Reader::previous_page() {
   if (mode_ == ReaderMode::Sections) return false;
-
-  if (mode_ == ReaderMode::End) {
-    mode_ = ReaderMode::Browse;
-    needs_render_ = true;
-    pending_context_change_ = true;
-    return true;
-  }
 
   if (mode_ == ReaderMode::Story) {
     const StoryRef* s = open_story();
@@ -113,12 +98,6 @@ bool Reader::open_story_at(int x, int y) {
 bool Reader::back() {
   if (mode_ == ReaderMode::Sections) {
     mode_ = have_story_ ? ReaderMode::Story : ReaderMode::Browse;
-    needs_render_ = true;
-    pending_context_change_ = true;
-    return true;
-  }
-  if (mode_ == ReaderMode::End) {
-    mode_ = ReaderMode::Browse;
     needs_render_ = true;
     pending_context_change_ = true;
     return true;
@@ -242,25 +221,6 @@ void Reader::render() {
 
   if (mode_ == ReaderMode::Sections) {
     render_section_overlay();
-  } else if (mode_ == ReaderMode::End) {
-    Framebuffer& fb = hal_.display->framebuffer();
-    fb.fill(kPaper);
-    const Face& head = fonts_.face(FaceId::Head);
-    const Face& meta = fonts_.face(FaceId::Meta);
-    if (head.valid()) {
-      const std::string done = "That's the paper.";
-      const int w = head.measure(done);
-      fb.draw_text(head, done, (kPageWidth * kSubpixel - w) / 2,
-                   kPageHeight / 2, kInk);
-    }
-    if (meta.valid()) {
-      const std::string sub =
-          std::to_string(edition_.stats.items_published) + " stories · " +
-          format_masthead_date(edition_.date);
-      const int w = meta.measure(sub);
-      fb.draw_text(meta, sub, (kPageWidth * kSubpixel - w) / 2,
-                   kPageHeight / 2 + 60, 110);
-    }
   } else {
     if (page_ >= edition_.pages.size()) return;
     renderer_.render(edition_.pages[page_], &hal_.display->framebuffer());
@@ -283,8 +243,6 @@ std::string Reader::position() const {
   switch (mode_) {
     case ReaderMode::Sections:
       return "sections";
-    case ReaderMode::End:
-      return "end of the paper";
     case ReaderMode::Story: {
       const StoryRef* s = open_story();
       if (s == nullptr) return "story";

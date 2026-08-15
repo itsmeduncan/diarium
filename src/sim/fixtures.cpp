@@ -139,12 +139,14 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
     if (file.empty()) {
       ++local.unresolved_feeds;
       local.problems.push_back("no fixture for " + feed.url);
+      local.feed_problems.push_back(FeedProblem{feed.url, "no fixture"});
       continue;
     }
     FileByteSource src(opts.fixtures_dir + "/" + file);
     if (!src.ok()) {
       ++local.unresolved_feeds;
       local.problems.push_back("cannot open " + file);
+      local.feed_problems.push_back(FeedProblem{feed.url, "could not be read"});
       continue;
     }
     ++local.feeds_read;
@@ -196,6 +198,8 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
   compose_opts.max_age_days = config.edition.max_age_days;
   compose_opts.front_page_columns = config.edition.front_page_columns;
   compose_opts.body_alignment = config.edition.body_alignment;
+  compose_opts.feeds_configured = config.feeds.size();
+  compose_opts.feed_problems = local.feed_problems;
 
   Edition ed = compose_edition(std::move(sections), fonts, compose_opts);
   if (report != nullptr) *report = local;
