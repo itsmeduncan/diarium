@@ -1,0 +1,114 @@
+# RSSpaper
+
+**A newspaper, not a feed.**
+
+RSSpaper is an e-ink RSS reader that behaves like a morning paper. It wakes up,
+fetches your feeds, composes a finite edition with a front page and sections,
+and then it is done. You read it, you reach the end, you put it down.
+
+There is no infinite scroll. There are no unread counts, no badges, no
+notifications, no engagement mechanics, and no algorithmic curation. Stories
+run in reverse-chronological order within their section, which is the whole of
+the ranking logic and always will be.
+
+**Everything runs on the device.** There is no server, no account, and no
+companion app. The only network requests RSSpaper ever makes are to the feed
+URLs you configured. Nothing phones home, because there is no home to phone.
+
+## Status
+
+Early. The desktop simulator and the parsing/layout core are being built first,
+because the page is the product and the page needs to be looked at. Hardware
+support follows.
+
+| Piece                             | State                                    |
+| --------------------------------- | ---------------------------------------- |
+| Streaming XML parser              | working                                  |
+| RSS 2.0 / RSS 1.0 / Atom parser   | working, exercised against 12 real feeds |
+| HTML → block model                | working                                  |
+| Type + layout engine              | in progress                              |
+| Edition composer                  | in progress                              |
+| Desktop simulator (PNG output)    | in progress                              |
+| HTTP fetcher with conditional GET | not started                              |
+| Inkplate 6FLICK target            | not started                              |
+
+## Hardware
+
+The first target is the [Soldered Inkplate
+6FLICK](https://soldered.com/product/inkplate-6flick/): ESP32, 8 MB PSRAM, a 6"
+1024×758 panel with ~225 ms 1-bit partial refresh and ~1.26 s 3-bit greyscale
+full refresh, capacitive touch, a 64-step frontlight, and ~23 µA in deep sleep.
+
+Nothing above the HAL includes an Inkplate header. Porting to another
+ESP32-class e-ink board means implementing `src/hal/hal.h` — display, touch,
+clock, power, storage, network — and nothing else.
+
+## Building
+
+The desktop simulator runs the same pipeline the device runs, renders pages to
+PNG at the panel's exact 1024×758 geometry, and fakes touch from the keyboard.
+
+```sh
+make sim        # bin/rsspaper-sim
+make check      # run the unit tests
+make edition    # compose an edition into out/ — not landed yet
+```
+
+`make` needs nothing but a C++17 compiler. If you have CMake, `cmake -B build
+&& cmake --build build` builds the same targets and is what CI uses.
+
+Inspect what the parser makes of a feed:
+
+```sh
+./bin/rsspaper-sim parse --verbose test/fixtures/feeds/*.xml
+```
+
+## Configuration
+
+Feeds live in a single `config/feeds.toml` on device storage — a URL, a section
+name, and how many items to take:
+
+```toml
+[[feed]]
+url     = "https://daringfireball.net/feeds/main"
+section = "Technology"
+max_items = 6
+```
+
+OPML import is a near-term follow-up; the config module is shaped so a
+converter drops in without touching anything downstream.
+
+## Non-goals
+
+No server component. No EPUB or OPDS. No read-later integrations. No AI. No
+full-text extraction of truncated feeds in v1 — RSSpaper renders what the feed
+publishes, and records per item whether the publisher looked like they held
+something back, so the value of a v2 readability extractor can be measured
+rather than guessed.
+
+## Repository layout
+
+```
+src/core/     portable C++17 — no Arduino, compiles on desktop
+  xml/        streaming pull parser
+  feed/       RSS/Atom → items
+  html/       HTML → block model
+  text/       font pack, glyph metrics
+  layout/     line breaking, pagination
+  render/     framebuffer, page drawing, dithering
+  edition/    composer, dedup, persistence
+  config/     feeds.toml
+src/hal/      hardware abstraction — the only portability seam
+src/sim/      desktop harness: PNG output, keyboard "touch"
+src/device/   Inkplate 6FLICK target
+tools/fontgen TTF → runtime font pack
+test/         unit tests and a corpus of real feeds
+```
+
+## Licence
+
+**Not yet chosen** — see `LICENSE`. Pick MIT or AGPL before the first public
+release.
+
+Bundled third-party material keeps its own terms: [Literata](assets/fonts/)
+(SIL Open Font License 1.1) and [stb](third_party/stb/) (public domain).

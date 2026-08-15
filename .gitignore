@@ -1,0 +1,17 @@
+# >>> claude-agents managed (DO NOT EDIT THIS BLOCK) >>>
+.claude/.toolkit-last-seen-sha
+.claude/.toolkit-setup-done
+.claude/.claude-agents.conf
+# <<< claude-agents managed <<<
+
+# Build output
+build/
+bin/
+out/
+.pio/
+compile_commands.json
+
+# Editor / OS
+.DS_Store
+*.swp
+.cache/

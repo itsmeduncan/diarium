@@ -1,0 +1,21 @@
+TODO: pick a licence before the first public release.
+
+The brief called for MIT or AGPL and left the choice open. The tradeoff:
+
+  MIT   — maximum adoption. Anyone can ship a closed-source e-ink reader built
+          on this core, including a hardware vendor who never contributes back.
+
+  AGPL  — improvements to a distributed derivative must be published. For a
+          device that runs entirely on-device with no network service, the
+          "network use" clause that makes AGPL distinctive rarely triggers, so
+          in practice it behaves close to GPLv3 here.
+
+Whichever is chosen, replace this file with its full text and add the matching
+SPDX identifier to the source headers.
+
+Third-party material bundled in this repository keeps its own terms and is not
+affected by this choice:
+
+  assets/fonts/       Literata — SIL Open Font License 1.1 (see OFL.txt)
+  third_party/stb/    stb_truetype.h, stb_image_write.h — public domain
+  third_party/doctest doctest.h — MIT

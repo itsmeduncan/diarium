@@ -1,0 +1,73 @@
+# RSSpaper edition configuration.
+#
+# This is the whole of the user-facing configuration. It lives on device
+# storage (LittleFS or SD) and is read at wake. Section order here is section
+# order in the paper.
+
+[edition]
+# Local time to wake, compose and go back to sleep. 24-hour.
+wake_at = "05:30"
+# Hard ceiling on the edition. A paper that never ends is a feed.
+max_items = 40
+# "justified" or "ragged". Justified needs hyphenation to look right in the
+# narrow front-page columns.
+body_alignment = "ragged"
+# Two-column front page, single-column article pages.
+front_page_columns = 2
+# Drop stories older than this many days, however recently they appeared.
+max_age_days = 3
+
+[[feed]]
+url = "https://daringfireball.net/feeds/main"
+section = "Technology"
+max_items = 6
+
+[[feed]]
+url = "https://www.theverge.com/rss/index.xml"
+section = "Technology"
+max_items = 5
+
+[[feed]]
+url = "https://feeds.arstechnica.com/arstechnica/index"
+section = "Technology"
+max_items = 5
+
+[[feed]]
+url = "https://simonwillison.net/atom/everything/"
+section = "Technology"
+max_items = 4
+
+[[feed]]
+url = "https://feeds.bbci.co.uk/news/rss.xml"
+section = "World"
+max_items = 8
+
+[[feed]]
+url = "https://www.theguardian.com/world/rss"
+section = "World"
+max_items = 6
+
+[[feed]]
+url = "https://www.nasa.gov/feed/"
+section = "Science"
+max_items = 4
+
+[[feed]]
+url = "https://astralcodexten.substack.com/feed"
+section = "Essays"
+max_items = 3
+
+[[feed]]
+url = "https://craigmod.com/index.xml"
+section = "Essays"
+max_items = 3
+
+[[feed]]
+url = "https://feeds.kottke.org/main"
+section = "Miscellany"
+max_items = 5
+
+[[feed]]
+url = "https://xkcd.com/rss.xml"
+section = "Miscellany"
+max_items = 2

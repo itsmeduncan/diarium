@@ -1,0 +1,70 @@
+# Desktop build for RSSpaper — simulator, tests and the font packer.
+#
+# This exists so a fresh clone can build with nothing but a C++17 compiler.
+# CMakeLists.txt builds the same targets and is what CI uses; if you have
+# cmake, prefer it. The two must stay in sync.
+#
+#   make sim      -> bin/rsspaper-sim
+#   make tests    -> bin/rsspaper-tests  (and `make check` runs them)
+#   make fonts    -> build/literata.rfp
+#   make edition  -> renders PNGs from the fixture feeds into out/
+
+CXX      ?= c++
+CXXFLAGS ?= -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Wshadow
+INCLUDES  = -Isrc -Ithird_party -Ithird_party/stb -Ithird_party/doctest
+BUILD     = build
+BIN       = bin
+
+CORE_SRCS := $(shell find src/core -name '*.cpp' 2>/dev/null | sort)
+SIM_SRCS  := $(shell find src/sim src/hal -name '*.cpp' 2>/dev/null | sort)
+TEST_SRCS := $(shell find test -name '*.cpp' 2>/dev/null | sort)
+FONT_SRCS := tools/fontgen/fontgen.cpp
+
+CORE_OBJS := $(CORE_SRCS:%.cpp=$(BUILD)/%.o)
+SIM_OBJS  := $(SIM_SRCS:%.cpp=$(BUILD)/%.o)
+TEST_OBJS := $(TEST_SRCS:%.cpp=$(BUILD)/%.o)
+FONT_OBJS := $(FONT_SRCS:%.cpp=$(BUILD)/%.o)
+
+FONT_PACK := $(BUILD)/literata.rfp
+
+.PHONY: all sim tests check fonts edition core clean fmt
+all: sim tests fonts
+
+core: $(CORE_OBJS)
+
+sim: $(BIN)/rsspaper-sim
+$(BIN)/rsspaper-sim: $(CORE_OBJS) $(SIM_OBJS)
+	@mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+tests: $(BIN)/rsspaper-tests
+$(BIN)/rsspaper-tests: $(CORE_OBJS) $(TEST_OBJS)
+	@mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+check: $(BIN)/rsspaper-tests
+	$(BIN)/rsspaper-tests
+
+fontgen: $(BIN)/fontgen
+$(BIN)/fontgen: $(FONT_OBJS)
+	@mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+fonts: $(FONT_PACK)
+$(FONT_PACK): $(BIN)/fontgen $(wildcard assets/fonts/*.ttf)
+	@mkdir -p $(BUILD)
+	$(BIN)/fontgen --fonts assets/fonts --out $(FONT_PACK)
+
+edition: sim fonts
+	@mkdir -p out
+	$(BIN)/rsspaper-sim compose --config config/feeds.toml --fonts $(FONT_PACK) --out out
+
+# Pattern rule with automatic dependency generation.
+$(BUILD)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+
+-include $(shell find $(BUILD) -name '*.d' 2>/dev/null)
+
+clean:
+	rm -rf $(BUILD) $(BIN) out

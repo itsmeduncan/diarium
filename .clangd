@@ -1,0 +1,9 @@
+CompileFlags:
+  Add:
+    - -std=c++17
+    - -xc++
+    - -I.
+    - -Isrc
+    - -Ithird_party
+    - -Ithird_party/stb
+    - -Ithird_party/doctest
