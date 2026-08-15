@@ -194,6 +194,26 @@ turned out to strand a section label at the foot of a column whenever the lede
 under it was tall. `c.dirty` already prevents looping (after advancing, the
 frame is clean and the group is placed regardless), so the guard was removed.
 
+### 21. Release coordinates are not part of a gesture
+
+A released touch panel reports no points, so whatever x,y a caller passes with
+`touching = false` is meaningless. `GestureRecognizer` measures from the last
+position seen while the finger was down, which means a caller has to poll
+during the stroke and not only at its ends.
+
+This is worth stating because the obvious test — press here, release there —
+passes for the wrong reason on a naive implementation and fails on a correct
+one. The contract is in the header.
+
+### 22. Only the reader touches the HAL
+
+`src/core/` is portable, and `tools/check-portability.sh` enforces it in CI:
+no Arduino, Inkplate, WiFi, SD or ESP-IDF headers above `src/hal/`, and no
+`#include "hal/..."` inside `src/core/` except `core/ui/reader`, which is the
+top of the portable stack and drives the display by design.
+
+Everything else in the core takes data and returns data.
+
 ---
 
 ## Open questions

@@ -32,7 +32,8 @@ support follows.
 | Type + layout engine              | working — widow/orphan control, two optical sizes |
 | Edition composer                  | working — front page, sections, dedup across days |
 | Desktop simulator (PNG output)    | working — 8-bit, 3-bit and 1-bit dithered         |
-| Reader UI (gestures, page turns)  | not started                                       |
+| HAL (six interfaces)              | working — simulator implements all six            |
+| Reader UI (gestures, page turns)  | working — open a story, come back, jump sections  |
 | HTTP fetcher with conditional GET | not started                                       |
 | Inkplate 6FLICK target            | not started                                       |
 
@@ -75,6 +76,19 @@ other:
 ./bin/rsspaper-sim compose --depth mono1 --pages 4   # 1-bit, Atkinson dithered
 ./bin/rsspaper-sim compose --depth grey3             # the full-refresh mode
 ```
+
+Read the paper. The keyboard stands in for the panel — a keystroke becomes a
+synthesised touch, through the same gesture recogniser and the same `Reader`
+the device will run — and every refresh writes a frame:
+
+```sh
+make read
+#  n  turn the page      1-9  open the Nth story here
+#  b  back               s    section list
+```
+
+It reports what the panel would have spent: partial refreshes are ~225 ms,
+full ones ~1.26 s, and the ratio is a design decision you can see.
 
 ## Configuration
 

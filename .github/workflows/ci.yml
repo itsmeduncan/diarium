@@ -31,5 +31,16 @@ jobs:
       - name: Build via Makefile
         run: make clean && make sim tests
 
+      - name: Portability invariant
+        run: ./tools/check-portability.sh
+
       - name: Parse the fixture corpus
         run: ./bin/rsspaper-sim parse test/fixtures/feeds/*.xml
+
+      - name: Compose an edition end to end
+        run: |
+          make fonts
+          ./bin/rsspaper-sim compose --fresh --out "$RUNNER_TEMP/edition"
+
+      - name: Drive the reader
+        run: printf 'n\n1\nn\nb\ns\n2\nq\n' | ./bin/rsspaper-sim read --out "$RUNNER_TEMP/read"

@@ -30,7 +30,7 @@ FONT_OBJS := $(FONT_SRCS:%.cpp=$(BUILD)/%.o)
 
 FONT_PACK := $(BUILD)/literata.rfp
 
-.PHONY: all sim tests check fonts edition core clean fmt
+.PHONY: all sim tests check fonts edition core clean fmt portability
 all: sim tests fonts
 
 core: $(CORE_OBJS)
@@ -45,8 +45,12 @@ $(BIN)/rsspaper-tests: $(CORE_OBJS) $(TEST_OBJS)
 	@mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-check: $(BIN)/rsspaper-tests
+check: $(BIN)/rsspaper-tests portability
 	$(BIN)/rsspaper-tests
+
+# The invariant everything else rests on.
+portability:
+	@./tools/check-portability.sh
 
 fontgen: $(BIN)/fontgen
 $(BIN)/fontgen: $(FONT_OBJS) $(CORE_OBJS)
@@ -59,8 +63,10 @@ $(FONT_PACK): $(BIN)/fontgen $(wildcard assets/fonts/*.ttf)
 	$(BIN)/fontgen --fonts assets/fonts --out $(FONT_PACK)
 
 edition: sim fonts
-	@mkdir -p out
-	$(BIN)/rsspaper-sim compose --config config/feeds.toml --fonts $(FONT_PACK) --out out
+	$(BIN)/rsspaper-sim compose --config config/feeds.toml --fonts $(FONT_PACK) --out out --fresh
+
+read: sim fonts
+	$(BIN)/rsspaper-sim read --fonts $(FONT_PACK)
 
 # Pattern rule with automatic dependency generation.
 $(BUILD)/%.o: %.cpp
