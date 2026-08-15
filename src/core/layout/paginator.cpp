@@ -7,9 +7,12 @@ namespace {
 
 // Compact image placeholder. A framed box would be the obvious choice, but
 // feeds like NASA's carry twenty images per item and twenty empty boxes make
-// the page unreadable. A marked caption line says the same thing and costs one
-// line. Real image decoding replaces `render_image_slot`, nothing else.
-constexpr const char* kImageMark = "\xE2\x96\xA3 ";  // ▣
+// the page unreadable. A labelled caption line says the same thing in one line.
+//
+// A word, not a symbol: Literata is a text face and has no geometric shapes,
+// so a ▣ resolves to .notdef and draws as tofu. Anything the placeholder uses
+// has to exist in a book face.
+constexpr const char* kImageMark = "Image: ";
 
 int line_height(const RoleStyle& style) {
   return style.leading > 0 ? style.leading : 32;

@@ -33,11 +33,15 @@ FaceId face_id_from_name(const char* name) {
 size_t charset_codepoints(Charset cs, uint32_t* out, size_t cap) {
   // Punctuation feeds actually emit, beyond Latin-1: curly quotes, dashes,
   // ellipsis, bullet, prime, and the arrows that turn up in link posts.
+  //
+  // Only characters Literata actually contains. Geometric shapes — ★ ▣ ▪ ✓ —
+  // are not in a book face, and asking for them buys a tofu box rather than a
+  // symbol. `fontgen --verbose` reports anything requested and absent, so this
+  // list stays honest.
   static const uint32_t kExtra[] = {
       0x2013, 0x2014, 0x2018, 0x2019, 0x201A, 0x201C, 0x201D, 0x201E,
       0x2020, 0x2021, 0x2022, 0x2026, 0x2030, 0x2039, 0x203A, 0x2044,
-      0x20AC, 0x2122, 0x2190, 0x2192, 0x2212, 0x2605, 0x2606, 0x25A3,
-      0x25AA, 0x25B8, 0x2713, 0xFFFD,
+      0x20AC, 0x2122, 0x2190, 0x2192, 0x2212, 0xFFFD,
   };
 
   size_t n = 0;

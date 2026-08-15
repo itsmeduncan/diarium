@@ -4,6 +4,8 @@
 // resolution from a configured URL to a fixture file is deliberately confined
 // to this file: it is a simulator concern and must never leak into the config
 // format or the core.
+#include <sys/stat.h>
+
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -94,6 +96,15 @@ std::string fixture_for(const std::string& url,
   return "";
 }
 
+// POSIX mkdir rather than <filesystem>: this is simulator-only code, and the
+// output directory not existing should not be the user's problem.
+bool ensure_dir(const std::string& path) {
+  if (path.empty()) return true;
+  if (::mkdir(path.c_str(), 0755) == 0) return true;
+  struct stat st;
+  return ::stat(path.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
+}
+
 std::vector<std::string> list_fixtures(const std::string& dir) {
   // No <filesystem>: the device build has no such thing, and the simulator
   // should not need more of the standard library than the device can offer.
@@ -123,6 +134,12 @@ int cmd_compose(const std::vector<std::string>& args) {
       flag(args, "--fixtures", "test/fixtures/feeds");
   const std::string seen_path = flag(args, "--seen", out_dir + "/seen.txt");
   const bool fresh = has_flag(args, "--fresh");
+
+  if (!ensure_dir(out_dir)) {
+    std::fprintf(stderr, "compose: cannot create output directory %s\n",
+                 out_dir.c_str());
+    return 1;
+  }
 
   FeedList config;
   std::string error;
