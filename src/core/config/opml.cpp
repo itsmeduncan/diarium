@@ -19,12 +19,28 @@ std::string outline_name(const XmlPullParser& xp) {
   return "";
 }
 
+// Folder names that mean "this feed isn't in a folder". Feedly files loose
+// subscriptions under a literal "Uncategorized" folder, and a newspaper
+// section called Uncategorized is not a section, it is an apology.
+bool is_placeholder_folder(const std::string& name) {
+  static const char* kPlaceholders[] = {
+      "uncategorized", "uncategorised", "unsorted",
+      "unfiled",       "imported",      "subscriptions",
+      "no folder",     "(no folder)",   "all",
+  };
+  for (const char* p : kPlaceholders) {
+    if (iequals(name, p)) return true;
+  }
+  return false;
+}
+
 // A section name has to be usable as a folio and a heading.
 std::string tidy_section(const std::string& raw, const std::string& fallback) {
   std::string s = collapse_ws(raw);
   if (s.size() > 40) s.resize(40);
   trim_inplace(s);
-  return s.empty() ? fallback : s;
+  if (s.empty() || is_placeholder_folder(s)) return fallback;
+  return s;
 }
 
 std::string quote_toml(const std::string& s) {

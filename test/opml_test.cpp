@@ -236,3 +236,32 @@ TEST_CASE("the shipped OPML fixture imports the way it reads") {
   REQUIRE(nested != nullptr);
   CHECK(nested->section == "Technology");
 }
+
+TEST_CASE("placeholder folders are not sections") {
+  // Feedly files loose subscriptions under a literal "Uncategorized" folder.
+  // A newspaper section called Uncategorized is not a section.
+  for (const char* folder : {"Uncategorized", "uncategorised", "Unsorted",
+                             "Imported", "(no folder)"}) {
+    CAPTURE(folder);
+    const std::string xml = std::string("<opml><body><outline text=\"") +
+                            folder +
+                            "\"><outline type=\"rss\" "
+                            "xmlUrl=\"https://a.example/feed\"/></outline>"
+                            "</body></opml>";
+    OpmlOptions opts;
+    opts.default_section = "Miscellany";
+    const FeedList list = import(xml, nullptr, opts);
+    REQUIRE(list.feeds.size() == 1);
+    CHECK(list.feeds[0].section == "Miscellany");
+  }
+}
+
+TEST_CASE("a real folder that merely sounds vague is still a section") {
+  const FeedList list = import(R"(<opml><body>
+    <outline text="Miscellany">
+      <outline type="rss" xmlUrl="https://a.example/feed"/>
+    </outline>
+  </body></opml>)");
+  REQUIRE(list.feeds.size() == 1);
+  CHECK(list.feeds[0].section == "Miscellany");
+}
