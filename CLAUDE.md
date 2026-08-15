@@ -56,6 +56,11 @@ ByteSource → XmlPullParser → parse_feed → Item{Block…} → layout → fr
              (pull)          (streaming)   (no HTML)      (pages)   (greyscale)
 ```
 
+An edition has two kinds of page. Pages `[0, browse_page_count)` are the ledes
+you flip through; everything after is story text reached by selecting a lede
+(`StoryRef`, `Edition::story_at`). Keep that split — a linear edition of the
+same content ran to 175 pages.
+
 **`src/core/` is portable C++17 and must never include a platform header.**
 That constraint is what lets the whole pipeline run on a laptop, and it is the
 single most important rule in the repo. Hardware lives behind `src/hal/hal.h`;
@@ -99,5 +104,4 @@ Key boundaries worth understanding before changing anything:
 - Fixtures in `test/fixtures/feeds/` are real feeds kept unmodified — the
   malformations are the point. Add one only when it breaks the parser in a way
   nothing else does, and document that in the fixtures README.
-- The licence is not chosen yet (`LICENSE` is a placeholder). Don't add SPDX
-  headers until it is.
+- Licensed MIT.

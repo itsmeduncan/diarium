@@ -55,4 +55,22 @@ FaceId face_id_from_name(const char* name);
 // 256 entries). Returns the count.
 size_t charset_codepoints(Charset cs, uint32_t* out, size_t cap);
 
+// What to draw when the pack has no glyph for `cp`.
+//
+// A book face has no geometric shapes or dingbats, but publishers use them:
+// Daring Fireball prefixes link posts with ★, feeds carry ✓ and ▸ and the
+// occasional emoji. Three outcomes, in order of preference:
+//
+//   a substitute  — a character Literata does have and that means the same
+//                   thing (★ becomes •, ▸ becomes ›)
+//   kDropGlyph    — draw nothing, advance nothing. Right for decoration: a
+//                   box in the middle of a headline is worse than no mark.
+//   kTofuGlyph    — U+FFFD. Right for *letters* we can't draw, because a
+//                   headline in a script we have no glyphs for should look
+//                   missing rather than silently become blank.
+constexpr uint32_t kDropGlyph = 0;
+constexpr uint32_t kTofuGlyph = 0xFFFD;
+
+uint32_t fallback_codepoint(uint32_t cp);
+
 }  // namespace rsspaper

@@ -15,6 +15,7 @@
 #include "core/io/file_byte_source.h"
 #include "core/text/faces.h"
 #include "core/text/font_pack.h"
+#include "tools/fontgen/gpos_kerning.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
@@ -183,18 +184,31 @@ bool bake_face(const FaceSpec& spec, const std::string& fonts_dir,
     }
   }
 
-  // Kerning. stb_truetype reads GPOS as well as the legacy kern table, which
-  // matters because modern fonts including Literata ship GPOS only.
+  // Kerning. Our own GPOS reader first, because stb skips the Extension
+  // lookups modern fonts keep their pairs in; stb's reader is the fallback for
+  // fonts with a legacy `kern` table.
+  rsspaper::fontgen::GposKerning gpos;
+  gpos.init(data, ttf.size());
+
   size_t probed = 0;
   for (size_t a = 0; a < out->glyphs.size(); ++a) {
     for (size_t b = 0; b < out->glyphs.size(); ++b) {
       ++probed;
-      const int raw = stbtt_GetGlyphKernAdvance(&font, stb_indices[a],
-                                                stb_indices[b]);
+      int raw = gpos.available()
+                    ? gpos.lookup(static_cast<uint16_t>(stb_indices[a]),
+                                  static_cast<uint16_t>(stb_indices[b]))
+                    : 0;
+      if (raw == 0 && !gpos.available()) {
+        raw = stbtt_GetGlyphKernAdvance(&font, stb_indices[a],
+                                        stb_indices[b]);
+      }
       if (raw == 0) continue;
       const int amount = static_cast<int>(raw * scale * kSubpixel +
                                           (raw < 0 ? -0.5f : 0.5f));
-      if (amount == 0) continue;
+      // Below an eighth of a pixel the adjustment cannot be drawn — glyph
+      // origins are rounded to whole pixels — so storing it costs flash and
+      // buys nothing. This prunes roughly half the pairs.
+      if (amount > -2 && amount < 2) continue;
       if (out->kerns.size() >= 65535) break;
       out->kerns.push_back(KernPair{static_cast<uint16_t>(a),
                                     static_cast<uint16_t>(b),
@@ -207,6 +221,9 @@ bool bake_face(const FaceSpec& spec, const std::string& fonts_dir,
                 "%6zu KB bitmaps\n",
                 spec.name, spec.px, out->glyphs.size(), out->kerns.size(),
                 probed, out->bitmaps.size() / 1024);
+    if (!gpos.available()) {
+      std::printf("           no GPOS 'kern' feature found; pairs unkerned\n");
+    }
     if (!missing.empty()) {
       // Worth saying out loud: a codepoint the charset asks for and the face
       // cannot supply renders as tofu, and that is far cheaper to notice here
@@ -252,7 +269,6 @@ std::vector<uint8_t> assemble(const std::vector<BakedFace>& faces) {
       append_u16(out, k.a);
       append_u16(out, k.b);
       append_u16(out, static_cast<uint16_t>(k.amount));
-      append_u16(out, 0);  // reserved
     }
 
     const uint32_t bitmap_off = static_cast<uint32_t>(out.size());

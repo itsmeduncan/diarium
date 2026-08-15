@@ -35,6 +35,13 @@ Block para(const std::string& text) {
   return b;
 }
 
+FlowElement element_of(TextRole role, const std::string& text) {
+  FlowElement e;
+  e.role = role;
+  e.block = para(text);
+  return e;
+}
+
 std::string line_text(const BrokenLine& line) {
   std::string out;
   for (const PositionedRun& r : line.runs) {
@@ -67,14 +74,50 @@ TEST_CASE("font pack loads and reports plausible metrics") {
   }
 }
 
-TEST_CASE("a missing glyph falls back rather than collapsing the line") {
+TEST_CASE("a missing letter shows as tofu, so the gap is visible") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
   const Face& body = fonts->face(FaceId::Body);
-  // U+4E2D is not in the Latin charset.
-  CHECK(body.glyph(0x4E2D) == nullptr);
+  // U+4E2D is a letter we have no glyph for. It must occupy space and be
+  // visible: a headline in a script we can't set should look missing, not
+  // silently become blank.
+  CHECK(fallback_codepoint(0x4E2D) == kTofuGlyph);
+  CHECK(body.glyph(0x4E2D) != nullptr);
   CHECK(body.advance_of(0x4E2D) > 0);
   CHECK(body.measure("a\xE4\xB8\xAD" "b") > body.measure("ab"));
+}
+
+TEST_CASE("a symbol with a stand-in is substituted, not boxed") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+  const Face& body = fonts->face(FaceId::Body);
+
+  // ★ is not in a book face. Daring Fireball puts one in front of every
+  // link-post title, so it has to become something rather than a box.
+  CHECK(fallback_codepoint(0x2605) == 0x2022);  // -> bullet
+  const Glyph* star = body.glyph(0x2605);
+  const Glyph* bullet = body.glyph(0x2022);
+  REQUIRE(star != nullptr);
+  REQUIRE(bullet != nullptr);
+  CHECK(star->codepoint == bullet->codepoint);
+  CHECK(body.advance_of(0x2605) == body.advance_of(0x2022));
+}
+
+TEST_CASE("decoration with no stand-in is dropped and costs nothing") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+  const Face& body = fonts->face(FaceId::Body);
+
+  const uint32_t check_mark = 0x2713;  // ✓
+  const uint32_t emoji = 0x1F600;
+  CHECK(fallback_codepoint(check_mark) == kDropGlyph);
+  CHECK(fallback_codepoint(emoji) == kDropGlyph);
+  CHECK(body.glyph(check_mark) == nullptr);
+  CHECK(body.advance_of(check_mark) == 0);
+
+  // Dropping must be consistent between measuring and drawing, or justified
+  // lines drift by exactly the width the renderer didn't spend.
+  CHECK(body.measure("ab\xE2\x9C\x93") == body.measure("ab"));
 }
 
 TEST_CASE("measuring is additive and kerning-consistent") {
@@ -261,15 +304,21 @@ TEST_CASE("a page break starts a new page") {
     flow.push_back(std::move(e));
   }
   std::vector<Page> pages;
-  std::vector<size_t> where;
+  std::vector<Placement> where;
   Paginator(*fonts, null_hyphenator())
       .paginate(flow, PageTemplate(), &pages, &where);
 
   CHECK(pages.size() == 3);
   REQUIRE(where.size() == 3);
-  CHECK(where[0] == 0);
-  CHECK(where[1] == 1);
-  CHECK(where[2] == 2);
+  CHECK(where[0].page == 0);
+  CHECK(where[1].page == 1);
+  CHECK(where[2].page == 2);
+  // Every element reports a real area, which is what makes a lede tappable.
+  for (const Placement& p : where) {
+    CHECK_FALSE(p.bounds.empty());
+    CHECK(p.bounds.y >= 0);
+    CHECK(p.bounds.y + p.bounds.h <= kPageHeight);
+  }
 }
 
 TEST_CASE("feeds.toml parses the config we ship") {
@@ -358,4 +407,69 @@ TEST_CASE("a missing seen store is not an error") {
   SeenStore seen;
   CHECK_FALSE(seen.load("build/definitely-not-here.txt", 0));
   CHECK(seen.size() == 0);
+}
+
+TEST_CASE("keep_with_next moves a group rather than splitting it") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  // Fill most of a page, then a three-element group that cannot fit in what
+  // remains. All three must land together on the next page.
+  std::vector<FlowElement> flow;
+  for (int i = 0; i < 14; ++i) {
+    FlowElement e;
+    e.role = TextRole::Body;
+    e.block = para("Filler paragraph " + std::to_string(i) +
+                   " with enough text to occupy a full line of the measure.");
+    flow.push_back(std::move(e));
+  }
+  FlowElement kicker = element_of(TextRole::LedeKicker, "The Source");
+  kicker.keep_with_next = true;
+  FlowElement head = element_of(TextRole::LedeHead,
+                                "A headline that runs to about two lines of "
+                                "the available measure on this page");
+  head.keep_with_next = true;
+  const size_t group_start = flow.size();
+  flow.push_back(std::move(kicker));
+  flow.push_back(std::move(head));
+  flow.push_back(element_of(TextRole::LedeText,
+                            "A summary of the story, long enough to take a "
+                            "couple of lines under the headline."));
+
+  std::vector<Page> pages;
+  std::vector<Placement> where;
+  Paginator(*fonts, null_hyphenator())
+      .paginate(flow, PageTemplate(), &pages, &where);
+
+  REQUIRE(where.size() == flow.size());
+  const size_t page = where[group_start].page;
+  CHECK(where[group_start + 1].page == page);
+  CHECK(where[group_start + 2].page == page);
+}
+
+TEST_CASE("a placement's bounds never span a page break") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  std::vector<FlowElement> flow;
+  for (int i = 0; i < 60; ++i) {
+    FlowElement e;
+    e.role = TextRole::Body;
+    e.block = para(
+        "Paragraph " + std::to_string(i) +
+        " long enough to wrap over several lines and eventually to straddle "
+        "a page boundary, which is the case that matters here.");
+    flow.push_back(std::move(e));
+  }
+
+  std::vector<Page> pages;
+  std::vector<Placement> where;
+  Paginator(*fonts, null_hyphenator())
+      .paginate(flow, PageTemplate(), &pages, &where);
+
+  for (const Placement& p : where) {
+    CHECK(p.bounds.y >= 0);
+    CHECK(p.bounds.y + p.bounds.h <= kPageHeight);
+    CHECK(p.page < pages.size());
+  }
 }

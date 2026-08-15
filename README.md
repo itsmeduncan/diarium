@@ -6,6 +6,9 @@ RSSpaper is an e-ink RSS reader that behaves like a morning paper. It wakes up,
 fetches your feeds, composes a finite edition with a front page and sections,
 and then it is done. You read it, you reach the end, you put it down.
 
+You flip through ledes — a dozen pages for forty stories — and open the ones
+you want in full, then come back. The paper has a last page.
+
 There is no infinite scroll. There are no unread counts, no badges, no
 notifications, no engagement mechanics, and no algorithmic curation. Stories
 run in reverse-chronological order within their section, which is the whole of
@@ -117,8 +120,7 @@ test/         unit tests and a corpus of real feeds
 
 ## Licence
 
-**Not yet chosen** — see `LICENSE`. Pick MIT or AGPL before the first public
-release.
+MIT. See [LICENSE](LICENSE).
 
 Bundled third-party material keeps its own terms: [Literata](assets/fonts/)
 (SIL Open Font License 1.1) and [stb](third_party/stb/) (public domain).

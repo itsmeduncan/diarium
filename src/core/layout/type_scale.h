@@ -23,6 +23,9 @@ enum class TextRole : uint8_t {
   Deck,         // standfirst under a lead headline
   Byline,       // author and source
   Kicker,       // small caps label above a headline
+  LedeKicker,   // source name above a lede on a section page
+  LedeHead,     // a lede's headline: the thing you select to open the story
+  LedeText,     // one or two lines of summary under it
   Body,
   ListItem,
   Quote,

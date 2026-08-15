@@ -16,10 +16,10 @@
 namespace rsspaper {
 
 struct PageTemplate {
-  int margin_left = 54;
-  int margin_right = 54;
-  int margin_top = 40;
-  int margin_bottom = 52;  // the folio sits in here
+  int margin_left = kSideMargin;
+  int margin_right = kSideMargin;
+  int margin_top = 30;
+  int margin_bottom = 40;  // the folio sits in here
   int columns = 1;
   int gutter = 34;
   // Extra space reserved at the top of the first page for the nameplate.
@@ -35,6 +35,12 @@ struct PageTemplate {
 
 std::vector<Frame> frames_for(const PageTemplate& tmpl, bool first_page);
 
+// Where a flow element ended up: which page, and the area it covers there.
+struct Placement {
+  size_t page = 0;
+  Rect bounds;
+};
+
 // A block plus the role it is set in. The composer decides roles; the
 // paginator only measures and places.
 struct FlowElement {
@@ -44,6 +50,10 @@ struct FlowElement {
   bool page_break_before = false;
   // Suppresses the first-line indent, for the paragraph that opens a story.
   bool opens_story = false;
+  // Keeps this element on the same page as the one after it. A lede is a
+  // kicker, a headline and a summary; splitting it across a page break makes
+  // it unreadable and makes its tap target meaningless.
+  bool keep_with_next = false;
 };
 
 class Paginator {
@@ -54,12 +64,13 @@ class Paginator {
   // Flows every element, appending to `out`. Returns the number of pages
   // added. Pages are complete and independent once returned.
   //
-  // `element_page`, when given, receives one entry per flow element: the
-  // index in `out` of the page that element started on. That is how the
-  // composer locates section starts without laying the edition out twice.
+  // `placements`, when given, receives one entry per flow element: which page
+  // it started on and the area it occupies there. That is how the composer
+  // locates section starts and, more importantly, how a lede becomes
+  // something the reader can tap — without laying the edition out twice.
   size_t paginate(const std::vector<FlowElement>& flow,
                   const PageTemplate& tmpl, std::vector<Page>* out,
-                  std::vector<size_t>* element_page = nullptr) const;
+                  std::vector<Placement>* placements = nullptr) const;
 
  private:
   struct Cursor {

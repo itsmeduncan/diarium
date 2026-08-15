@@ -97,11 +97,13 @@ bool Paginator::advance_frame(Cursor* c, const PageTemplate& tmpl,
 
 size_t Paginator::paginate(const std::vector<FlowElement>& flow,
                            const PageTemplate& tmpl, std::vector<Page>* out,
-                           std::vector<size_t>* element_page) const {
+                           std::vector<Placement>* placements) const {
   const size_t before = out->size();
   Cursor c;
   start_page(&c, tmpl);
-  if (element_page != nullptr) element_page->assign(flow.size(), before);
+  if (placements != nullptr) {
+    placements->assign(flow.size(), Placement{before, Rect()});
+  }
 
   for (size_t ei = 0; ei < flow.size(); ++ei) {
     const FlowElement& el = flow[ei];
@@ -109,11 +111,33 @@ size_t Paginator::paginate(const std::vector<FlowElement>& flow,
       finish_page(&c, out);
       start_page(&c, tmpl);
     }
-    // The in-progress page has not been appended yet, so its eventual index
-    // is exactly the current size of `out`.
-    if (element_page != nullptr) (*element_page)[ei] = out->size();
 
     const RoleStyle style = role_style(el.role);
+
+    // Keep-with-next: measure the whole group and move it as a unit if it
+    // won't fit in what's left of this frame.
+    if (el.keep_with_next && c.dirty) {
+      int group_height = 0;
+      for (size_t k = ei; k < flow.size(); ++k) {
+        const RoleStyle gs = role_style(flow[k].role);
+        const Frame& gf = c.frames[c.frame];
+        const int gm = gf.w - gs.left_margin;
+        if (gm > 0 && !flow[k].block.text.empty()) {
+          const size_t n =
+              break_block(flow[k].block, gs, gm, fonts_, hyphenator_).size();
+          group_height += static_cast<int>(n) * line_height(gs);
+        }
+        group_height += gs.space_before + gs.space_after;
+        if (!flow[k].keep_with_next) break;
+      }
+      // No "only if it would fit on a fresh frame" guard: `c.dirty` already
+      // stops this from looping, because after advancing the new frame is
+      // clean and the group is placed regardless. Guarding on the frame
+      // height instead strands a section label at the foot of a column
+      // whenever the lede under it happens to be tall.
+      const Frame& f = c.frames[c.frame];
+      if (c.pen_y + group_height > f.bottom()) advance_frame(&c, tmpl, out);
+    }
 
     if (el.block.type == BlockType::Rule) {
       const Frame& f = c.frames[c.frame];
@@ -219,6 +243,24 @@ size_t Paginator::paginate(const std::vector<FlowElement>& flow,
           PositionedRun abs = r;
           abs.x = x0 * kSubpixel + r.x;
           out_line.runs.push_back(std::move(abs));
+        }
+        if (placements != nullptr) {
+          // Record the page when a line actually lands, not before the
+          // attempt: orphan control and overflow can move an element to the
+          // next page after we've begun considering it.
+          Placement& pl = (*placements)[ei];
+          const size_t current_page = out->size();
+          if (pl.bounds.empty()) pl.page = current_page;
+          // Only the first page an element touches contributes to its area:
+          // a rect spanning a page break is not a target anyone can tap.
+          if (pl.page == current_page) {
+            Rect r;
+            r.x = frame->x + style.left_margin;
+            r.y = y;
+            r.w = frame->w - style.left_margin;
+            r.h = lh;
+            pl.bounds.extend(r);
+          }
         }
         c.page.lines.push_back(std::move(out_line));
         y += lh;

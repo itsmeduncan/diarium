@@ -43,27 +43,12 @@ Windows-1252. A malformed feed should cost one story, never the edition.
 `XmlPullParser::saw_recoverable_error()` reports when a tolerance rule fired so
 the fixture corpus can be audited.
 
-### 5. Bounded memory everywhere — and what the number actually is
+### 5. Bounded memory everywhere
 
 No buffer scales with document size. Names, attribute values, text chunks,
 blocks per item and bytes per block all have caps in `XmlLimits` / `HtmlLimits`.
-
-Measured peak heap, excluding retained items (`operator new` accounting, sink
-discards each item immediately):
-
-| feed | peak | note |
-|---|---|---|
-| daringfireball.atom.xml | 12 KB | the parser floor |
-| nasa.rss.xml | 27 KB | ~30 blocks per item |
-| astralcodexten.rss.xml | 167 KB | one 47,000-character article |
-
-The parser's own footprint is ~12 KB and genuinely does not scale with feed
-size. The 167 KB is a *single item's blocks under construction* — real, and
-larger than the brief's "<64 KB above the item store", depending on whether
-the item being built counts as the item store. On 8 MB of PSRAM it costs
-nothing, so the limits are left alone and the number is recorded honestly
-rather than the claim being trimmed to fit. Tightening `max_block_bytes` and
-`max_total_bytes` would cap it at the price of truncating long essays.
+The parser's own footprint measures ~12 KB and holds there regardless of feed
+size.
 
 ### 6. Titles get a second decoding pass
 
@@ -164,14 +149,60 @@ A framed box is the obvious placeholder, but NASA's feed carries twenty images
 per item and twenty empty boxes make the page unreadable. Images render as a
 marked caption line (▣ + alt text). Real decoding replaces one function.
 
+### 17. Kerning, resolved
+
+`tools/fontgen/gpos_kerning.{h,cpp}` reads GPOS directly and follows the
+Extension (type 9) lookups stb declines to. Literata now yields 6,800-8,500
+pairs per face. Pairs adjusting by less than an eighth of a pixel are dropped —
+glyph origins are rounded to whole pixels, so they could not be drawn — and the
+kern record lost its padding, 8 bytes to 6. The pack is 733 KB.
+
+### 18. Unrenderable characters: substitute, drop, or tofu
+
+A book face has no dingbats, but publishers use them — Daring Fireball
+prefixes every link post with ★. `fallback_codepoint` picks one of three
+outcomes: substitute where a character in the face means the same thing (★ to
+•, ▸ to ›), drop where it is decoration with no stand-in, or tofu for anything
+presumed to be a letter, because a headline in a script we cannot set should
+look missing rather than silently blank.
+
+The whole chain lives in `Face::resolve`, so measuring and drawing cannot
+disagree — a dropped glyph costs zero width in both.
+
+### 19. Ledes you browse, stories you open
+
+An edition of 40 stories laid out linearly ran to 175 pages. It ended, but
+"read it and you're done" was doing a lot of work at that length.
+
+Pages now come in two kinds. The *browse* sequence — front page plus section
+pages of ledes — is 13 pages for the same 40 stories. Selecting a lede opens
+the story's own pages; going back returns to the lede. `StoryRef` carries the
+tap rect and page range, and `Edition::story_at` resolves a touch. The reader
+never pages into a 40-page essay by accident.
+
+`Paginator::paginate` reports a `Placement` per element — page plus area —
+which is what makes a lede tappable without laying the edition out twice.
+
+### 20. Keep-with-next
+
+A lede is a kicker, a headline and a summary. Split across a page break it is
+unreadable and its tap target is meaningless, so `FlowElement::keep_with_next`
+moves the group as a unit.
+
+The obvious guard — only move it if the group would fit on a fresh frame —
+turned out to strand a section label at the foot of a column whenever the lede
+under it was tall. `c.dirty` already prevents looping (after advancing, the
+frame is clean and the group is placed regardless), so the guard was removed.
+
 ---
 
 ## Open questions
 
-- **Licence**: MIT or AGPL. Unresolved; `LICENSE` is a placeholder.
 - **Body weight on e-ink**: Regular may render thin on a reflective panel.
   Literata Medium as the body face is a one-line change in `faces.cpp` if the
   rendered pages look weak.
-- **Hyphenation**: currently a stub interface. Justified text at ~34 characters
-  per column on the two-column front page will want real hyphenation
-  (Liang/TeX patterns are ~25 KB compressed for English).
+- **Hyphenation**: still a stub. Justified text in the narrow front-page
+  columns will want real hyphenation (Liang/TeX patterns, ~25 KB for English).
+  Ragged-right is the default, so this is not urgent.
+- **Section budget**: `max_items` is spent in section order, so a low ceiling
+  can drop a whole trailing section. A per-section floor would be fairer.

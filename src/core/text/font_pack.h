@@ -11,7 +11,7 @@
 //   header      "RFP1", u16 version, u16 face_count, u32 file_size
 //   face[N]     fixed 52-byte records, in FaceId order
 //   glyphs      per face: u16-sorted-by-codepoint records of 20 bytes
-//   kern        per face: 8-byte records sorted by (glyph_a, glyph_b)
+//   kern        per face: 6-byte records sorted by (glyph_a, glyph_b)
 //   bitmaps     per face: 4-bit alpha, rows padded to whole bytes
 //
 // 4 bits of alpha is not a compromise: the panel renders 3-bit greyscale, so
@@ -42,7 +42,9 @@ constexpr uint32_t kFontPackMagic = 0x31504652;  // "RFP1"
 constexpr size_t kFontPackHeaderBytes = 12;
 constexpr size_t kFontPackFaceBytes = 52;
 constexpr size_t kFontPackGlyphBytes = 20;
-constexpr size_t kFontPackKernBytes = 8;
+// u16 left, u16 right, i16 adjustment. No padding: with ~8000 pairs per
+// face across nine faces, two spare bytes per record is 120 KB of flash.
+constexpr size_t kFontPackKernBytes = 6;
 
 struct Glyph {
   uint32_t codepoint = 0;
@@ -105,6 +107,9 @@ class Face {
   int16_t cap_height_ = 0;
 
   int glyph_index(uint32_t cp) const;
+  // glyph_index plus the fallback chain. Every lookup goes through this, so
+  // measuring and drawing can never disagree about what a character costs.
+  int resolve(uint32_t cp) const;
   Glyph glyph_at(int index) const;
 };
 
