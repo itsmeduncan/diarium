@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "core/base/str.h"
+#include "core/layout/hyphenator.h"
 #include "core/layout/paginator.h"
 #include "core/layout/type_scale.h"
 #include "core/render/page_renderer.h"
@@ -78,13 +79,13 @@ std::string standfirst(const Item& item, size_t max_bytes) {
 // Total height of the first `count` elements at `measure` px wide. Used to
 // size the front-page banner to its content instead of a guessed constant.
 int measure_flow_height(const std::vector<FlowElement>& flow, size_t count,
-                        int measure, const FontPack& fonts) {
+                        int measure, const FontPack& fonts,
+                        const Hyphenator& hyphenator) {
   int total = 0;
   for (size_t i = 0; i < count && i < flow.size(); ++i) {
     const RoleStyle style = role_style(flow[i].role);
     const std::vector<BrokenLine> lines = break_block(
-        flow[i].block, style, measure - style.left_margin, fonts,
-        null_hyphenator());
+        flow[i].block, style, measure - style.left_margin, fonts, hyphenator);
     total += style.space_before + style.space_after +
              static_cast<int>(lines.size()) * style.leading;
   }
@@ -96,13 +97,14 @@ int measure_flow_height(const std::vector<FlowElement>& flow, size_t count,
 // than setting every lead at one size and hoping; three lines at 66 px is the
 // point where the headline stops being a headline and starts being the page.
 TextRole fit_lead_headline(const std::string& title, int measure,
-                           const FontPack& fonts) {
+                           const FontPack& fonts,
+                           const Hyphenator& hyphenator) {
   for (const TextRole candidate : {TextRole::LeadHead, TextRole::ArticleHead}) {
     const RoleStyle style = role_style(candidate);
     Block b;
     b.text = title;
     const size_t lines =
-        break_block(b, style, measure, fonts, null_hyphenator()).size();
+        break_block(b, style, measure, fonts, hyphenator).size();
     if (lines <= (candidate == TextRole::LeadHead ? 2u : 4u)) return candidate;
   }
   return TextRole::ArticleHead;
@@ -193,6 +195,8 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   }
 
   // --- front page -----------------------------------------------------------
+  const Hyphenator& hyphenator =
+      opts.hyphenate ? english_hyphenator() : null_hyphenator();
   const PageRenderer renderer(fonts);
   std::vector<FlowElement> front;
   size_t lead_element_count = 0;
@@ -200,8 +204,9 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   if (lead != nullptr) {
     const int lead_measure = kPageWidth - 2 * PageTemplate().margin_left;
     front.push_back(element(TextRole::Kicker, sections[lead_section].name));
-    front.push_back(element(fit_lead_headline(lead->title, lead_measure, fonts),
-                            lead->title));
+    front.push_back(element(
+        fit_lead_headline(lead->title, lead_measure, fonts, hyphenator),
+        lead->title));
     const std::string deck = standfirst(*lead, 320);
     if (!deck.empty()) front.push_back(element(TextRole::Deck, deck));
     const std::string by = byline_for(*lead);
@@ -245,7 +250,7 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
       measure_flow_height(front, lead_element_count,
                           kPageWidth - front_tmpl.margin_left -
                               front_tmpl.margin_right,
-                          fonts);
+                          fonts, hyphenator);
   // The banner may take most of the page below the nameplate, but not all of
   // it: something has to be left for the section teasers that make a front
   // page a front page.
@@ -256,7 +261,7 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
     front_tmpl.banner_height = banner_cap;
   }
 
-  const Paginator paginator(fonts, null_hyphenator());
+  const Paginator paginator(fonts, hyphenator);
   std::vector<Placement> front_placements;
   paginator.paginate(front, front_tmpl, &ed.pages, &front_placements);
 

@@ -176,6 +176,8 @@ std::string to_feeds_toml(const FeedList& list) {
   out += "max_age_days = " + std::to_string(list.edition.max_age_days) + "\n";
   out += "front_page_columns = " +
          std::to_string(list.edition.front_page_columns) + "\n";
+  out += std::string("hyphenate = ") +
+         (list.edition.hyphenate ? "true" : "false") + "\n";
   out += std::string("body_alignment = ") +
          (list.edition.body_alignment == Align::Justify ? "\"justified\""
                                                         : "\"ragged\"") +

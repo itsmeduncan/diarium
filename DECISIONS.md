@@ -214,6 +214,33 @@ top of the portable stack and drives the display by design.
 
 Everything else in the core takes data and returns data.
 
+### 23. Hyphenation: Liang patterns, baked into a searchable table
+
+`tools/hyphgen` turns `assets/hyphenation/hyph-en-us.tex` into ~55 KB of const
+tables — pattern letters, u16 offsets, and priorities. The generated file is
+checked in, so none of the three build systems needs a codegen step; the
+patterns have not changed since 1990.
+
+The values table needs no offsets of its own: each pattern contributes one
+more value than it has letters, so pattern *i*'s values start at
+`kOffsets[i] + i`.
+
+Matching narrows a range over the sorted table by prefix rather than searching
+for every substring of every word, and exits as soon as the range empties.
+Words containing anything outside ASCII letters are left whole — the patterns
+are ASCII and guessing at "naïve" or "don't" would be worse than not breaking.
+
+The licence is the FSF all-permissive notice: copying and distribution with or
+without modification, royalty-free, provided the notice is preserved. It is
+preserved in the file, in the generated header, and in `LICENSE`.
+
+### 24. Paragraphs are indented, not spaced
+
+With no space between paragraphs, the first-line indent is the only thing
+telling a reader where one ends and the next begins — and running paragraphs
+together, which is what the type scale did until now, made body text a slab.
+One em, and none on the paragraph that opens a story.
+
 ---
 
 ## Open questions

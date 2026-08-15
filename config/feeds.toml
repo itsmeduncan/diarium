@@ -10,8 +10,11 @@ wake_at = "05:30"
 # Hard ceiling on the edition. A paper that never ends is a feed.
 max_items = 40
 # "justified" or "ragged". Justified needs hyphenation to look right in the
-# narrow front-page columns.
+# narrow front-page columns; with it on, either reads well.
 body_alignment = "ragged"
+# Liang hyphenation. Evens the rag when ragged, and is what makes justified
+# text possible at all in a narrow column.
+hyphenate = true
 # Two-column front page, single-column article pages.
 front_page_columns = 2
 # Drop stories older than this many days, however recently they appeared.

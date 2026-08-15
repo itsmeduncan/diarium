@@ -30,7 +30,60 @@ uint8_t flags_at(const Block& block, size_t offset) {
   return kStyleNone;
 }
 
+bool is_word_char(char c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
 class NullHyphenator final : public Hyphenator {};
+
+// Splits `atoms[index]` so that its first part, plus a hyphen, fits in
+// `room`. Returns false when no break point fits, which is the common case
+// and has to be cheap.
+bool try_hyphenate(std::vector<Atom>* atoms, size_t index, int room,
+                   const FontPack& fonts, const Hyphenator& hyphenator) {
+  Atom& atom = (*atoms)[index];
+  if (room <= 0 || atom.text.size() < 4) return false;
+
+  // Punctuation is not part of the word the patterns know, but it travels
+  // with it: "hyphenation," has to hyphenate as "hyphenation".
+  size_t core_begin = 0, core_end = atom.text.size();
+  while (core_begin < core_end && !is_word_char(atom.text[core_begin])) ++core_begin;
+  while (core_end > core_begin && !is_word_char(atom.text[core_end - 1])) --core_end;
+  if (core_end - core_begin < 4) return false;
+
+  std::vector<size_t> points;
+  hyphenator.break_points(atom.text.substr(core_begin, core_end - core_begin),
+                          &points);
+  if (points.empty()) return false;
+
+  const Face& face = fonts.face(atom.face);
+  // Longest first: take as much of the word as will fit.
+  for (size_t k = points.size(); k-- > 0;) {
+    const size_t cut = core_begin + points[k];
+    const std::string head = atom.text.substr(0, cut) + "-";
+    const int head_width = face.measure(head);
+    if (head_width > room) continue;
+
+    Atom tail;
+    tail.text = atom.text.substr(cut);
+    tail.face = atom.face;
+    tail.width = face.measure(tail.text);
+    tail.space_after = atom.space_after;
+    tail.break_after = atom.break_after;
+    tail.kern_to_next = atom.kern_to_next;
+
+    atom.text = head;
+    atom.width = head_width;
+    atom.space_after = 0;
+    atom.break_after = false;
+    atom.kern_to_next = 0;
+
+    atoms->insert(atoms->begin() + static_cast<std::ptrdiff_t>(index) + 1,
+                  std::move(tail));
+    return true;
+  }
+  return false;
+}
 
 // The maximum a space may stretch when justifying, as a multiple of its
 // natural width. Beyond this the line is left short instead: rivers of white
@@ -121,8 +174,12 @@ std::vector<BrokenLine> break_atoms(const std::vector<Atom>& atoms, int measure,
 
   const int measure_sub = measure * kSubpixel;
 
+  // A mutable copy, because hyphenating splits an atom in two and the line
+  // after the break has to carry the remainder.
+  std::vector<Atom> work(atoms.begin(), atoms.end());
+
   size_t i = 0;
-  while (i < atoms.size()) {
+  while (i < work.size()) {
     // Gather atoms until the next one would not fit. Fragments joined by a
     // style change (kern_to_next < 0) are taken as one unit.
     size_t start = i;
@@ -131,14 +188,13 @@ std::vector<BrokenLine> break_atoms(const std::vector<Atom>& atoms, int measure,
     size_t end = i;
     bool forced = false;
 
-    while (end < atoms.size()) {
+    while (end < work.size()) {
       // Measure the whole join group so a styled word never splits.
       size_t group_end = end;
       int group_width = 0;
       for (;;) {
-        group_width += atoms[group_end].width;
-        if (atoms[group_end].kern_to_next < 0 &&
-            group_end + 1 < atoms.size()) {
+        group_width += work[group_end].width;
+        if (work[group_end].kern_to_next < 0 && group_end + 1 < work.size()) {
           ++group_end;
           continue;
         }
@@ -146,11 +202,32 @@ std::vector<BrokenLine> break_atoms(const std::vector<Atom>& atoms, int measure,
       }
 
       const int candidate = natural + trailing_space + group_width;
-      if (candidate > measure_sub && end > start) break;
+      if (candidate > measure_sub) {
+        // The word won't fit. Before giving up the rest of the line, see
+        // whether part of it will — this is the whole reason hyphenation
+        // exists, and without it a narrow column is mostly white space.
+        if (group_end == end &&
+            try_hyphenate(&work, end, measure_sub - natural - trailing_space,
+                          fonts, hyphenator)) {
+          natural += trailing_space + work[end].width;
+          trailing_space = 0;
+          end = end + 1;
+          forced = true;  // the line ends at the hyphen
+          break;
+        }
+        if (end > start) break;  // it will fit on a line of its own
+
+        // The first thing on the line and still too wide, with nowhere to
+        // hyphenate: let it overhang rather than dropping it or looping.
+        natural += group_width;
+        trailing_space = work[group_end].space_after;
+        end = group_end + 1;
+        break;
+      }
 
       natural += trailing_space + group_width;
-      trailing_space = atoms[group_end].space_after;
-      const bool break_here = atoms[group_end].break_after;
+      trailing_space = work[group_end].space_after;
+      const bool break_here = work[group_end].break_after;
       end = group_end + 1;
       if (break_here) {
         forced = true;
@@ -158,24 +235,22 @@ std::vector<BrokenLine> break_atoms(const std::vector<Atom>& atoms, int measure,
       }
     }
 
-    // A single unit wider than the measure: hyphenate if we can, otherwise
+    // A single unit wider than the whole measure even after hyphenation:
     // let it overhang rather than dropping it.
     if (end == start) {
-      std::vector<size_t> points;
-      hyphenator.break_points(atoms[start].text, &points);
       end = start + 1;
-      natural = atoms[start].width;
+      natural = work[start].width;
     }
 
     BrokenLine line;
     line.width = natural;
-    line.last = forced || end >= atoms.size();
+    line.last = forced || end >= work.size();
 
     const int slack = measure_sub - natural;
     // Count the gaps that can absorb slack.
     size_t gaps = 0;
     for (size_t k = start; k + 1 < end; ++k) {
-      if (atoms[k].space_after > 0) ++gaps;
+      if (work[k].space_after > 0) ++gaps;
     }
 
     int extra_per_gap = 0;
@@ -183,7 +258,7 @@ std::vector<BrokenLine> break_atoms(const std::vector<Atom>& atoms, int measure,
       const int per = slack / static_cast<int>(gaps);
       // Cap the stretch; a line that would need more is left ragged.
       const int space_w =
-          fonts.face(atoms[start].face).advance_of(static_cast<uint32_t>(' '));
+          fonts.face(work[start].face).advance_of(static_cast<uint32_t>(' '));
       const int max_extra =
           space_w * kMaxStretchNumerator / kMaxStretchDenominator - space_w;
       extra_per_gap = per < max_extra ? per : max_extra;
@@ -195,12 +270,12 @@ std::vector<BrokenLine> break_atoms(const std::vector<Atom>& atoms, int measure,
 
     for (size_t k = start; k < end; ++k) {
       PositionedRun run;
-      run.face = atoms[k].face;
+      run.face = work[k].face;
       run.x = x;
-      run.text = atoms[k].text;
-      x += atoms[k].width;
-      if (k + 1 < end && atoms[k].space_after > 0) {
-        x += atoms[k].space_after + extra_per_gap;
+      run.text = work[k].text;
+      x += work[k].width;
+      if (k + 1 < end && work[k].space_after > 0) {
+        x += work[k].space_after + extra_per_gap;
       }
       line.runs.push_back(std::move(run));
     }

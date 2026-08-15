@@ -157,8 +157,10 @@ size_t Paginator::paginate(const std::vector<FlowElement>& flow,
 
     Block block = el.block;
     if (block.type == BlockType::Image) {
-      block.text = std::string(kImageMark) +
-                   (block.text.empty() ? "Image" : block.text);
+      // With alt text the label introduces it; without, the label is all
+      // there is to say, and "Image: Image" is not a caption.
+      block.text = block.text.empty() ? "Image"
+                                      : std::string(kImageMark) + block.text;
       block.runs.clear();
     }
     if (block.text.empty()) continue;
