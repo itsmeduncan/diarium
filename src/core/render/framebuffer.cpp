@@ -68,13 +68,12 @@ int Framebuffer::draw_text_tracked(const Face& face, const std::string& utf8,
   while (i < utf8.size()) {
     const uint32_t cp = utf8_next(utf8, i);
     if (prev != 0) pen += face.kern(prev, cp) + tracking;
+    // Face::glyph already applies the fallback chain; a second one here
+    // would let the renderer disagree with the line breaker.
     const Glyph* g = face.glyph(cp);
-    if (g == nullptr) g = face.glyph(0xFFFD);
     if (g != nullptr) {
       blit_glyph(face, *g, to_px(pen), baseline, ink);
       pen += g->advance;
-    } else {
-      pen += face.advance_of(cp);
     }
     prev = cp;
   }

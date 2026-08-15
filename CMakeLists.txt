@@ -24,7 +24,7 @@ file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS test/*.cpp)
 file(GLOB FONTGEN_SOURCES CONFIGURE_DEPENDS tools/fontgen/*.cpp)
 
 add_library(rsspaper_core STATIC ${CORE_SOURCES})
-target_include_directories(rsspaper_core PUBLIC src)
+target_include_directories(rsspaper_core PUBLIC src ${CMAKE_SOURCE_DIR})
 # SYSTEM so vendored headers don't spray warnings over ours.
 target_include_directories(rsspaper_core SYSTEM PUBLIC third_party)
 

@@ -6,13 +6,11 @@
 namespace rsspaper {
 namespace {
 
-constexpr int kSideMargin = 54;
-
 // The nameplate is set in the display face, in caps, letterspaced to fill the
 // measure — which is how a broadsheet nameplate works and why RSSpaper does
 // not need a dedicated 100 px masthead font eating 200 KB of flash.
-constexpr int kNameplateTop = 20;
-constexpr int kNameplateRuleGap = 10;
+constexpr int kNameplateTop = 14;
+constexpr int kNameplateRuleGap = 8;
 
 std::string to_upper_ascii(const std::string& s) {
   std::string out = s;
@@ -28,7 +26,7 @@ int PageRenderer::masthead_height() const {
   const Face& lead = fonts_.face(FaceId::Lead);
   const Face& meta = fonts_.face(FaceId::Meta);
   return kNameplateTop + lead.ascent() + lead.descent() + kNameplateRuleGap +
-         meta.ascent() + meta.descent() + 14;
+         meta.ascent() + meta.descent() + 10;
 }
 
 int PageRenderer::render_masthead(const MastheadInfo& info,
@@ -61,7 +59,7 @@ int PageRenderer::render_masthead(const MastheadInfo& info,
 
   int y = baseline + lead.descent() + kNameplateRuleGap;
   fb->fill_rect(kSideMargin, y, measure, 2, kInk);
-  y += 2 + 10;
+  y += 2 + 7;
 
   // Date on the left, strap on the right, in the manner of a folio line.
   if (!info.date_line.empty() && meta_b.valid()) {
@@ -74,7 +72,7 @@ int PageRenderer::render_masthead(const MastheadInfo& info,
                   (kPageWidth - kSideMargin) * kSubpixel - w,
                   y + meta.ascent(), kInk);
   }
-  y += meta.ascent() + meta.descent() + 4;
+  y += meta.ascent() + meta.descent() + 3;
   fb->fill_rect(kSideMargin, y, measure, 1, 90);
 
   return masthead_height();
@@ -85,8 +83,8 @@ void PageRenderer::render_folio(const Page& page, Framebuffer* fb) const {
   if (!meta.valid()) return;
   if (page.folio_left.empty() && page.folio_right.empty()) return;
 
-  const int y = kPageHeight - 30;
-  fb->fill_rect(kSideMargin, y - 14, kPageWidth - 2 * kSideMargin, 1, 170);
+  const int y = kPageHeight - 26;
+  fb->fill_rect(kSideMargin, y - 11, kPageWidth - 2 * kSideMargin, 1, 185);
 
   if (!page.folio_left.empty()) {
     fb->draw_text(meta, page.folio_left, kSideMargin * kSubpixel,

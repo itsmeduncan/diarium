@@ -276,9 +276,11 @@ int cmd_compose(const std::vector<std::string>& args) {
 
   if (!fresh) seen.save(seen_path);
 
-  std::printf("Edition of %s — %zu pages, %zu stories\n",
-              format_masthead_date(now).c_str(), ed.pages.size(),
-              ed.stats.items_published);
+  std::printf("Edition of %s\n", format_masthead_date(now).c_str());
+  std::printf("  %zu pages to flip through, %zu stories, %zu pages of story "
+              "text behind them\n",
+              ed.browse_page_count, ed.stats.items_published,
+              ed.pages.size() - ed.browse_page_count);
   std::printf("  sections: ");
   for (size_t i = 0; i < ed.section_marks.size(); ++i) {
     std::printf("%s%s p%zu", i ? ", " : "", ed.section_marks[i].name.c_str(),
@@ -294,6 +296,19 @@ int cmd_compose(const std::vector<std::string>& args) {
               ed.stats.truncated_published, ed.stats.items_published);
   std::printf("  wrote %s/page-*.png (%s)\n", out_dir.c_str(),
               depth_flag.c_str());
+
+  // The navigation map. Without a reader UI yet, this is how you check that
+  // selecting a lede would land somewhere sensible.
+  if (has_flag(args, "--index")) {
+    std::printf("\n  lede page  tap region        story pages  title\n");
+    for (const StoryRef& s : ed.stories) {
+      std::printf("  %9zu  %4d,%-4d %4dx%-4d  %4zu-%-4zu   %.44s%s\n",
+                  s.lede_page + 1, s.lede_bounds.x, s.lede_bounds.y,
+                  s.lede_bounds.w, s.lede_bounds.h, s.first_page + 1,
+                  s.first_page + s.page_count, s.title.c_str(),
+                  s.truncated ? "  [excerpt]" : "");
+    }
+  }
   return 0;
 }
 

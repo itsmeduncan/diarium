@@ -179,19 +179,23 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
     const Section& s = sections[si];
     if (s.items.empty()) continue;
 
-    front.push_back(element(TextRole::Kicker, s.name));
+    // A section label with no story under it is worse than no label.
+    FlowElement section_label = element(TextRole::Kicker, s.name);
+    section_label.keep_with_next = true;
+    front.push_back(std::move(section_label));
     size_t listed = 0;
     for (size_t ii = 0; ii < s.items.size(); ++ii) {
       if (si == lead_section && ii == lead_index) continue;  // already the lead
       if (listed >= opts.front_page_per_section) break;
+      // Same shape as a section lede, so the front page and the section
+      // pages teach the reader one thing rather than two — and so a teaser
+      // that doesn't fit is pushed off whole instead of being cut mid-line.
       const Item& it = s.items[ii];
-      front.push_back(element(TextRole::Subhead, it.title));
-      const std::string ex = standfirst(it, 150);
-      if (!ex.empty()) {
-        FlowElement e = element(TextRole::Body, ex);
-        e.opens_story = true;
-        front.push_back(std::move(e));
-      }
+      FlowElement head = element(TextRole::LedeHead, it.title);
+      head.keep_with_next = true;
+      front.push_back(std::move(head));
+      const std::string ex = standfirst(it, 130);
+      if (!ex.empty()) front.push_back(element(TextRole::LedeText, ex));
       ++listed;
     }
   }
@@ -219,8 +223,8 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   }
 
   const Paginator paginator(fonts, null_hyphenator());
-  std::vector<size_t> front_element_page;
-  paginator.paginate(front, front_tmpl, &ed.pages, &front_element_page);
+  std::vector<Placement> front_placements;
+  paginator.paginate(front, front_tmpl, &ed.pages, &front_placements);
 
   // A front page is one page. Anything that didn't fit is dropped rather than
   // spilling into a second and third "front" page — but it is counted, because
@@ -228,42 +232,122 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   // able to notice.
   const size_t front_pages = ed.pages.empty() ? 0 : 1;
   if (ed.pages.size() > 1) {
-    for (size_t i = 0; i < front_element_page.size(); ++i) {
-      if (front_element_page[i] >= 1 && front[i].role == TextRole::Subhead) {
+    for (size_t i = 0; i < front_placements.size(); ++i) {
+      if (front_placements[i].page >= 1 && front[i].role == TextRole::LedeHead) {
         ++ed.stats.front_page_overflow;
       }
     }
     ed.pages.resize(1);
   }
 
-  // --- section pages --------------------------------------------------------
-  std::vector<FlowElement> body;
+  // --- section pages: ledes you browse ------------------------------------
+  //
+  // This is the edition proper. Each section page carries four or so ledes;
+  // selecting one opens the story, which lives on pages of its own after the
+  // browse sequence.
+  std::vector<FlowElement> ledes;
   std::vector<std::pair<std::string, size_t>> section_starts;  // name, flow idx
+  // Parallel to `ledes`: which flow elements make up each story's tap target,
+  // and which story they belong to.
+  struct LedeSpan {
+    size_t first_element;
+    size_t element_count;
+    size_t story;
+  };
+  std::vector<LedeSpan> lede_spans;
 
   for (const Section& s : sections) {
     if (s.items.empty()) continue;
-    section_starts.emplace_back(s.name, body.size());
+    section_starts.emplace_back(s.name, ledes.size());
 
-    bool first_in_section = true;
+    FlowElement head = element(TextRole::SectionHead, s.name);
+    head.page_break_before = true;
+    ledes.push_back(std::move(head));
+
     for (const Item& it : s.items) {
-      // Each story opens a page, per the brief. A newspaper doesn't run two
-      // unrelated stories into each other mid-column.
-      const bool opens_section = first_in_section;
-      first_in_section = false;
+      const size_t first = ledes.size();
 
-      if (opens_section) {
-        FlowElement head = element(TextRole::SectionHead, s.name);
-        head.page_break_before = true;
-        body.push_back(std::move(head));
-        body.push_back(element(TextRole::ArticleHead, it.title));
-      } else {
-        FlowElement head = element(TextRole::ArticleHead, it.title);
-        head.page_break_before = true;
-        body.push_back(std::move(head));
+      std::string source = it.source_name;
+      if (it.published != kNoDate) {
+        source += source.empty() ? "" : "  ·  ";
+        source += format_short_date(it.published);
+      }
+      if (!source.empty()) {
+        FlowElement kicker = element(TextRole::LedeKicker, source);
+        kicker.keep_with_next = true;
+        ledes.push_back(std::move(kicker));
+      }
+      FlowElement lede_head = element(TextRole::LedeHead, it.title);
+      lede_head.keep_with_next = true;
+      ledes.push_back(std::move(lede_head));
+
+      std::string summary = standfirst(it, 190);
+      if (it.looks_truncated() && !summary.empty()) {
+        summary += "  (feed excerpt)";
+      }
+      if (!summary.empty()) {
+        ledes.push_back(element(TextRole::LedeText, summary));
       }
 
+      StoryRef ref;
+      ref.title = it.title;
+      ref.section = s.name;
+      ref.truncated = it.looks_truncated();
+      ed.stories.push_back(std::move(ref));
+
+      lede_spans.push_back(
+          LedeSpan{first, ledes.size() - first, ed.stories.size() - 1});
+      ++ed.stats.items_published;
+      if (it.looks_truncated()) ++ed.stats.truncated_published;
+    }
+  }
+
+  PageTemplate lede_tmpl;
+  lede_tmpl.columns = 1;
+  std::vector<Placement> lede_placements;
+  paginator.paginate(ledes, lede_tmpl, &ed.pages, &lede_placements);
+  ed.browse_page_count = ed.pages.size();
+
+  for (const std::pair<std::string, size_t>& start : section_starts) {
+    const size_t page = start.second < lede_placements.size()
+                            ? lede_placements[start.second].page
+                            : 0;
+    ed.section_marks.push_back(Edition::SectionMark{start.first, page});
+  }
+
+  // A lede's tap target is the union of its kicker, headline and summary.
+  for (const LedeSpan& span : lede_spans) {
+    StoryRef& ref = ed.stories[span.story];
+    Rect bounds;
+    size_t page = 0;
+    bool have_page = false;
+    for (size_t k = 0; k < span.element_count; ++k) {
+      const size_t idx = span.first_element + k;
+      if (idx >= lede_placements.size()) break;
+      const Placement& pl = lede_placements[idx];
+      if (pl.bounds.empty()) continue;
+      // A lede split across a page boundary anchors to where it began.
+      if (!have_page) {
+        page = pl.page;
+        have_page = true;
+      }
+      if (pl.page == page) bounds.extend(pl.bounds);
+    }
+    ref.lede_page = page;
+    ref.lede_bounds = bounds;
+  }
+
+  // --- story pages: the full text, reached by selection --------------------
+  PageTemplate story_tmpl;
+  story_tmpl.columns = 1;
+
+  size_t story_index = 0;
+  for (const Section& s : sections) {
+    for (const Item& it : s.items) {
+      std::vector<FlowElement> story;
+      story.push_back(element(TextRole::ArticleHead, it.title));
       const std::string by = byline_for(it);
-      if (!by.empty()) body.push_back(element(TextRole::Byline, by));
+      if (!by.empty()) story.push_back(element(TextRole::Byline, by));
 
       bool opened = false;
       for (const Block& b : it.blocks) {
@@ -274,46 +358,47 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
           e.opens_story = true;
           opened = true;
         }
-        body.push_back(std::move(e));
+        story.push_back(std::move(e));
       }
-
       if (it.looks_truncated()) {
-        // Say so, rather than letting the reader wonder why a story stops.
-        body.push_back(element(TextRole::Caption,
-                               "The publisher's feed ends here."));
+        story.push_back(element(TextRole::Caption,
+                                "The publisher's feed ends here."));
       }
-      ++ed.stats.items_published;
-      if (it.looks_truncated()) ++ed.stats.truncated_published;
+
+      const size_t first = ed.pages.size();
+      const size_t added = paginator.paginate(story, story_tmpl, &ed.pages);
+      if (story_index < ed.stories.size()) {
+        ed.stories[story_index].first_page = first;
+        ed.stories[story_index].page_count = added;
+      }
+      ++story_index;
     }
-  }
-
-  PageTemplate body_tmpl;
-  body_tmpl.columns = 1;
-  body_tmpl.first_page_header = 0;
-  std::vector<size_t> element_page;
-  paginator.paginate(body, body_tmpl, &ed.pages, &element_page);
-
-  for (const std::pair<std::string, size_t>& start : section_starts) {
-    const size_t page =
-        start.second < element_page.size() ? element_page[start.second] : 0;
-    ed.section_marks.push_back(Edition::SectionMark{start.first, page});
   }
 
   // --- furniture ------------------------------------------------------------
   for (size_t i = 0; i < ed.pages.size(); ++i) {
     Page& p = ed.pages[i];
     p.is_front_page = i < front_pages;
-    p.folio_right = std::to_string(i + 1) + " / " +
-                    std::to_string(ed.pages.size());
-    if (p.is_front_page) {
-      p.folio_left = format_masthead_date(opts.now);
-    }
-  }
 
-  for (size_t i = 0; i < ed.pages.size(); ++i) {
-    if (ed.pages[i].is_front_page) continue;
-    for (const Edition::SectionMark& m : ed.section_marks) {
-      if (i >= m.first_page) ed.pages[i].folio_left = m.name;
+    if (i < ed.browse_page_count) {
+      p.folio_right = std::to_string(i + 1) + " / " +
+                      std::to_string(ed.browse_page_count);
+      p.folio_left = p.is_front_page ? format_masthead_date(opts.now) : "";
+      for (const Edition::SectionMark& m : ed.section_marks) {
+        if (i >= m.first_page) p.folio_left = m.name;
+      }
+    } else {
+      // Inside a story the folio says where you are in *that* story, not in
+      // the edition: the edition's page count is not what you're reading.
+      for (const StoryRef& st : ed.stories) {
+        if (st.page_count > 0 && i >= st.first_page &&
+            i < st.first_page + st.page_count) {
+          p.folio_left = st.section;
+          p.folio_right = std::to_string(i - st.first_page + 1) + " / " +
+                          std::to_string(st.page_count);
+          break;
+        }
+      }
     }
   }
 

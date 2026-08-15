@@ -50,9 +50,21 @@ int Face::glyph_index(uint32_t cp) const {
   return -1;
 }
 
+int Face::resolve(uint32_t cp) const {
+  const int direct = glyph_index(cp);
+  if (direct >= 0) return direct;
+
+  const uint32_t fallback = fallback_codepoint(cp);
+  if (fallback == kDropGlyph) return -1;
+  const int substituted = glyph_index(fallback);
+  if (substituted >= 0) return substituted;
+  // Even the fallback is absent — nothing sensible left to draw.
+  return -1;
+}
+
 const Glyph* Face::glyph(uint32_t cp) const {
   if (!valid()) return nullptr;
-  const int i = glyph_index(cp);
+  const int i = resolve(cp);
   if (i < 0) return nullptr;
   // Cached so callers can hold the pointer for the duration of one lookup,
   // which is all the line breaker needs.
@@ -74,8 +86,8 @@ uint8_t Face::alpha_at(const Glyph& g, int x, int y) const {
 
 int Face::kern(uint32_t a, uint32_t b) const {
   if (!valid() || kern_count_ == 0) return 0;
-  const int ia = glyph_index(a);
-  const int ib = glyph_index(b);
+  const int ia = resolve(a);
+  const int ib = resolve(b);
   if (ia < 0 || ib < 0) return 0;
 
   const uint32_t key = (static_cast<uint32_t>(ia) << 16) |
@@ -95,15 +107,10 @@ int Face::kern(uint32_t a, uint32_t b) const {
 
 int Face::advance_of(uint32_t cp) const {
   if (!valid()) return 0;
-  const int i = glyph_index(cp);
-  if (i >= 0) return glyph_at(i).advance;
-  // A missing glyph must not collapse the line. Prefer the replacement
-  // character's width, then a space, then a guess from the size.
-  for (const uint32_t fallback : {uint32_t(0xFFFD), uint32_t(' ')}) {
-    const int f = glyph_index(fallback);
-    if (f >= 0) return glyph_at(f).advance;
-  }
-  return px_size_ * kSubpixel / 3;
+  const int i = resolve(cp);
+  // A dropped character costs nothing — that is what dropping means, and it
+  // is why measurement has to use the same resolution the renderer does.
+  return i >= 0 ? glyph_at(i).advance : 0;
 }
 
 int Face::measure(const std::string& utf8) const {

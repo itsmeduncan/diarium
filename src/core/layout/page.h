@@ -20,6 +20,10 @@ namespace rsspaper {
 constexpr int kPageWidth = 1024;
 constexpr int kPageHeight = 758;
 
+// One margin, used by both the paginator's frames and the renderer's
+// furniture. They must agree or rules won't line up with columns.
+constexpr int kSideMargin = 44;
+
 enum class Align : uint8_t { Left, Center, Right, Justify };
 
 // A fragment of a line sharing one face: usually a word, or a run of words
@@ -33,6 +37,31 @@ struct PositionedRun {
 struct Line {
   int baseline = 0;  // px from the top of the page
   std::vector<PositionedRun> runs;
+};
+
+// A region on a page. Used for the tap target of a lede: the reader needs to
+// know where a story's summary sits in order to let you open it.
+struct Rect {
+  int x = 0, y = 0, w = 0, h = 0;
+  bool empty() const { return w <= 0 || h <= 0; }
+  bool contains(int px, int py) const {
+    return px >= x && py >= y && px < x + w && py < y + h;
+  }
+  void extend(const Rect& other) {
+    if (other.empty()) return;
+    if (empty()) {
+      *this = other;
+      return;
+    }
+    const int x1 = x < other.x ? x : other.x;
+    const int y1 = y < other.y ? y : other.y;
+    const int x2 = (x + w) > (other.x + other.w) ? x + w : other.x + other.w;
+    const int y2 = (y + h) > (other.y + other.h) ? y + h : other.y + other.h;
+    x = x1;
+    y = y1;
+    w = x2 - x1;
+    h = y2 - y1;
+  }
 };
 
 // Horizontal or vertical hairline: section rules, column dividers, the

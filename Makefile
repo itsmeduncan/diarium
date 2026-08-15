@@ -13,7 +13,7 @@ CXX      ?= c++
 CXXFLAGS ?= -std=c++17 -O2 -g -Wall -Wextra -Wpedantic -Wshadow
 # third_party is -isystem: vendored headers must not spray warnings over
 # ours, and we are not going to patch stb.
-INCLUDES  = -Isrc -isystem third_party -isystem third_party/stb \
+INCLUDES  = -I. -Isrc -isystem third_party -isystem third_party/stb \
             -isystem third_party/doctest
 BUILD     = build
 BIN       = bin
@@ -21,7 +21,7 @@ BIN       = bin
 CORE_SRCS := $(shell find src/core -name '*.cpp' 2>/dev/null | sort)
 SIM_SRCS  := $(shell find src/sim src/hal -name '*.cpp' 2>/dev/null | sort)
 TEST_SRCS := $(shell find test -name '*.cpp' 2>/dev/null | sort)
-FONT_SRCS := tools/fontgen/fontgen.cpp
+FONT_SRCS := $(shell find tools/fontgen -name '*.cpp' 2>/dev/null | sort)
 
 CORE_OBJS := $(CORE_SRCS:%.cpp=$(BUILD)/%.o)
 SIM_OBJS  := $(SIM_SRCS:%.cpp=$(BUILD)/%.o)
