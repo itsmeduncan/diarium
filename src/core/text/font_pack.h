@@ -27,6 +27,17 @@
 
 namespace rsspaper {
 
+// Advances and kerning are stored in 1/16 px, not whole pixels.
+//
+// Rounding each advance to an integer accumulates up to half a pixel of error
+// per character; over a 65-character measure that is enough drift to make
+// justified text visibly uneven. Positions are kept in subpixel units through
+// line breaking and rounded once, at blit time.
+constexpr int kSubpixel = 16;
+constexpr int to_px(int subpixel_units) {
+  return (subpixel_units + kSubpixel / 2) / kSubpixel;
+}
+
 constexpr uint32_t kFontPackMagic = 0x31504652;  // "RFP1"
 constexpr size_t kFontPackHeaderBytes = 12;
 constexpr size_t kFontPackFaceBytes = 52;
@@ -39,7 +50,7 @@ struct Glyph {
   int16_t bearing_y = 0;  // baseline to bitmap top, positive up
   uint16_t width = 0;
   uint16_t height = 0;
-  int16_t advance = 0;
+  int16_t advance = 0;  // 1/16 px
   uint32_t bitmap_offset = 0;  // into the face's bitmap blob
 };
 
@@ -65,14 +76,14 @@ class Face {
   const Glyph* glyph(uint32_t cp) const;
   // Alpha 0-15 for a pixel of `g`'s bitmap. Out-of-range reads return 0.
   uint8_t alpha_at(const Glyph& g, int x, int y) const;
-  // Kerning adjustment in px between two codepoints, usually negative.
+  // Kerning adjustment in 1/16 px between two codepoints, usually negative.
   int kern(uint32_t a, uint32_t b) const;
 
-  // Advance width of a UTF-8 string, kerning included. The measurement the
-  // line breaker runs on.
+  // Advance width of a UTF-8 string in 1/16 px, kerning included. This is
+  // the measurement the line breaker runs on.
   int measure(const std::string& utf8) const;
-  // Advance of a single codepoint, with the glyph for U+FFFD or a space as
-  // the fallback so a missing glyph never collapses a line.
+  // Advance of a single codepoint in 1/16 px, falling back to U+FFFD or a
+  // space so a missing glyph never collapses a line.
   int advance_of(uint32_t cp) const;
 
  private:

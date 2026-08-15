@@ -49,9 +49,9 @@ The desktop simulator runs the same pipeline the device runs, renders pages to
 PNG at the panel's exact 1024×758 geometry, and fakes touch from the keyboard.
 
 ```sh
-make sim        # bin/rsspaper-sim
+make            # simulator, tests and the font pack
 make check      # run the unit tests
-make edition    # compose an edition into out/ — not landed yet
+make edition    # compose an edition from the fixture feeds into out/
 ```
 
 `make` needs nothing but a C++17 compiler. If you have CMake, `cmake -B build
@@ -61,6 +61,15 @@ Inspect what the parser makes of a feed:
 
 ```sh
 ./bin/rsspaper-sim parse --verbose test/fixtures/feeds/*.xml
+```
+
+See the page as the panel will actually show it, rather than as an 8-bit
+render — thin serifs and hairline rules survive one reduction and not the
+other:
+
+```sh
+./bin/rsspaper-sim compose --depth mono1 --pages 4   # 1-bit, Atkinson dithered
+./bin/rsspaper-sim compose --depth grey3             # the full-refresh mode
 ```
 
 ## Configuration
