@@ -21,16 +21,17 @@ Early. The desktop simulator and the parsing/layout core are being built first,
 because the page is the product and the page needs to be looked at. Hardware
 support follows.
 
-| Piece                             | State                                    |
-| --------------------------------- | ---------------------------------------- |
-| Streaming XML parser              | working                                  |
-| RSS 2.0 / RSS 1.0 / Atom parser   | working, exercised against 12 real feeds |
-| HTML → block model                | working                                  |
-| Type + layout engine              | in progress                              |
-| Edition composer                  | in progress                              |
-| Desktop simulator (PNG output)    | in progress                              |
-| HTTP fetcher with conditional GET | not started                              |
-| Inkplate 6FLICK target            | not started                              |
+| Piece                             | State                                             |
+| --------------------------------- | ------------------------------------------------- |
+| Streaming XML parser              | working                                           |
+| RSS 2.0 / RSS 1.0 / Atom parser   | working, exercised against 12 real feeds          |
+| HTML → block model                | working                                           |
+| Type + layout engine              | working — widow/orphan control, two optical sizes |
+| Edition composer                  | working — front page, sections, dedup across days |
+| Desktop simulator (PNG output)    | working — 8-bit, 3-bit and 1-bit dithered         |
+| Reader UI (gestures, page turns)  | not started                                       |
+| HTTP fetcher with conditional GET | not started                                       |
+| Inkplate 6FLICK target            | not started                                       |
 
 ## Hardware
 
