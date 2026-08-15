@@ -118,11 +118,17 @@ bool bake_face(const FaceSpec& spec, const std::string& fonts_dir,
 
   // Glyph indices in the pack, parallel to out->glyphs, for the kern pass.
   std::vector<int> stb_indices;
+  std::vector<uint32_t> missing;
 
   for (size_t i = 0; i < n; ++i) {
     const uint32_t cp = codepoints[i];
     const int gi = stbtt_FindGlyphIndex(&font, static_cast<int>(cp));
-    if (gi == 0 && cp != 0xFFFD) continue;  // the face has no such glyph
+    if (gi == 0 && cp != 0xFFFD) {
+      // U+FFFD is deliberately baked as .notdef — tofu is the honest signal
+      // for a character we cannot draw. Everything else is simply absent.
+      missing.push_back(cp);
+      continue;
+    }
 
     int advance = 0, lsb = 0;
     stbtt_GetGlyphHMetrics(&font, gi, &advance, &lsb);
@@ -201,6 +207,17 @@ bool bake_face(const FaceSpec& spec, const std::string& fonts_dir,
                 "%6zu KB bitmaps\n",
                 spec.name, spec.px, out->glyphs.size(), out->kerns.size(),
                 probed, out->bitmaps.size() / 1024);
+    if (!missing.empty()) {
+      // Worth saying out loud: a codepoint the charset asks for and the face
+      // cannot supply renders as tofu, and that is far cheaper to notice here
+      // than in a page render.
+      std::printf("           %zu requested codepoints absent from the face:",
+                  missing.size());
+      for (size_t i = 0; i < missing.size() && i < 12; ++i) {
+        std::printf(" U+%04X", missing[i]);
+      }
+      std::printf("%s\n", missing.size() > 12 ? " ..." : "");
+    }
   }
   return true;
 }
