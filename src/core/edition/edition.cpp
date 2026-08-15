@@ -123,24 +123,58 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
           ? kNoDate
           : opts.now - static_cast<Epoch>(opts.max_age_days) * 86400;
 
-  size_t budget = opts.max_items;
+  // Drop stale stories, then sort each section newest-first — *before* any
+  // budget is applied. Cutting to the budget first would decide which stories
+  // survive by their order in the feed rather than by their date, which is
+  // only accidentally the same thing.
   for (Section& s : sections) {
-    std::vector<Item> kept;
+    std::vector<Item> fresh;
     for (Item& it : s.items) {
       ++ed.stats.items_in;
-      if (cutoff != kNoDate && it.published != kNoDate && it.published < cutoff) {
+      if (cutoff != kNoDate && it.published != kNoDate &&
+          it.published < cutoff) {
         ++ed.stats.dropped_stale;
         continue;
       }
-      if (kept.size() >= budget) {
-        ++ed.stats.dropped_over_budget;
-        continue;
-      }
-      kept.push_back(std::move(it));
+      fresh.push_back(std::move(it));
     }
-    std::stable_sort(kept.begin(), kept.end(), newer);
-    budget -= kept.size() < budget ? kept.size() : budget;
-    s.items = std::move(kept);
+    std::stable_sort(fresh.begin(), fresh.end(), newer);
+    s.items = std::move(fresh);
+  }
+
+  // Allocate the budget: a floor for every section first, then the remainder
+  // round-robin. Spending it in section order instead means a busy Technology
+  // section eats the whole paper and the back pages simply vanish — a
+  // newspaper doesn't drop its last section because the front was busy.
+  {
+    std::vector<size_t> take(sections.size(), 0);
+    size_t remaining = opts.max_items;
+
+    for (size_t i = 0; i < sections.size() && remaining > 0; ++i) {
+      size_t floor = opts.min_per_section;
+      if (floor > sections[i].items.size()) floor = sections[i].items.size();
+      if (floor > remaining) floor = remaining;
+      take[i] = floor;
+      remaining -= floor;
+    }
+
+    bool progress = true;
+    while (remaining > 0 && progress) {
+      progress = false;
+      for (size_t i = 0; i < sections.size() && remaining > 0; ++i) {
+        if (take[i] >= sections[i].items.size()) continue;
+        ++take[i];
+        --remaining;
+        progress = true;
+      }
+    }
+
+    for (size_t i = 0; i < sections.size(); ++i) {
+      if (sections[i].items.size() > take[i]) {
+        ed.stats.dropped_over_budget += sections[i].items.size() - take[i];
+        sections[i].items.resize(take[i]);
+      }
+    }
   }
 
   // The lead is simply the most recent story in the paper. No scoring, no
