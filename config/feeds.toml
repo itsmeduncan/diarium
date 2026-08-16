@@ -5,6 +5,8 @@
 # order in the paper.
 
 [edition]
+# The nameplate across the top of page one.
+title = "RSSpaper"
 # Local time to wake, compose and go back to sleep. 24-hour.
 wake_at = "05:30"
 # Hard ceiling on the edition. A paper that never ends is a feed.

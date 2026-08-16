@@ -41,6 +41,10 @@ above the HAL, and it writes PNGs you can actually look at.
 - **Ask before adding a dependency.** The vendored set is deliberately tiny:
   `stb_truetype` and `stb_image_write` (public domain), `doctest` (MIT), and
   Literata (SIL OFL). Everything else is written here.
+- **`src/core/layout/hyphen_patterns_en.cpp` is generated.** It is checked in
+  so no build system needs a codegen step, but it is an output: edit
+  `assets/hyphenation/hyph-en-us.tex` and re-run `tools/hyphgen`. Its header
+  says the same thing, and that is the only generated file in the tree.
 - **Log non-obvious choices in `DECISIONS.md`.** Especially the ones you'd
   otherwise have to re-derive in six months.
 
@@ -49,6 +53,10 @@ above the HAL, and it writes PNGs you can actually look at.
 Parser and layout changes need tests. The corpus in `test/fixtures/feeds/` is
 real feeds with real breakage in them — add to it when you hit a feed that
 misbehaves in a new way, and note its provenance in the fixtures README.
+`test/fixtures/opml/` does the same for subscription lists.
+
+Do not check in a real subscription export: it is somebody's reading list, and
+a synthetic file exercises the parser just as well.
 
 Tests use [doctest](https://github.com/doctest/doctest), vendored. Run a single
 case with:

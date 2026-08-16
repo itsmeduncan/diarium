@@ -36,6 +36,11 @@ Run a single test case (doctest):
 ./bin/rsspaper-tests --list-test-cases
 ```
 
+An edition is composed once and read many times; `compose` saves it and `read`
+loads it. `--recompose` skips the cache, `--index` prints the lede-to-story
+navigation map, `--all-pages` writes the story text as well as the pages you
+flip through.
+
 Inspect the parser's view of a feed — the fastest way to diagnose a feed bug:
 
 ```sh

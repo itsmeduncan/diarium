@@ -82,6 +82,23 @@ other:
 ./bin/rsspaper-sim compose --depth grey3             # the full-refresh mode
 ```
 
+`compose` saves the edition it built, and `read` loads it rather than
+composing again — which is the whole reason a page turn is cheap on a battery:
+
+```sh
+./bin/rsspaper-sim compose --fresh        # writes out/edition.rspe
+./bin/rsspaper-sim read                   # "no re-parse, no re-layout"
+./bin/rsspaper-sim read --recompose       # ignore it and build a fresh one
+```
+
+By default `compose` writes only the pages you flip through. `--all-pages`
+writes the story text behind them too, and `--index` prints the navigation
+map — every lede's page, its tap region, and the pages its story occupies:
+
+```sh
+./bin/rsspaper-sim compose --fresh --index --all-pages
+```
+
 Read the paper. The keyboard stands in for the panel — a keystroke becomes a
 synthesised touch, through the same gesture recogniser and the same `Reader`
 the device will run — and every refresh writes a frame:
@@ -102,6 +119,10 @@ Feeds live in a single `config/feeds.toml` on device storage — a URL, a sectio
 name, and how many items to take:
 
 ```toml
+[edition]
+title = "RSSpaper"      # the nameplate across the top of page one
+max_items = 40          # a paper that never ends is a feed
+
 [[feed]]
 url     = "https://daringfireball.net/feeds/main"
 section = "Technology"
@@ -142,7 +163,10 @@ src/core/               portable C++17 — no Arduino, compiles on desktop
 src/hal/                hardware abstraction — the only portability seam
 src/sim/                desktop harness: PNG output, keyboard "touch"
 tools/fontgen/          TTF → runtime font pack, including GPOS kerning
+tools/hyphgen/          TeX hyphenation patterns → a searchable table
 tools/check-portability.sh   CI gate on the seam above
+assets/fonts/           Literata, and the pack is built from it
+assets/hyphenation/     Liang patterns for American English
 test/                   unit tests and a corpus of real feeds
 ```
 
