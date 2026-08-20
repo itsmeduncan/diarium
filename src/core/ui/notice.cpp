@@ -37,37 +37,72 @@ void render_sleep_page(const FontPack& fonts, const std::string& title,
   const Face& lead = fonts.face(FaceId::Lead);
   const Face& meta = fonts.face(FaceId::Meta);
 
-  // A framed nameplate, set a little above true centre — optical centre sits
-  // high, and this is a cover rather than a front page.
-  const int mid = kPageHeight / 2 - 18;
+  std::string caps;
+  for (char c : title) {
+    caps.push_back(c >= 'a' && c <= 'z' ? static_cast<char>(c - 32) : c);
+  }
 
-  // Two weights, as a masthead rule would be: a heavy line above and a hair
-  // below, so the block reads as the top of something rather than a box.
-  fb->fill_rect(left, mid - 104, width, 4, kInk);
-  fb->fill_rect(left, mid + 66, width, 1, 120);
+  // The nameplate is knocked out of a full-bleed band. Glyphs composite by
+  // darkening, so white type cannot simply be drawn: the band is set black
+  // on white and then the whole strip is inverted.
+  const int band_top = 236;
+  const int band_height = 172;
+  const int baseline = band_top + 116;
 
   if (lead.valid()) {
-    std::string caps;
-    for (char c : title) {
-      caps.push_back(c >= 'a' && c <= 'z' ? static_cast<char>(c - 32) : c);
-    }
-    const int tracking = 6 * kSubpixel;
-    const int measured = lead.measure(caps) + tracking * (int)caps.size();
-    const int x = left * kSubpixel + (width * kSubpixel - measured) / 2;
-    fb->draw_text_tracked(lead, caps, x, mid, kInk, tracking);
+    const int tracking = 10 * kSubpixel;
+    const int measured =
+        lead.measure(caps) + tracking * static_cast<int>(caps.size());
+    const int x = (kPageWidth * kSubpixel - measured) / 2;
+    fb->draw_text_tracked(lead, caps, x, baseline, kInk, tracking);
   }
 
-  if (meta.valid() && !date_line.empty()) {
-    const int measured = meta.measure(date_line);
-    const int x = left * kSubpixel + (width * kSubpixel - measured) / 2;
-    fb->draw_text(meta, date_line, x, mid + 48, 90);
+  for (int y = band_top; y < band_top + band_height; ++y) {
+    for (int x = 0; x < kPageWidth; ++x) {
+      fb->set(x, y, static_cast<uint8_t>(255 - fb->get(x, y)));
+    }
   }
+
+  // Thick-thin above, thin-thick below: a printer's rule stack, which is what
+  // makes a masthead read as pressed rather than typed. Full bleed, like the
+  // band, so nothing appears to float inside a margin it does not share.
+  fb->fill_rect(0, band_top - 22, kPageWidth, 7, kInk);
+  fb->fill_rect(0, band_top - 10, kPageWidth, 2, kInk);
+  fb->fill_rect(0, band_top + band_height + 8, kPageWidth, 2, kInk);
+  fb->fill_rect(0, band_top + band_height + 15, kPageWidth, 7, kInk);
+
+  // The date, letterspaced and small, the way a dateline is set.
+  if (meta.valid() && !date_line.empty()) {
+    std::string date_caps;
+    for (char c : date_line) {
+      date_caps.push_back(c >= 'a' && c <= 'z' ? static_cast<char>(c - 32) : c);
+    }
+    const int tracking = 5 * kSubpixel;
+    const int measured =
+        meta.measure(date_caps) + tracking * static_cast<int>(date_caps.size());
+    const int x = (kPageWidth * kSubpixel - measured) / 2;
+    fb->draw_text_tracked(meta, date_caps, x, band_top + band_height + 84, 40,
+                          tracking);
+  }
+
+  // A tone bar, the way a press prints one in the trim: eight swatches, which
+  // is exactly what this panel can show. It is an honest test card and it
+  // says what the machine is.
+  const int bar_y = kPageHeight - 84;
+  const int swatch = width / 8;
+  for (int i = 0; i < 8; ++i) {
+    const uint8_t tone = static_cast<uint8_t>(255 - (255 * i) / 7);
+    fb->fill_rect(left + i * swatch, bar_y, swatch, 26, tone);
+  }
+  fb->frame_rect(left, bar_y, swatch * 8, 26, kInk);
 
   if (meta.valid()) {
-    const char* hint = "Touch to wake";
-    const int measured = meta.measure(hint);
-    const int x = left * kSubpixel + (width * kSubpixel - measured) / 2;
-    fb->draw_text(meta, hint, x, kPageHeight - 70, 130);
+    const char* hint = "TOUCH TO WAKE";
+    const int tracking = 4 * kSubpixel;
+    const int measured =
+        meta.measure(hint) + tracking * static_cast<int>(std::string(hint).size());
+    const int x = (kPageWidth * kSubpixel - measured) / 2;
+    fb->draw_text_tracked(meta, hint, x, kPageHeight - 28, 110, tracking);
   }
 }
 
