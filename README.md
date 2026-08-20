@@ -47,6 +47,9 @@ support follows — tracked on the
 | HTTP fetcher with conditional GET | working — verified live, most feeds answer 304    |
 | Inkplate 6FLICK target            | working — fetches, composes and is read by touch  |
 | Read state and carry-over         | working — unread stories keep until you read them |
+| Reading model                     | working — one pass, oldest first, ends when it ends |
+| Full text behind truncated feeds  | working — the article is pulled from its own page |
+| Device commands                   | working — flash, log, put, compose from make      |
 | Frontlight, battery mark          | working — threshold is a guess until measured     |
 | Power loop (wake, compose, sleep) | working — draw over a day is not yet measured     |
 
@@ -213,10 +216,15 @@ refinements, not sections:
 ## Non-goals
 
 No server component. No EPUB or OPDS. No read-later integrations. No AI. No
-full-text extraction of truncated feeds in v1 — RSSpaper renders what the feed
-publishes, and records per item whether the publisher looked like they held
-something back, so the value of a v2 readability extractor can be measured
-rather than guessed.
+images: a feed gives one usable one per item at best, and twenty empty boxes
+make a page unreadable, so an image becomes a caption line.
+
+Full-text extraction was a non-goal until the reading model changed. Skimming
+ledes and picking made a truncated story cheap; swiping through every story in
+turn made it a dead end, and 21 of 40 stories in a typical edition are cut
+short by their publisher. So a truncated story now has its own page fetched
+and the article pulled out of it — and when that fails, the feed's excerpt is
+printed rather than a navigation bar.
 
 ## Repository layout
 
@@ -230,11 +238,14 @@ src/core/               portable C++17 — no Arduino, compiles on desktop
   text/                 font pack, glyph metrics, fallbacks
   layout/               line breaking, pagination, the type scale
   render/               framebuffer and page drawing
-  edition/              composer, seen-store dedup
+  edition/              composer, read-state dedup
+  net/                  HTTP heads, body framing, URLs, the validator cache
   config/               feeds.toml
   ui/                   gesture recognition, the reader
 src/hal/                hardware abstraction — the only portability seam
 src/sim/                desktop harness: PNG output, keyboard "touch"
+src/device/             the Inkplate: six HAL implementations and a console
+tools/device.py         put files on the card, force a compose, watch the log
 tools/fontgen/          TTF → runtime font pack, including GPOS kerning
 tools/hyphgen/          TeX hyphenation patterns → a searchable table
 tools/check-portability.sh   CI gate on the seam above

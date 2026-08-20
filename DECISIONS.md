@@ -346,6 +346,70 @@ ordering. Reverse-chronological within a section remains the entire ranking.
 The reader gets a way to declare the whole thing read, because a carry-over
 pile with no exit is an inbox.
 
+### 32. Reading is one pass, and the front page is drawn rather than composed
+
+The reader was a tree: browse pages of ledes, tap one, read it, come back. It
+is now a line — you land on a contents page and swipe onward through every
+unread story, oldest first, until there are none.
+
+That made the composed front page wrong rather than merely redundant. It led
+with the newest story while swiping right took you to the oldest, so the first
+thing it showed was the last thing you would reach. It also printed a count of
+what was outstanding, which decision 31 rules out.
+
+So page one is drawn by `core/ui/contents.h` at read time. A view of what is
+left to read cannot be composed into an edition, because it changes as you
+read and the edition does not. The lede pages behind it still exist and can
+still be flipped through and clipped from; nothing was thrown away.
+
+### 33. The article is found by scoring blocks, because there is no DOM
+
+Publishers truncate: 21 of 40 stories in a typical edition end in an ellipsis.
+Fetching the page behind one is easy; deciding which part of it is the story
+is not, and every readability algorithm worth the name scores a tree.
+
+There is no tree here. `html_to_blocks` is a push parser that discards
+structure as it goes, which is exactly what lets it run over a socket without
+buffering a page. Rebuilding a DOM to score it would give back the memory the
+streaming design exists to save.
+
+So the heuristic scores the block sequence instead: prose is long and
+consecutive, furniture is short and scattered. Each block is worth how far its
+length exceeds a floor, and the best contiguous run is the article — a
+maximum-subarray scan, linear, needing nothing the parser threw away. An empty
+result means the page read as all furniture, and the feed's own excerpt is
+printed instead. A navigation bar in a newspaper is worse than a stub.
+
+### 34. The day comes from the servers, because nothing else can tell it
+
+The RTC has no battery and starts at 2000-01-01. There is no NTP, no keyboard,
+and no network at all on the read path.
+
+Every HTTP response carries a Date header, and `parse_feed_date` already reads
+that format for RSS. The clock is set from the first response of a compose
+wake, including a 304 — most mornings most feeds answer 304, so waiting for a
+200 would drift the clock on exactly the days nothing changed.
+
+Seeding it from the edition already on the card was tried first and is a trap:
+the device inherits the date of whatever paper it happens to be holding and
+then composes the next one with it, so a wrong date is self-perpetuating.
+
+The masthead is local, not UTC. A paper is dated the day the reader is having,
+and at nine in the evening those are not the same day.
+
+### 35. Feed bodies and article pages are kept on the card
+
+A 304 means a feed is unchanged, which means there are no items — so composing
+from scratch after one would quietly drop those stories from the paper.
+Conditional GET would remove the very stories it exists to fetch cheaply.
+
+So each feed's body is kept, and re-parsed when the server says nothing has
+changed. Article pages are kept the same way, keyed on the item rather than the
+feed, because a feed's stories change and each one's full text is its own.
+
+It costs card space and buys correctness on the mornings when little has
+changed, which is most of them.
+
 ## Open questions
 
 Tracked as issues, so there is one place to update rather than two:

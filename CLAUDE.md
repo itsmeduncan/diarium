@@ -25,6 +25,14 @@ make read                 # drive the reader from the keyboard
 make portability          # the no-platform-headers gate (also part of check)
 make clean
 
+make device               # build the firmware (needs PlatformIO)
+make device-flash         # build it and put it on the board
+make device-log           # watch what it says
+make device-ls            # what is on the card
+make device-put FILE=config/feeds.local.toml DEST=/feeds.toml
+make device-compose       # fetch and compose now, not at wake_at
+make help                 # all of the above, listed
+
 cmake -B build && cmake --build build   # same targets; what CI runs
 ctest --test-dir build --output-on-failure
 ```
@@ -64,10 +72,17 @@ ByteSource → XmlPullParser → parse_feed → Item{Block…} → layout → fr
              (pull)          (streaming)   (no HTML)      (pages)   (greyscale)
 ```
 
-An edition has two kinds of page. Pages `[0, browse_page_count)` are the ledes
-you flip through; everything after is story text reached by selecting a lede
-(`StoryRef`, `Edition::story_at`). Keep that split — a linear edition of the
-same content ran to 175 pages.
+An edition has two kinds of page. Pages `[0, browse_page_count)` are the ledes;
+everything after is story text (`StoryRef`, `Edition::story_at`). Keep that
+split — a linear edition of the same content ran to 175 pages.
+
+Reading is a single pass rather than a tree. You land on a contents page —
+drawn by `core/ui/contents.h`, not composed, because it is a view of what is
+left rather than a fact about the edition — and swipe onward through every
+unread story, oldest first (`Edition::reading_order`), until there are none.
+Each is marked read on arrival; what you did not reach is still in tomorrow's
+paper, because the composer dedups against what was *read* rather than what it
+printed.
 
 **`src/core/` is portable C++17 and must never include a platform header.**
 That constraint is what lets the whole pipeline run on a laptop, and it is the
@@ -96,6 +111,15 @@ Key boundaries worth understanding before changing anything:
   `fallback_codepoint` decides what happens to a character the face lacks:
   substitute, drop, or tofu. Everything routes through `Face::resolve`, so
   measuring and drawing can't disagree about what a glyph costs.
+- **`core/net/`** is the HTTP the device speaks: an incremental head parser, a
+  body source that hides chunked from the feed parser, URL resolution for
+  relative redirects, and the per-feed validator cache that makes most
+  mornings a handshake instead of a download. All portable, because the things
+  that break against real servers are testable on a laptop.
+- **`core/html/readability.h`** finds the article inside a whole page, for the
+  publishers that truncate. There is no DOM to score — `html_to_blocks` is a
+  push parser that discards structure so it can run over a socket — so it
+  scores the block sequence instead and takes the best contiguous run.
 - **`core/ui/`** is the top of the portable stack. `gesture.h` turns touch
   points into intentions — note that release coordinates are ignored, because
   a released panel reports none — and `reader.h` is the only thing in
