@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include "core/render/reduce.h"
+
 namespace rsspaper {
 namespace device {
 namespace {
@@ -35,6 +37,12 @@ void DeviceDisplay::blit_3bit() {
 }
 
 void DeviceDisplay::blit_1bit() {
+  // Atkinson-dither first, using the same code the simulator uses, so what
+  // `--depth mono1` shows is what the panel shows. A hard threshold loses the
+  // grey edges that antialiasing puts on small type, and small type on a
+  // partial refresh is most of what a reader looks at.
+  reduce_to_mono1(&fb_);
+
   const uint8_t* src = fb_.pixels();
   uint8_t* dst = panel_->_partial;
   if (dst == nullptr) return;
@@ -45,8 +53,7 @@ void DeviceDisplay::blit_1bit() {
     uint8_t* d = dst + static_cast<size_t>(y) * kOneBitStride;
     for (int xb = 0; xb < w / 8; ++xb) {
       const uint8_t* p = s + xb * 8;
-      // Thresholded, not dithered. Dithering a page turn is a question about
-      // how partial refreshes should look, which belongs to issue #7.
+      // Already reduced to exactly kInk or kPaper, so this test is exact.
       uint8_t bits = 0;
       if (p[0] < 128) bits |= 0x01;
       if (p[1] < 128) bits |= 0x02;

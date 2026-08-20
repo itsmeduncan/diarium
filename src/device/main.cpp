@@ -165,7 +165,10 @@ void loop() {
                   changed ? "changed" : "ignored");
     if (changed) {
       reader->tick();
-      Serial.printf("  %s\n", reader->position().c_str());
+      Serial.printf("  %s | blit %3u ms  refresh %4u ms\n",
+                    reader->position().c_str(),
+                    (unsigned)hal_impl->display.last_blit_ms(),
+                    (unsigned)hal_impl->display.last_flush_ms());
     }
   }
 
