@@ -153,6 +153,7 @@ std::string serialize_edition(const Edition& ed) {
     put_u32(out, static_cast<uint32_t>(s.first_page));
     put_u32(out, static_cast<uint32_t>(s.page_count));
     put_u8(out, s.truncated ? 1 : 0);
+    put_i64(out, static_cast<int64_t>(s.published));
   }
 
   put_u32(out, static_cast<uint32_t>(ed.pages.size()));
@@ -204,7 +205,7 @@ bool deserialize_edition(const std::string& blob, Edition* out,
   Reader r(blob);
   if (r.u32() != kEditionMagic) return fail("not a saved edition");
   const uint16_t version = r.u16();
-  if (version != kEditionVersion) {
+  if (version < kMinEditionVersion || version > kEditionVersion) {
     return fail("saved edition was written by a different build");
   }
   r.u16();  // flags
@@ -248,6 +249,9 @@ bool deserialize_edition(const std::string& blob, Edition* out,
     s.first_page = r.u32();
     s.page_count = r.u32();
     s.truncated = r.u8() != 0;
+    // Version 2 predates publication dates. Reading such an edition is fine;
+    // it simply has no dates to order by until it is composed again.
+    s.published = version >= 3 ? static_cast<Epoch>(r.i64()) : kNoDate;
     ed.stories.push_back(std::move(s));
   }
 

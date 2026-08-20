@@ -26,4 +26,47 @@ void render_notice(const FontPack& fonts, const char* headline,
   }
 }
 
+void render_sleep_page(const FontPack& fonts, const std::string& title,
+                       const std::string& date_line, Framebuffer* fb) {
+  fb->fill(kPaper);
+
+  const int left = kSideMargin;
+  const int right = kPageWidth - kSideMargin;
+  const int width = right - left;
+
+  const Face& lead = fonts.face(FaceId::Lead);
+  const Face& meta = fonts.face(FaceId::Meta);
+
+  // A framed nameplate, centred on the page rather than sitting at the top:
+  // this is a cover, not a front page.
+  const int mid = kPageHeight / 2;
+
+  fb->fill_rect(left, mid - 150, width, 3, kInk);
+  fb->fill_rect(left, mid + 96, width, 3, kInk);
+
+  if (lead.valid()) {
+    std::string caps;
+    for (char c : title) {
+      caps.push_back(c >= 'a' && c <= 'z' ? static_cast<char>(c - 32) : c);
+    }
+    const int tracking = 6 * kSubpixel;
+    const int measured = lead.measure(caps) + tracking * (int)caps.size();
+    const int x = left * kSubpixel + (width * kSubpixel - measured) / 2;
+    fb->draw_text_tracked(lead, caps, x, mid, kInk, tracking);
+  }
+
+  if (meta.valid() && !date_line.empty()) {
+    const int measured = meta.measure(date_line);
+    const int x = left * kSubpixel + (width * kSubpixel - measured) / 2;
+    fb->draw_text(meta, date_line, x, mid + 62, 90);
+  }
+
+  if (meta.valid()) {
+    const char* hint = "Touch to wake";
+    const int measured = meta.measure(hint);
+    const int x = left * kSubpixel + (width * kSubpixel - measured) / 2;
+    fb->draw_text(meta, hint, x, kPageHeight - 70, 130);
+  }
+}
+
 }  // namespace rsspaper

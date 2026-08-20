@@ -2,6 +2,8 @@
 // budget depends on.
 #pragma once
 
+#include <cstdint>
+
 #include "Inkplate.h"
 #include "core/base/datetime.h"
 #include "device/device_storage.h"
@@ -18,6 +20,11 @@ class DevicePower final : public IPower {
   // a real share of the deep-sleep budget.
   void set_storage(DeviceStorage* storage) { storage_ = storage; }
 
+  // Seconds until the next scheduled wake, or 0 for none. A timer rather than
+  // the RTC alarm pin, because ext1 can carry only one active-low source and
+  // that one has to be touch — see the implementation.
+  void set_wake_in(uint32_t seconds) { wake_in_seconds_ = seconds; }
+
   void deep_sleep_until(Epoch when) override;
   int battery_millivolts() const override;
 
@@ -31,6 +38,7 @@ class DevicePower final : public IPower {
  private:
   Inkplate* panel_;
   DeviceStorage* storage_ = nullptr;
+  uint32_t wake_in_seconds_ = 0;
 };
 
 }  // namespace device

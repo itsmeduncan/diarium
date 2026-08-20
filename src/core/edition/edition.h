@@ -83,6 +83,9 @@ struct StoryRef {
   size_t first_page = 0;   // where the full text starts
   size_t page_count = 0;   // how long it runs
   bool truncated = false;  // the publisher's feed stops early
+  // When the publisher says it ran. Carried so the reader can walk the
+  // edition oldest-first, which page order alone cannot give.
+  Epoch published = kNoDate;
 };
 
 struct Edition {
@@ -108,6 +111,11 @@ struct Edition {
   std::vector<SectionMark> section_marks;
 
   size_t page_count() const { return pages.size(); }
+
+  // Story indices oldest-first, which is the order a reader walks them in.
+  // Computed rather than stored: it is a view of the stories, not a fact
+  // about the edition.
+  std::vector<size_t> reading_order() const;
 
   // The story whose lede covers a point on a browse page, or null.
   const StoryRef* story_at(size_t page, int x, int y) const {

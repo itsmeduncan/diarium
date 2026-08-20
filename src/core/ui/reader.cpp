@@ -204,11 +204,39 @@ bool Reader::jump_to_section(size_t index) {
 }
 
 bool Reader::handle(const GestureEvent& event) {
+  // The continuous pass has its own gestures: right goes onward through the
+  // news, and up and down move within the article you are on.
+  if (mode_ == ReaderMode::Article) {
+    switch (event.kind) {
+      case Gesture::SwipeRight:
+        return next_article();
+      case Gesture::SwipeLeft:
+        return previous_article();
+      case Gesture::SwipeUp:
+        return scroll_down();
+      case Gesture::SwipeDown:
+        return scroll_up();
+      case Gesture::LongPress:
+        toggle_clipping_at(event.x, event.y);
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  if (mode_ == ReaderMode::Finished) {
+    // Backwards out of the end, in case it arrived sooner than expected.
+    if (event.kind == Gesture::SwipeLeft) return previous_article();
+    return false;
+  }
+
   switch (event.kind) {
     case Gesture::SwipeLeft:
       return next_page();
     case Gesture::SwipeRight:
-      return previous_page();
+      // From the overview, rightwards is into the news rather than backwards
+      // through pages you have already passed.
+      return mode_ == ReaderMode::Browse ? begin_reading() : previous_page();
     case Gesture::SwipeDown:
       return toggle_sections();
     case Gesture::SwipeUp:
@@ -395,6 +423,8 @@ void Reader::render() {
     render_section_overlay();
   } else if (mode_ == ReaderMode::Clippings) {
     render_clippings();
+  } else if (mode_ == ReaderMode::Finished) {
+    render_finished();
   } else {
     if (page_ >= edition_.pages.size()) return;
     renderer_.render(edition_.pages[page_], &hal_.display->framebuffer());
@@ -414,6 +444,14 @@ void Reader::render() {
 }
 
 std::string Reader::position() const {
+  if (mode_ == ReaderMode::Article && order_pos_ < order_.size()) {
+    const StoryRef& s = edition_.stories[order_[order_pos_]];
+    return "article " + std::to_string(order_pos_ + 1) + "/" +
+           std::to_string(order_.size()) + " page " +
+           std::to_string(article_page_ + 1) + "/" +
+           std::to_string(s.page_count) + " — " + s.title;
+  }
+  if (mode_ == ReaderMode::Finished) return "no more news";
   switch (mode_) {
     case ReaderMode::Sections:
       return "sections";
@@ -431,6 +469,136 @@ std::string Reader::position() const {
   }
   return "browsing page " + std::to_string(page_ + 1) + "/" +
          std::to_string(edition_.browse_page_count);
+}
+
+
+// ---------------------------------------------------------------------------
+// The continuous pass: every unread article, oldest first, one swipe at a
+// time. This is the reading model — the ledes are an overview you land on,
+// not a place you keep coming back to.
+// ---------------------------------------------------------------------------
+
+void Reader::load_read_state(const std::string& path) {
+  read_path_ = path;
+  order_ = edition_.reading_order();
+  if (hal_.storage == nullptr) return;
+  std::string blob;
+  if (!hal_.storage->read(path, &blob)) return;  // nothing read yet
+  read_.deserialize(blob, edition_.date);
+}
+
+size_t Reader::unread_remaining() const {
+  size_t n = 0;
+  for (size_t i = 0; i < order_.size(); ++i) {
+    if (!read_.has(edition_.stories[order_[i]].key)) ++n;
+  }
+  return n;
+}
+
+void Reader::mark_current_read() {
+  if (order_pos_ >= order_.size()) return;
+  const StoryRef& s = edition_.stories[order_[order_pos_]];
+  if (!read_.mark(s.key, edition_.date)) return;  // already read
+  if (hal_.storage != nullptr && !read_path_.empty()) {
+    hal_.storage->write(read_path_, serialize_seen_store(read_));
+  }
+}
+
+bool Reader::show_article_at(size_t order_pos, bool context_change) {
+  if (order_pos >= order_.size()) {
+    mode_ = ReaderMode::Finished;
+    needs_render_ = true;
+    pending_context_change_ = true;
+    return true;
+  }
+  const StoryRef& s = edition_.stories[order_[order_pos]];
+  if (s.page_count == 0) return false;
+
+  order_pos_ = order_pos;
+  article_page_ = 0;
+  mode_ = ReaderMode::Article;
+  story_index_ = order_[order_pos];
+  have_story_ = true;
+  set_page(s.first_page, context_change);
+  mark_current_read();
+  return true;
+}
+
+// Enters the pass at the oldest thing not yet read.
+bool Reader::begin_reading() {
+  for (size_t i = 0; i < order_.size(); ++i) {
+    if (!read_.has(edition_.stories[order_[i]].key)) {
+      return show_article_at(i, true);
+    }
+  }
+  mode_ = ReaderMode::Finished;
+  needs_render_ = true;
+  pending_context_change_ = true;
+  return true;
+}
+
+bool Reader::next_article() {
+  for (size_t i = order_pos_ + 1; i < order_.size(); ++i) {
+    if (!read_.has(edition_.stories[order_[i]].key)) {
+      return show_article_at(i, true);
+    }
+  }
+  // Nothing unread ahead: the news has run out.
+  mode_ = ReaderMode::Finished;
+  needs_render_ = true;
+  pending_context_change_ = true;
+  return true;
+}
+
+// Backwards goes to the previous article whether or not it has been read:
+// having just read it is the usual reason to want it again.
+bool Reader::previous_article() {
+  if (order_pos_ == 0) return false;
+  return show_article_at(order_pos_ - 1, true);
+}
+
+bool Reader::scroll_down() {
+  if (order_pos_ >= order_.size()) return false;
+  const StoryRef& s = edition_.stories[order_[order_pos_]];
+  if (static_cast<size_t>(article_page_) + 1 >= s.page_count) return false;
+  ++article_page_;
+  set_page(s.first_page + static_cast<size_t>(article_page_), false);
+  return true;
+}
+
+bool Reader::scroll_up() {
+  if (order_pos_ >= order_.size() || article_page_ == 0) return false;
+  --article_page_;
+  const StoryRef& s = edition_.stories[order_[order_pos_]];
+  set_page(s.first_page + static_cast<size_t>(article_page_), false);
+  return true;
+}
+
+void Reader::render_finished() {
+  Framebuffer& fb = hal_.display->framebuffer();
+  fb.fill(kPaper);
+
+  const Face& head = fonts_.face(FaceId::Head);
+  const Face& body = fonts_.face(FaceId::Body);
+  const Face& meta = fonts_.face(FaceId::Meta);
+
+  int y = 260;
+  if (head.valid()) {
+    fb.draw_text(head, "That is all the news", kSideMargin * kSubpixel, y, kInk);
+    y += head.descent() + 28;
+  }
+  fb.fill_rect(kSideMargin, y, kPageWidth - 2 * kSideMargin, 2, kInk);
+  y += 56;
+
+  if (body.valid()) {
+    fb.draw_text(body, "You have read everything in this edition.",
+                 kSideMargin * kSubpixel, y, kInk);
+    y += 46;
+  }
+  if (meta.valid()) {
+    fb.draw_text(meta, "The next paper arrives in the morning.",
+                 kSideMargin * kSubpixel, y, 110);
+  }
 }
 
 }  // namespace rsspaper

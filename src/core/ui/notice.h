@@ -7,6 +7,8 @@
 // be told which of those happened.
 #pragma once
 
+#include <string>
+
 #include "core/render/framebuffer.h"
 #include "core/text/font_pack.h"
 
@@ -17,5 +19,11 @@ namespace rsspaper {
 // missing.
 void render_notice(const FontPack& fonts, const char* headline,
                    const char* body, Framebuffer* fb);
+
+// What the panel holds while the device sleeps. E-ink keeps its last image,
+// so this is what the paper looks like sitting on a table — it should look
+// like a paper at rest, not like a device that has switched off.
+void render_sleep_page(const FontPack& fonts, const std::string& title,
+                       const std::string& date_line, Framebuffer* fb);
 
 }  // namespace rsspaper

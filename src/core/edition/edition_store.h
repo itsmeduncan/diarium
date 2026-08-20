@@ -24,7 +24,10 @@ namespace rsspaper {
 constexpr uint32_t kEditionMagic = 0x45505352;  // "RSPE"
 // 2: StoryRef gained a stable key and a source, so a clipping can find
 // its story again in a later edition.
-constexpr uint16_t kEditionVersion = 2;
+constexpr uint16_t kEditionVersion = 3;  // 3 adds StoryRef::published
+// The oldest format still readable. A format bump must not brick a device
+// whose only copy of the paper is the one already on its card.
+constexpr uint16_t kMinEditionVersion = 2;
 
 std::string serialize_edition(const Edition& edition);
 

@@ -1,6 +1,7 @@
 // Gesture recognition and reader navigation, driven through the same HAL the
 // device will implement — with a fake display that records refresh modes
 // instead of driving a panel.
+#include <map>
 #include <string>
 #include <vector>
 
@@ -68,12 +69,26 @@ class FakePower final : public IPower {
   int battery_millivolts() const override { return 4000; }
 };
 
+// A real store rather than a black hole: clippings and read state are only
+// worth anything if they survive being written and read back.
 class FakeStorage final : public IStorage {
  public:
-  bool read(const std::string&, std::string*) override { return false; }
-  bool write(const std::string&, const std::string&) override { return true; }
-  bool exists(const std::string&) override { return false; }
-  bool remove(const std::string&) override { return true; }
+  bool read(const std::string& path, std::string* out) override {
+    auto it = files.find(path);
+    if (it == files.end()) return false;
+    *out = it->second;
+    return true;
+  }
+  bool write(const std::string& path, const std::string& data) override {
+    files[path] = data;
+    return true;
+  }
+  bool exists(const std::string& path) override {
+    return files.count(path) != 0;
+  }
+  bool remove(const std::string& path) override { return files.erase(path) != 0; }
+
+  std::map<std::string, std::string> files;
 };
 
 class FakeHttp final : public IHttpClient {
@@ -417,4 +432,138 @@ TEST_CASE("the reader describes where it is") {
   CHECK(reader.position().find("browsing page 1/") != std::string::npos);
   reader.toggle_sections();
   CHECK(reader.position() == "sections");
+}
+
+// The continuous pass: an overview you land on, then every unread article
+// oldest-first, one swipe at a time, until the news runs out.
+TEST_CASE("reading: the continuous oldest-first pass") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;  // no font pack built; nothing to lay out
+  Edition ed = make_edition(*fonts);
+  REQUIRE_FALSE(ed.stories.empty());
+
+  SUBCASE("reading order runs oldest first") {
+    const std::vector<size_t> order = ed.reading_order();
+    REQUIRE(order.size() == ed.stories.size());
+    for (size_t i = 1; i < order.size(); ++i) {
+      const Epoch a = ed.stories[order[i - 1]].published;
+      const Epoch b = ed.stories[order[i]].published;
+      if (a != kNoDate && b != kNoDate) CHECK(a <= b);
+    }
+  }
+
+  SUBCASE("swiping right from the overview enters the oldest article") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    r.render();
+    REQUIRE(r.mode() == ReaderMode::Browse);
+
+    GestureEvent e;
+    e.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(e));
+    CHECK(r.mode() == ReaderMode::Article);
+
+    const std::vector<size_t> order = ed.reading_order();
+    CHECK(r.open_story() != nullptr);
+    CHECK(r.open_story()->key == ed.stories[order[0]].key);
+  }
+
+  SUBCASE("swiping right walks onward and never revisits") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));
+
+    std::vector<uint64_t> seen;
+    for (int i = 0; i < 40 && r.mode() == ReaderMode::Article; ++i) {
+      seen.push_back(r.open_story()->key);
+      r.handle(right);
+    }
+    CHECK(r.mode() == ReaderMode::Finished);
+
+    for (size_t i = 0; i < seen.size(); ++i) {
+      for (size_t j = i + 1; j < seen.size(); ++j) CHECK(seen[i] != seen[j]);
+    }
+  }
+
+  SUBCASE("swiping up and down scrolls within the article") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));
+
+    // Find an article long enough to have somewhere to scroll to.
+    while (r.mode() == ReaderMode::Article && r.open_story()->page_count < 2) {
+      r.handle(right);
+    }
+    if (r.mode() != ReaderMode::Article) return;
+
+    const size_t top = r.current_page();
+    GestureEvent up;
+    up.kind = Gesture::SwipeUp;
+    CHECK(r.handle(up));
+    CHECK(r.current_page() == top + 1);
+
+    GestureEvent down;
+    down.kind = Gesture::SwipeDown;
+    CHECK(r.handle(down));
+    CHECK(r.current_page() == top);
+    CHECK_FALSE(r.handle(down));  // already at the top of the article
+  }
+
+  SUBCASE("scrolling stops at the end of the article rather than running on") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));
+
+    const size_t pages = r.open_story()->page_count;
+    GestureEvent up;
+    up.kind = Gesture::SwipeUp;
+    for (size_t i = 0; i + 1 < pages; ++i) CHECK(r.handle(up));
+    CHECK_FALSE(r.handle(up));
+    CHECK(r.mode() == ReaderMode::Article);  // scrolling never advances
+  }
+
+  SUBCASE("what has been read is remembered across a session") {
+    Rig rig;
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+
+    uint64_t first_key = 0;
+    {
+      Reader r(ed, *fonts, rig.hal());
+      r.load_read_state("read.dat");
+      REQUIRE(r.handle(right));
+      first_key = r.open_story()->key;
+      REQUIRE(r.handle(right));  // move on, marking the first read
+    }
+
+    Reader again(ed, *fonts, rig.hal());
+    again.load_read_state("read.dat");
+    REQUIRE(again.handle(right));
+    CHECK(again.open_story()->key != first_key);
+  }
+
+  SUBCASE("the pass ends rather than looping when everything is read") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    for (int i = 0; i < 60; ++i) r.handle(right);
+    CHECK(r.mode() == ReaderMode::Finished);
+
+    Reader fresh(ed, *fonts, rig.hal());
+    fresh.load_read_state("read.dat");
+    fresh.handle(right);
+    CHECK(fresh.mode() == ReaderMode::Finished);
+  }
 }
