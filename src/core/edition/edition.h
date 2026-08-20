@@ -30,10 +30,14 @@ struct FeedProblem {
 struct ComposeOptions {
   Epoch now = kNoDate;
   std::string title = "RSSpaper";
-  // Hard ceiling on the whole edition. A paper that never ends is a feed.
-  size_t max_items = 40;
-  // Stories every section gets before any section gets more. Without this the
-  // budget is spent in section order and the last section can vanish entirely.
+  // Optional ceiling on the whole edition. Zero means no ceiling: every story
+  // that survives the per-feed caps and the age window is published, which is
+  // what you want when you are a week behind the news. Set it if you would
+  // rather have a paper of a predictable length.
+  size_t max_items = 0;
+  // When there is a ceiling, the stories every section gets before any section
+  // gets more — otherwise the budget is spent in section order and the last
+  // section vanishes because the front was busy.
   size_t min_per_section = 2;
   // Stories older than this are stale news, however recently they appeared in
   // the feed.

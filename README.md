@@ -215,7 +215,7 @@ password = "..."        # never commit this; see config/feeds.local.toml
 [edition]
 title = "RSSpaper"       # the nameplate across the top of page one
 wake_at = "05:30"        # local time the next edition is composed
-max_items = 40           # a paper that never ends is a feed
+# max_items = 40         # optional ceiling; there is none by default
 max_age_days = 3         # older than this is not news
 utc_offset_minutes = 0   # no network to ask, no keyboard to be asked
 front_page_columns = 2   # 1 to 4

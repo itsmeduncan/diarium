@@ -326,8 +326,10 @@ TEST_CASE("feeds.toml parses the config we ship") {
   std::string error;
   REQUIRE_MESSAGE(load_feeds_toml("config/feeds.toml", &list, &error), error);
   CHECK(list.feeds.size() >= 10);
-  CHECK(list.edition.max_items > 0);
+  // No ceiling on the edition as a whole — the per-feed caps are what bound it.
+  CHECK(list.edition.max_items == 0);
   for (const FeedEntry& f : list.feeds) {
+    CHECK(f.max_items > 0);
     CHECK(starts_with(f.url, "http"));
     CHECK_FALSE(f.section.empty());
   }

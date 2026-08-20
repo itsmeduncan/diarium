@@ -144,11 +144,14 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
     s.items = std::move(fresh);
   }
 
-  // Allocate the budget: a floor for every section first, then the remainder
+  // Allocate the budget, if there is one. A ceiling of zero is no ceiling:
+  // everything that got this far is published.
+  //
+  // When there is one: a floor for every section first, then the remainder
   // round-robin. Spending it in section order instead means a busy Technology
   // section eats the whole paper and the back pages simply vanish — a
   // newspaper doesn't drop its last section because the front was busy.
-  {
+  if (opts.max_items > 0) {
     std::vector<size_t> take(sections.size(), 0);
     size_t remaining = opts.max_items;
 

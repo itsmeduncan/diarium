@@ -29,7 +29,8 @@ struct EditionConfig {
   // Minutes east of UTC. The device has no network to ask and no keyboard to
   // be asked, so the offset travels with the config on the card.
   int utc_offset_minutes = 0;
-  size_t max_items = 40;
+  // Zero is no ceiling on the edition as a whole; per-feed caps still apply.
+  size_t max_items = 0;
   int max_age_days = 3;
   int front_page_columns = 2;
   Align body_alignment = Align::Left;
