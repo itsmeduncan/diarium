@@ -546,13 +546,15 @@ namespace rsspaper {
 namespace device {
 
 Epoch DeviceClock::now() const {
-  return static_cast<Epoch>(panel_->getEpoch());
+  // RTC is a member of the driver, not a base class.
+  return static_cast<Epoch>(panel_->rtc.getEpoch());
 }
 
 void DeviceClock::set_wake_alarm(Epoch when) {
   if (when == kNoDate) return;
   // match on second+minute+hour+day
-  panel_->setAlarmEpoch(static_cast<uint32_t>(when), 15);
+  panel_->rtc.setAlarmEpoch(static_cast<uint32_t>(when),
+                            RTC_ALARM_MATCH_DHHMMSS);
 }
 
 }  // namespace device
@@ -581,7 +583,8 @@ class DevicePower final : public IPower {
 
   void deep_sleep_until(Epoch when) override;
   int battery_millivolts() const override;
-  bool on_external_power() const override { return panel_->isPowerGood(); }
+  // Deliberately not overridden — see the note in the implementation. The
+  // PMIC reports rail health, not whether a cable is attached.
 
  private:
   Inkplate* panel_;
@@ -675,7 +678,11 @@ class DeviceHttpClient final : public IHttpClient {
 - [ ] **Step 6: Verify on device**
 
 Run: `cd src/device && pio run -t upload && pio device monitor`
-Expected: `touch init: 1`, a plausible epoch, a battery reading between 3000 and 4300 mV, and touch coordinates printed within 1024x758 as you touch the panel.
+Expected: `touch init: 1`, a battery reading between 3000 and 4300 mV, `hal complete: 1`, and touch coordinates printed within 1024x758 as you touch the panel.
+
+**The RTC will read ~946684800 (2000-01-01) on a fresh board — it is unset,
+and with no network in this milestone nothing sets it.** Task 6 seeds it from
+the composed edition's own date so the masthead is not wrong by 26 years.
 
 - [ ] **Step 7: Commit**
 
