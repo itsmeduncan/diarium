@@ -16,6 +16,11 @@ class DeviceClock final : public IClock {
   // and wake_at are both local.
   void set_utc_offset(int seconds) { offset_ = seconds; }
 
+  // A fresh board reads 2000-01-01. With no network in this milestone,
+  // nothing else can set the clock, so the composed edition's own date is the
+  // best available answer and beats a masthead that is 26 years wrong.
+  void seed_if_unset(Epoch when);
+
   Epoch now() const override;
   int utc_offset_seconds() const override { return offset_; }
   void set_wake_alarm(Epoch when) override;
