@@ -98,7 +98,8 @@ make device-rm PATH_ON_CARD=/read.dat               # forget what you have read
 make device-compose    # fetch and compose now, rather than waiting for wake_at
 ```
 
-`RSSPAPER_PORT` overrides the serial port. A file's bytes go straight from
+The board is found automatically; `RSSPAPER_PORT` picks one if a machine has
+more than one attached. A file's bytes go straight from
 disk to the port and are never printed, which is what makes it safe to send a
 `feeds.toml` with wifi credentials in it — keep that copy in
 `config/feeds.local.toml`, which is gitignored, and never in the committed
