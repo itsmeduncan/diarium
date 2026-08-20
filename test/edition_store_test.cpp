@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "core/edition/edition_store.h"
+#include "core/edition/seen_store.h"
 #include "core/text/font_pack.h"
 #include "doctest.h"
 
@@ -220,4 +221,36 @@ TEST_CASE("a story pointing past the pages is refused") {
   std::string error;
   CHECK_FALSE(deserialize_edition(serialize_edition(ed), &out, &error));
   CHECK(error.find("past its pages") != std::string::npos);
+}
+
+// The seen-store as a blob. The path-based API reaches stdio, which on device
+// is not the SD card — so the device needs to do its own reading and writing
+// through IStorage, exactly as the reader does for clippings.
+TEST_CASE("seen store round-trips through a blob") {
+  SeenStore store;
+  store.mark(0xABCDEF0123456789ull, 1000);
+  store.mark(0x1122334455667788ull, 2000);
+
+  SeenStore reloaded;
+  REQUIRE(reloaded.deserialize(serialize_seen_store(store), kNoDate));
+  CHECK(reloaded.size() == 2);
+  CHECK(reloaded.has(0xABCDEF0123456789ull));
+  CHECK(reloaded.has(0x1122334455667788ull));
+}
+
+TEST_CASE("seen store drops expired entries when deserializing") {
+  SeenStore store(30);
+  store.mark(0xAAAAull, 1000);                  // ancient
+  store.mark(0xBBBBull, 100L * 86400);          // recent
+
+  SeenStore reloaded(30);
+  REQUIRE(reloaded.deserialize(serialize_seen_store(store), 100L * 86400));
+  CHECK_FALSE(reloaded.has(0xAAAAull));
+  CHECK(reloaded.has(0xBBBBull));
+}
+
+TEST_CASE("an empty seen-store blob is not an error") {
+  SeenStore store;
+  CHECK(store.deserialize("", kNoDate));
+  CHECK(store.size() == 0);
 }
