@@ -30,6 +30,7 @@ class DeviceDisplay final : public IDisplay {
  private:
   void blit_3bit();
   void blit_1bit();
+  void sync_reference_frame();
 
   Inkplate* panel_;
   Framebuffer fb_;  // 776 KB; must be allocated before fonts and edition

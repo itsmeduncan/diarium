@@ -1,5 +1,7 @@
 #include "device/device_display.h"
 
+#include <cstring>
+
 namespace rsspaper {
 namespace device {
 namespace {
@@ -13,6 +15,7 @@ namespace {
 //        and a set bit meaning ink.
 constexpr int kThreeBitStride = 1024 / 2;
 constexpr int kOneBitStride = 1024 / 8;
+constexpr size_t kOneBitBytes = 1024u * 758u / 8u;
 
 }  // namespace
 
@@ -58,6 +61,18 @@ void DeviceDisplay::blit_1bit() {
   }
 }
 
+// partialUpdate() diffs the new frame against DMemoryNew, which the library
+// treats as "what is currently on the panel" in 1-bit. Only the 1-bit paths
+// ever sync it — a 3-bit display() leaves it holding a frame from pages ago.
+// The next partial then decides that matching pixels need no driving and
+// leaves the old ink where it was, which reads as the previous page bleeding
+// through this one. So after a full refresh, tell the library the truth.
+void DeviceDisplay::sync_reference_frame() {
+  if (panel_->DMemoryNew == nullptr || panel_->_partial == nullptr) return;
+  blit_1bit();
+  std::memcpy(panel_->DMemoryNew, panel_->_partial, kOneBitBytes);
+}
+
 void DeviceDisplay::flush(RefreshMode mode) {
   uint32_t t0 = millis();
   // partialUpdate() is a no-op in 3-bit mode, which is why hal.h describes a
@@ -78,10 +93,12 @@ void DeviceDisplay::flush(RefreshMode mode) {
       break;
     case RefreshMode::Full:
       panel_->display();
+      sync_reference_frame();
       break;
     case RefreshMode::DeepClean:
       panel_->burnInClean(2, 20);
       panel_->display();
+      sync_reference_frame();
       break;
   }
   last_flush_ms_ = millis() - t0;
