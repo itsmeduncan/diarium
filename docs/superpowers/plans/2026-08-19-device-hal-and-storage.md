@@ -376,8 +376,9 @@ void DeviceDisplay::flush(RefreshMode mode) {
 
 void DeviceDisplay::set_frontlight(int level) {
   frontlight_ = level < 0 ? 0 : (level > max_frontlight() ? max_frontlight() : level);
-  panel_->setState(frontlight_ > 0);
-  panel_->setBrightness(static_cast<uint8_t>(frontlight_));
+  // Frontlight is a member of the driver, not a base class.
+  panel_->frontlight.setState(frontlight_ > 0);
+  panel_->frontlight.setBrightness(static_cast<uint8_t>(frontlight_));
 }
 
 }  // namespace device
@@ -404,22 +405,32 @@ After the storage smoke test, render a test pattern and time each mode:
 - [ ] **Step 4: Verify on device**
 
 Run: `cd src/device && pio run -t upload && pio device monitor`
-Expected: a framed page with two grey blocks. Timings printed. **The full-refresh number must be under 1900 ms and the partial under 500 ms.** If the partial is over 500 ms the blit is still the bottleneck — see Step 5.
+Expected: a framed page with two grey blocks. Timings printed. **The full-refresh number must be under 1900 ms and the steady-state partial under 500 ms.** Measured: full 1733 ms, partial 459 ms, blits 94 and 63 ms.
 
-- [ ] **Step 5: If the blit is still too slow, reach the panel buffer directly**
+- [ ] **Step 5: Two corrections found by measuring — both are required, not optional**
 
-`DMemory4Bit` is protected on the driver, so a derived class can reach it. Only do this if Step 4 missed its budget. Add to `device_display.h`:
+**`partialUpdate()` is a no-op in 3-bit mode.** `Inkplate6FLICKDriver.cpp:425`
+returns 0 immediately when `getDisplayMode() == 1`. This is why `hal.h`
+describes a partial refresh as 1-bit: the display mode is part of the
+contract. `flush` must `selectDisplayMode(INKPLATE_1BIT)` and pack a 1-bit
+frame for `RefreshMode::Partial`, and `INKPLATE_3BIT` for the others.
 
-```cpp
-// Reaches the 3-bit panel buffer directly. Two pixels per byte, high nibble
-// first. Only needed because per-pixel calls cost a third of a page turn.
-class PanelAccess : public Inkplate {
- public:
-  uint8_t* buffer3bit() { return DMemory4Bit; }
-};
-```
+**Per-pixel packing is too slow at any granularity.** `drawPixel` measured
+749 ms per frame and `writePixelInternal` 540 ms. Write the panel buffers
+directly instead — both are public members of `EPDDriver`, which `Inkplate`
+inherits, so no subclass is needed:
 
-and replace `blit()`'s inner loop with a two-pixels-per-byte pack. Re-run Step 4.
+- 3-bit: `panel->DMemory4Bit`, stride `1024/2`, two pixels per byte, **even x
+  in the high nibble**.
+- 1-bit: `panel->_partial`, stride `1024/8`, eight pixels per byte, `x % 8`
+  selecting the bit **LSB-first** (`pixelMaskLUT = {0x1, 0x2, 0x4, ...}`), and
+  a set bit meaning ink (`BLACK 1`).
+
+Measured after the change: 3-bit blit 94 ms, 1-bit blit 63 ms.
+
+**Expect the first partial after a mode switch to be slow.** Measured 1400 ms
+switching 3-bit to 1-bit, then 459 ms steady state. Staying in one mode while
+browsing is worth something, which is input for #7.
 
 - [ ] **Step 6: Commit**
 
