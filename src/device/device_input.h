@@ -22,6 +22,14 @@ class DeviceInput final : public IInput {
 
  private:
   Inkplate* panel_;
+
+  // The controller is edge-triggered: an interrupt sets a flag, getData()
+  // clears it, and a finger held still produces no further events. poll() is
+  // specified as "the currently-touched points" — a level — so the last
+  // report is held until the controller says otherwise.
+  TouchPoint held_[2];
+  size_t held_count_ = 0;
+  uint32_t held_since_ = 0;
 };
 
 }  // namespace device

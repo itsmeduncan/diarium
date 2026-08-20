@@ -160,9 +160,12 @@ void loop() {
                                : gestures.update(false, 0, 0, now);
   if (e.kind != Gesture::None) {
     session.touched(now);
-    if (reader->handle(e)) {
+    const bool changed = reader->handle(e);
+    Serial.printf("gesture %d at %d,%d -> %s\n", (int)e.kind, e.x, e.y,
+                  changed ? "changed" : "ignored");
+    if (changed) {
       reader->tick();
-      Serial.printf("%s\n", reader->position().c_str());
+      Serial.printf("  %s\n", reader->position().c_str());
     }
   }
 
