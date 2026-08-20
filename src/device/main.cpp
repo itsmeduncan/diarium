@@ -93,56 +93,100 @@ Lifecycle lifecycle_from_wake() {
              : Lifecycle::Read;
 }
 
-// Accepts one file over the serial line in the moment after boot, so config
-// can reach the card without the card leaving the device. Nothing here logs
-// what it receives: this is how wifi credentials arrive.
+// A console on the serial line, open for a moment after boot.
 //
-//   host sends:  PUT <path> <bytes>\n  followed by exactly <bytes> bytes
-//   device says: READY, then OK <bytes> or ERR <reason>
-bool serial_receive(device::DeviceHal& d) {
-  Serial.println("READY");  // the host waits for this before sending
+// The device has no keyboard and its card does not come out, so this is how a
+// file gets on, how the card is inspected, and how a compose is asked for
+// without editing the firmware to force one. Nothing here logs what it
+// receives: this is also how wifi credentials arrive.
+//
+//   PUT <path> <bytes>   then exactly that many bytes
+//   LS                   what is on the card
+//   RM <path>            remove one file
+//   COMPOSE              take the compose path on this boot
+//   GO                   stop listening and get on with it
+//
+// Replies are one line: OK ..., or ERR <reason>.
+bool serial_console(device::DeviceHal& d) {
+  Serial.println("READY");
+  bool force_compose = false;
 
-  std::string header;
-  const uint32_t deadline = millis() + 2000;
+  uint32_t deadline = millis() + 1500;
+  std::string line;
+
   while (millis() < deadline) {
     if (!Serial.available()) continue;
     const char c = static_cast<char>(Serial.read());
-    if (c == '\n') break;
-    if (c != '\r' && header.size() < 128) header.push_back(c);
-  }
-  if (header.compare(0, 4, "PUT ") != 0) return false;
-
-  const size_t sp = header.find(' ', 4);
-  if (sp == std::string::npos) {
-    Serial.println("ERR malformed header");
-    return false;
-  }
-  const std::string path = header.substr(4, sp - 4);
-  const long want = atol(header.c_str() + sp + 1);
-  if (want <= 0 || want > 256L * 1024) {
-    Serial.println("ERR implausible length");
-    return false;
-  }
-
-  std::string body;
-  body.reserve(static_cast<size_t>(want));
-  uint32_t last = millis();
-  while (body.size() < static_cast<size_t>(want)) {
-    if (Serial.available()) {
-      body.push_back(static_cast<char>(Serial.read()));
-      last = millis();
-    } else if (millis() - last > 5000) {
-      Serial.printf("ERR truncated at %u of %ld\n", (unsigned)body.size(), want);
-      return false;
+    if (c != '\n') {
+      if (c != '\r' && line.size() < 160) line.push_back(c);
+      continue;
     }
+
+    // A command means someone is talking to us; keep listening for more.
+    deadline = millis() + 4000;
+
+    if (line == "GO") {
+      line.clear();
+      break;
+    } else if (line == "COMPOSE") {
+      force_compose = true;
+      Serial.println("OK will compose");
+    } else if (line == "LS") {
+      FsFile dir = panel.getSdFat().open("/", O_READ);
+      FsFile entry;
+      char name[64];
+      while (entry.openNext(&dir, O_READ)) {
+        entry.getName(name, sizeof(name));
+        Serial.printf("  %-28s %8u%s\n", name, (unsigned)entry.fileSize(),
+                      entry.isDir() ? "  <dir>" : "");
+        entry.close();
+      }
+      dir.close();
+      Serial.println("OK");
+    } else if (line.compare(0, 3, "RM ") == 0) {
+      const std::string path = line.substr(3);
+      Serial.println(d.storage.remove(path) ? "OK removed" : "ERR not removed");
+    } else if (line.compare(0, 4, "PUT ") == 0) {
+      const size_t sp = line.find(' ', 4);
+      if (sp == std::string::npos) {
+        Serial.println("ERR malformed header");
+      } else {
+        const std::string path = line.substr(4, sp - 4);
+        const long want = atol(line.c_str() + sp + 1);
+        if (want <= 0 || want > 256L * 1024) {
+          Serial.println("ERR implausible length");
+        } else {
+          std::string body;
+          body.reserve(static_cast<size_t>(want));
+          uint32_t last = millis();
+          bool ok = true;
+          while (body.size() < static_cast<size_t>(want)) {
+            if (Serial.available()) {
+              body.push_back(static_cast<char>(Serial.read()));
+              last = millis();
+            } else if (millis() - last > 5000) {
+              Serial.printf("ERR truncated at %u of %ld\n",
+                            (unsigned)body.size(), want);
+              ok = false;
+              break;
+            }
+          }
+          if (ok) {
+            Serial.println(d.storage.write(path, body)
+                               ? ("OK " + std::to_string(body.size()) +
+                                  " bytes to " + path).c_str()
+                               : "ERR could not write to the card");
+          }
+        }
+      }
+      deadline = millis() + 4000;
+    } else if (!line.empty()) {
+      Serial.println("ERR unknown command");
+    }
+    line.clear();
   }
 
-  if (!d.storage.write(path, body)) {
-    Serial.println("ERR could not write to the card");
-    return false;
-  }
-  Serial.printf("OK %u bytes to %s\n", (unsigned)body.size(), path.c_str());
-  return true;
+  return force_compose;
 }
 
 // Fetch, compose, persist, sleep. Never constructs a Reader, and the radio is
@@ -279,10 +323,10 @@ void setup() {
                     : "Insert a card with feeds.toml and an edition on it.");
     return;
   }
-  // Before anything else, in case the host has a file for us.
-  serial_receive(d);
+  // Before anything else, in case the host has something to say.
+  const bool asked_to_compose = serial_console(d);
 
-  if (lifecycle_from_wake() == Lifecycle::Compose) {
+  if (asked_to_compose || lifecycle_from_wake() == Lifecycle::Compose) {
     compose_wake(d);  // does not return: it sleeps
   }
 

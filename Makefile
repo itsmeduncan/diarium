@@ -89,3 +89,32 @@ clean:
 .PHONY: device
 device:
 	cd src/device && pio run
+
+# The device is talked to over its serial console. Override the port with
+# RSSPAPER_PORT if it is not the usual one.
+PIO_PY := /opt/homebrew/opt/platformio/libexec/bin/python3
+DEVICE := $(PIO_PY) tools/device.py
+
+.PHONY: device-flash device-log device-ls device-put device-rm device-compose
+device-flash:
+	cd src/device && pio run -t upload
+
+device-log:
+	$(DEVICE) log
+
+device-ls:
+	$(DEVICE) ls
+
+# make device-put FILE=config/feeds.local.toml AS=/feeds.toml
+device-put:
+	@test -n "$(FILE)" || { echo "usage: make device-put FILE=<path> [AS=/name]"; exit 2; }
+	$(DEVICE) put $(FILE) $(AS)
+
+# make device-rm PATH=/read.dat
+device-rm:
+	@test -n "$(PATH_ON_CARD)" || { echo "usage: make device-rm PATH_ON_CARD=/name"; exit 2; }
+	$(DEVICE) rm $(PATH_ON_CARD)
+
+# Fetch and compose now, rather than waiting for wake_at.
+device-compose:
+	$(DEVICE) compose
