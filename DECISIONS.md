@@ -302,6 +302,26 @@ unaffected and a port to another panel inherits nothing from it — but
 distributing firmware binaries carries a relinking obligation, and that is a
 deliberate acceptance rather than an oversight.
 
+### 30. The panel's reductions live in core, not in the simulator
+
+`reduce_to_grey3` and `reduce_to_mono1` began life in `src/sim/png_writer.cpp`,
+which meant the simulator and the device reduced the framebuffer differently:
+the simulator Atkinson-dithered its 1-bit output while the device thresholded
+at 128. Page turns use a partial refresh, a partial refresh is 1-bit, and
+thresholding throws away exactly the grey edges antialiasing puts on small
+type — so subheads were markedly less legible on the panel than in
+`--depth mono1`, and the claim that the simulator runs the identical pipeline
+was quietly false.
+
+The reductions are now shared. The dither also had to get frugal to run on
+device: the original carried error in a full-size `std::vector<int>`, which is
+3 MB for this panel and more than the device has spare. Atkinson never reaches
+further than two rows down, so error rides in three rolling rows — 6 KB, the
+same arithmetic, and the simulator inherits the reduction for free.
+
+It costs ~276 ms a page turn, taking a turn from ~0.52 s to ~0.80 s. That is
+the right trade: a reader looks at small type far more than at the clock.
+
 ## Open questions
 
 Tracked as issues, so there is one place to update rather than two:

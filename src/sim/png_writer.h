@@ -9,6 +9,7 @@
 #include <string>
 
 #include "core/render/framebuffer.h"
+#include "core/render/reduce.h"
 
 namespace rsspaper {
 namespace sim {
@@ -22,11 +23,9 @@ enum class Depth {
 // Writes `fb` reduced to `depth`. Returns false if the file can't be written.
 bool write_png(const Framebuffer& fb, Depth depth, const std::string& path);
 
-// Reduces in place, so the caller can inspect exactly what the panel shows.
-void reduce_to_grey3(Framebuffer* fb);
-// Atkinson dithering: fewer artefacts than Floyd-Steinberg on text, and it's
-// what e-ink devices have historically used.
-void reduce_to_mono1(Framebuffer* fb);
+// The reductions themselves live in core/render/reduce.h, because the device
+// performs the identical ones — a mono1 PNG is only worth looking at if it is
+// what the panel will actually show.
 
 }  // namespace sim
 }  // namespace rsspaper
