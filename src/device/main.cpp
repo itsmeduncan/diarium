@@ -13,6 +13,7 @@
 #include "core/config/feeds_config.h"
 #include "core/text/font_pack.h"
 #include "core/base/datetime.h"
+#include "core/ui/contents.h"
 #include "core/ui/notice.h"
 #include "core/ui/gesture.h"
 #include "core/ui/reader.h"
@@ -38,6 +39,8 @@ FontPack fonts;
 Edition edition;
 Reader* reader = nullptr;
 Session session{SessionThresholds{}};
+// Kept from feeds.toml so the idle sleep can aim at the next edition.
+std::string wake_at = "05:30";
 GestureRecognizer gestures;
 
 // Says what went wrong on the panel rather than only down the serial line,
@@ -230,13 +233,28 @@ void compose_wake(device::DeviceHal& d) {
     // The read state is the reader's to write, not the composer's: composing
     // must not mark anything read.
     Serial.println("saved");
+
+    // Draw the new paper before sleeping. E-ink holds the last image, so
+    // without this the panel keeps yesterday's cover and the reader picks up
+    // a device that looks like nothing happened overnight.
+    const std::vector<size_t> order = ed.reading_order();
+    const std::vector<bool> unread(order.size(), true);
+    render_contents(fonts, ed, order, unread, "composed on device",
+                    &d.display.framebuffer());
+    d.display.flush(RefreshMode::Full);
   } else {
     Serial.println("could not save the edition");
   }
 
-  // Tomorrow. wake_at is honoured once #5 owns the policy.
-  d.clock.set_wake_alarm(d.clock.now() + 24 * 60 * 60);
-  d.power.set_wake_in(24 * 60 * 60);
+  // The next edition is due at wake_at, local. Sleeping a flat day instead
+  // means the paper arrives whenever you last put the device down, which is
+  // how a morning paper ends up being yesterday's.
+  const Epoch now_local = d.clock.now() + d.clock.utc_offset_seconds();
+  const uint32_t until = seconds_until_local_time(config.edition.wake_at, now_local);
+  Serial.printf("next edition in %u min (%s local)\n", (unsigned)(until / 60),
+                config.edition.wake_at.c_str());
+  d.clock.set_wake_alarm(d.clock.now() + static_cast<Epoch>(until));
+  d.power.set_wake_in(until);
   d.power.deep_sleep_until(kNoDate);
 }
 
@@ -298,6 +316,7 @@ void setup() {
   if (d.storage.read("/feeds.toml", &toml) &&
       parse_feeds_toml(toml, &config, &config_error)) {
     d.clock.set_utc_offset(config.edition.utc_offset_minutes * 60);
+    wake_at = config.edition.wake_at;
     Serial.printf("feeds.toml: %u feeds, utc%+d min\n",
                   (unsigned)config.feeds.size(),
                   config.edition.utc_offset_minutes);
@@ -360,10 +379,11 @@ void loop() {
                       &hal_impl->display.framebuffer());
     hal_impl->display.flush(RefreshMode::Full);
 
-    // Always leave a scheduled wake armed. A reader who cannot wake the paper
-    // by touch must still get tomorrow's, rather than a device that looks
-    // broken until someone finds a reset button.
-    hal_impl->power.set_wake_in(24 * 60 * 60);
+    // Always leave a scheduled wake armed, aimed at the next edition rather
+    // than a flat day from now: a reader who puts the paper down at noon
+    // should still get the morning one.
+    const Epoch local = hal_impl->clock.now() + hal_impl->clock.utc_offset_seconds();
+    hal_impl->power.set_wake_in(seconds_until_local_time(wake_at, local));
     Serial.println("sleeping — touch to wake");
     Serial.flush();
     hal_impl->power.deep_sleep_until(kNoDate);

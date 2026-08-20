@@ -286,4 +286,30 @@ std::string format_clock(Epoch t) {
   return pad2(c.hour) + ":" + pad2(c.minute);
 }
 
+uint32_t seconds_until_local_time(const std::string& hh_mm, Epoch local_now) {
+  constexpr uint32_t kDay = 24 * 60 * 60;
+
+  // "05:30". Anything else is not worth guessing at: a device that never
+  // wakes is worse than one that wakes at the wrong time.
+  if (hh_mm.size() != 5 || hh_mm[2] != ':') return kDay;
+  for (size_t i : {0u, 1u, 3u, 4u}) {
+    if (hh_mm[i] < '0' || hh_mm[i] > '9') return kDay;
+  }
+  const int hour = (hh_mm[0] - '0') * 10 + (hh_mm[1] - '0');
+  const int minute = (hh_mm[3] - '0') * 10 + (hh_mm[4] - '0');
+  if (hour > 23 || minute > 59) return kDay;
+
+  const CivilTime now = civil_from_epoch(local_now);
+  CivilTime target = now;
+  target.hour = hour;
+  target.minute = minute;
+  target.second = 0;
+
+  Epoch when = epoch_from_civil(target);
+  // On the dot counts as gone: otherwise a wake that lands exactly on the
+  // hour would schedule a zero-second sleep and spin.
+  if (when <= local_now) when += static_cast<Epoch>(kDay);
+  return static_cast<uint32_t>(when - local_now);
+}
+
 }  // namespace rsspaper
