@@ -114,15 +114,19 @@ map — every lede's page, its tap region, and the pages its story occupies:
 ./bin/rsspaper-sim compose --fresh --index --all-pages
 ```
 
-Read the paper. The keyboard stands in for the panel — a keystroke becomes a
+Read the paper. You land on a contents page and swipe onward through every
+story you have not read, oldest first, until the news runs out; each one is
+marked read as you reach it, and what you did not get to is still there
+tomorrow. The keyboard stands in for the panel — a keystroke becomes a
 synthesised touch, through the same gesture recogniser and the same `Reader`
 the device will run — and every refresh writes a frame:
 
 ```sh
 make read
-#  n  turn the page      1-9  open the Nth story here
-#  b  back               s    section list
-#  h  fold this corner   c    clippings
+#  n  the next unread article    j/k  scroll within it
+#  p  the previous article       1-9  open the Nth story here
+#  b  back                       s    section list
+#  h  fold this corner           c    clippings
 ```
 
 It reports what the panel would have spent: partial refreshes are ~0.46 s,
@@ -141,9 +145,14 @@ ssid = "your-network"   # omit the section and the device never fetches
 password = "..."        # never commit this; see config/feeds.local.toml
 
 [edition]
-title = "RSSpaper"      # the nameplate across the top of page one
-max_items = 40          # a paper that never ends is a feed
-utc_offset_minutes = 0  # no network to ask, no keyboard to be asked
+title = "RSSpaper"       # the nameplate across the top of page one
+wake_at = "05:30"        # local time the next edition is composed
+max_items = 40           # a paper that never ends is a feed
+max_age_days = 3         # older than this is not news
+utc_offset_minutes = 0   # no network to ask, no keyboard to be asked
+front_page_columns = 2   # 1 to 4
+body_alignment = "ragged"  # or "justified", which wants hyphenation
+hyphenate = true
 
 [[feed]]
 url     = "https://daringfireball.net/feeds/main"
