@@ -37,12 +37,14 @@ void render_sleep_page(const FontPack& fonts, const std::string& title,
   const Face& lead = fonts.face(FaceId::Lead);
   const Face& meta = fonts.face(FaceId::Meta);
 
-  // A framed nameplate, centred on the page rather than sitting at the top:
-  // this is a cover, not a front page.
-  const int mid = kPageHeight / 2;
+  // A framed nameplate, set a little above true centre — optical centre sits
+  // high, and this is a cover rather than a front page.
+  const int mid = kPageHeight / 2 - 18;
 
-  fb->fill_rect(left, mid - 150, width, 3, kInk);
-  fb->fill_rect(left, mid + 96, width, 3, kInk);
+  // Two weights, as a masthead rule would be: a heavy line above and a hair
+  // below, so the block reads as the top of something rather than a box.
+  fb->fill_rect(left, mid - 104, width, 4, kInk);
+  fb->fill_rect(left, mid + 66, width, 1, 120);
 
   if (lead.valid()) {
     std::string caps;
@@ -58,7 +60,7 @@ void render_sleep_page(const FontPack& fonts, const std::string& title,
   if (meta.valid() && !date_line.empty()) {
     const int measured = meta.measure(date_line);
     const int x = left * kSubpixel + (width * kSubpixel - measured) / 2;
-    fb->draw_text(meta, date_line, x, mid + 62, 90);
+    fb->draw_text(meta, date_line, x, mid + 48, 90);
   }
 
   if (meta.valid()) {

@@ -45,6 +45,7 @@ int main(int argc, char** argv) {
   if (cmd == "compose") return rsspaper::sim::cmd_compose(args);
   if (cmd == "read") return rsspaper::sim::cmd_read(args);
   if (cmd == "opml") return rsspaper::sim::cmd_opml(args);
+  if (cmd == "screens") return rsspaper::sim::cmd_screens(args);
   if (cmd == "-h" || cmd == "--help" || cmd == "help") {
     usage();
     return 0;
