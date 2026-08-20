@@ -254,3 +254,29 @@ TEST_CASE("an empty seen-store blob is not an error") {
   CHECK(store.deserialize("", kNoDate));
   CHECK(store.size() == 0);
 }
+
+TEST_CASE("the version gate accepts the formats it claims to") {
+  // A format bump must not brick a device whose only copy of the paper is the
+  // one already on its card, so the reader accepts back to kMinEditionVersion.
+  // Whether a real v2 edition round-trips is verified on the device, against
+  // an actual v2 file, which is the only place that fact lives.
+  Edition ed;
+  ed.date = 1786864000;
+  ed.title = "RSSpaper";
+  ed.pages.push_back(Page());
+  ed.browse_page_count = 1;
+  const std::string good = serialize_edition(ed);
+
+  auto with_version = [&good](uint16_t v) {
+    std::string blob = good;
+    blob[4] = static_cast<char>(v & 0xFF);
+    blob[5] = static_cast<char>((v >> 8) & 0xFF);
+    return blob;
+  };
+
+  Edition out;
+  std::string error;
+  CHECK(deserialize_edition(with_version(kEditionVersion), &out, &error));
+  CHECK_FALSE(deserialize_edition(with_version(kMinEditionVersion - 1), &out, &error));
+  CHECK_FALSE(deserialize_edition(with_version(kEditionVersion + 1), &out, &error));
+}

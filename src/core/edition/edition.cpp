@@ -329,6 +329,7 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
       }
 
       StoryRef ref;
+      ref.published = it.published;
       ref.key = it.dedup_key();
       ref.title = it.title;
       ref.section = s.name;
@@ -501,6 +502,22 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   }
 
   return ed;
+}
+
+std::vector<size_t> Edition::reading_order() const {
+  std::vector<size_t> order;
+  order.reserve(stories.size());
+  for (size_t i = 0; i < stories.size(); ++i) order.push_back(i);
+
+  // Oldest first. Undated stories keep their composed position relative to
+  // each other rather than all piling up at one end.
+  std::stable_sort(order.begin(), order.end(), [this](size_t a, size_t b) {
+    const Epoch pa = stories[a].published;
+    const Epoch pb = stories[b].published;
+    if (pa == kNoDate || pb == kNoDate) return false;
+    return pa < pb;
+  });
+  return order;
 }
 
 }  // namespace rsspaper

@@ -12,6 +12,7 @@
 #include "core/edition/edition_store.h"
 #include "core/config/feeds_config.h"
 #include "core/text/font_pack.h"
+#include "core/base/datetime.h"
 #include "core/ui/notice.h"
 #include "core/ui/gesture.h"
 #include "core/ui/reader.h"
@@ -83,12 +84,10 @@ enum class Lifecycle { Compose, Read };
 Lifecycle lifecycle_from_wake() {
   // An RTC alarm means it is time to build tomorrow's paper. Anything else —
   // the wake button, a reset, first power-on — means someone wants to read.
-  // Both wake sources are ext1, so ask which pin actually fired.
-  if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_EXT1) {
-    return Lifecycle::Read;
-  }
-  const uint64_t fired = esp_sleep_get_ext1_wakeup_status();
-  return (fired & (1ULL << GPIO_NUM_39)) ? Lifecycle::Compose : Lifecycle::Read;
+  // The scheduled wake is a timer; a touch is ext1 on TOUCHSCREEN_INT.
+  return esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_TIMER
+             ? Lifecycle::Compose
+             : Lifecycle::Read;
 }
 
 // Fetch, compose, persist, sleep. Never constructs a Reader, and the radio is
@@ -167,8 +166,9 @@ void compose_wake(device::DeviceHal& d) {
     Serial.println("could not save the edition");
   }
 
-  // Tomorrow, at the same time. wake_at is honoured once #5 owns the policy.
+  // Tomorrow. wake_at is honoured once #5 owns the policy.
   d.clock.set_wake_alarm(d.clock.now() + 24 * 60 * 60);
+  d.power.set_wake_in(24 * 60 * 60);
   d.power.deep_sleep_until(kNoDate);
 }
 
@@ -243,6 +243,7 @@ void setup() {
   static Reader r(edition, fonts, hal);
   reader = &r;
   reader->load_clippings("clippings.dat");
+  reader->load_read_state("read.dat");
   reader->render();
   session.touched(millis());
   Serial.printf("reading — %s\n", reader->position().c_str());
@@ -274,7 +275,18 @@ void loop() {
   }
 
   if (session.intent(now) == SessionIntent::Sleep) {
-    Serial.println("sleeping");
+    // E-ink holds whatever was last drawn, so a sleeping paper sits on the
+    // table showing this. Worth it being the nameplate rather than whichever
+    // paragraph you happened to stop on.
+    render_sleep_page(fonts, edition.title, format_masthead_date(edition.date),
+                      &hal_impl->display.framebuffer());
+    hal_impl->display.flush(RefreshMode::Full);
+
+    // Always leave a scheduled wake armed. A reader who cannot wake the paper
+    // by touch must still get tomorrow's, rather than a device that looks
+    // broken until someone finds a reset button.
+    hal_impl->power.set_wake_in(24 * 60 * 60);
+    Serial.println("sleeping — touch to wake");
     Serial.flush();
     hal_impl->power.deep_sleep_until(kNoDate);
   }

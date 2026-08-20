@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "core/edition/clippings.h"
+#include "core/edition/seen_store.h"
 #include "core/edition/edition.h"
 #include "core/render/page_renderer.h"
 #include "core/text/font_pack.h"
@@ -28,10 +29,12 @@
 namespace rsspaper {
 
 enum class ReaderMode : uint8_t {
-  Browse,     // the ledes, the front page, and the colophon that ends them
-  Story,      // the full text of a story you opened
+  Browse,     // the overview: the front page you land on
+  Article,    // one article in a continuous oldest-first pass
+  Story,      // the full text of a story opened from a lede
   Sections,   // the jump list
   Clippings,  // stories you folded the corner of
+  Finished,   // the news ran out
 };
 
 // The last browse page is the colophon: it says the paper has ended, and why
@@ -40,9 +43,13 @@ enum class ReaderMode : uint8_t {
 
 struct ReaderPolicy {
   // Partial refreshes between full ones. E-ink ghosting accumulates; this is
-  // the number of page turns before the panel gets cleaned up. Tune against
-  // real hardware, not a simulator.
-  int partial_turns_before_full = 6;
+  // the number of page turns before the panel gets cleaned up.
+  //
+  // Measured on a 6FLICK: smearing becomes visible around the seventh page,
+  // so six partials cleaned up exactly one turn too late. Four keeps the
+  // panel ahead of it, at about 75 ms more per turn averaged over the cycle —
+  // a partial costs ~0.52 s and a full ~1.83 s.
+  int partial_turns_before_full = 4;
   // Opening a story or coming back always gets a full refresh: the whole page
   // changes, and partial-refreshing a wholly different page looks like dirt.
   bool full_refresh_on_context_change = true;
@@ -89,7 +96,25 @@ class Reader {
   // Returns true if it is now saved.
   bool toggle_clipping_at(int x, int y);
 
+  // The continuous pass: every article you have not read, oldest first, one
+  // swipe at a time until there are none left.
+  bool begin_reading();
+  bool next_article();
+  bool previous_article();
+  bool scroll_down();
+  bool scroll_up();
+  // Stories already read, so a second pass does not show them again.
+  void load_read_state(const std::string& path);
+
  private:
+  void mark_current_read();
+  void render_finished();
+  size_t unread_remaining() const;
+
+  // Position within the oldest-first order, and the page within the article
+  // at that position. Scrolling an article is moving through its pages.
+  bool show_article_at(size_t order_pos, bool context_change);
+
   void set_page(size_t page, bool context_change);
   RefreshMode choose_refresh(bool context_change);
   void render_section_overlay();
@@ -114,6 +139,14 @@ class Reader {
   size_t return_page_ = 0;
   size_t story_index_ = 0;
   bool have_story_ = false;
+
+  // The oldest-first walk. `order_` is story indices; `order_pos_` is where
+  // the reader has got to.
+  std::vector<size_t> order_;
+  size_t order_pos_ = 0;
+  int article_page_ = 0;
+  SeenStore read_;
+  std::string read_path_;
   class Clippings clippings_;
   std::string clippings_path_;
   int partials_since_full_ = 0;
