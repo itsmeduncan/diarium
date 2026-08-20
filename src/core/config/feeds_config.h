@@ -38,8 +38,18 @@ struct EditionConfig {
   bool hyphenate = true;
 };
 
+// Credentials live on the card and never in the repo. The device has no
+// keyboard, so this is how a network gets configured — and it is why the
+// card, not a captive portal, is the answer to getting config onto a device.
+struct WifiConfig {
+  std::string ssid;
+  std::string password;
+  bool configured() const { return !ssid.empty(); }
+};
+
 struct FeedList {
   EditionConfig edition;
+  WifiConfig wifi;
   std::vector<FeedEntry> feeds;
 
   // Sections in the order they first appear, which is the running order of
