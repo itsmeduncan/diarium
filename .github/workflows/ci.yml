@@ -50,3 +50,21 @@ jobs:
             --edition "$RUNNER_TEMP/edition/edition.rspe" \
             --out "$RUNNER_TEMP/read" | tee "$RUNNER_TEMP/read.log"
           grep -q 'no re-parse, no re-layout' "$RUNNER_TEMP/read.log"
+
+  # Compiling the firmware is what catches hal.h drifting away from the six
+  # implementations behind it. No hardware needed to notice that.
+  device:
+    name: build the device firmware
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build for the Inkplate 6FLICK
+        run: cd src/device && pio run
