@@ -21,6 +21,10 @@ class DeviceClock final : public IClock {
   // best available answer and beats a masthead that is 26 years wrong.
   void seed_if_unset(Epoch when);
 
+  // Believed over anything already set: a server's clock beats a date
+  // inherited from whatever edition happened to be on the card.
+  void set_now(Epoch when);
+
   Epoch now() const override;
   int utc_offset_seconds() const override { return offset_; }
   void set_wake_alarm(Epoch when) override;

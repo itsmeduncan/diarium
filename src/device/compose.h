@@ -14,6 +14,7 @@
 #include "core/edition/edition.h"
 #include "core/edition/seen_store.h"
 #include "core/net/feed_cache.h"
+#include "device/device_clock.h"
 #include "core/text/font_pack.h"
 #include "hal/hal.h"
 
@@ -21,6 +22,7 @@ namespace rsspaper {
 namespace device {
 
 struct ComposeReport {
+  size_t articles_fetched = 0;  // full text pulled for a truncated feed
   size_t feeds_fetched = 0;    // returned a body
   size_t feeds_unchanged = 0;  // answered 304, and were read from the card
   size_t feeds_failed = 0;
@@ -38,8 +40,12 @@ struct ComposeReport {
 // is the opposite of what conditional GET is for.
 //
 // A feed that fails costs that feed and lands in the colophon, never the paper.
+// `clock` is set from the first response that carries a Date header. The RTC
+// has no battery and there is no NTP, so the servers being talked to are the
+// only source of the day — and a paper dated wrongly is worse than one dated
+// not at all.
 void fetch_all(const FeedList& config, IHttpClient* http, IStorage* storage,
-               FeedCache* cache, ComposeReport* report);
+               FeedCache* cache, DeviceClock* clock, ComposeReport* report);
 
 // Phase two: parse what is on the card and lay out the paper. Call it with
 // the radio already off.

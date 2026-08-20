@@ -65,6 +65,8 @@ void HttpHeadParser::take_line(const std::string& line) {
     head_.last_modified = value;
   } else if (name_is(line, colon, "location")) {
     head_.location = value;
+  } else if (name_is(line, colon, "date")) {
+    head_.date = value;
   } else if (name_is(line, colon, "content-encoding")) {
     head_.content_encoding = value;
   } else if (name_is(line, colon, "content-length")) {

@@ -112,6 +112,9 @@ struct HttpResponse {
   int status = 0;  // 0 means the request never completed
   std::string etag;
   std::string last_modified;
+  // The server's Date header. A device with no NTP and an RTC that starts
+  // unset has to learn the day from somewhere, and every response carries it.
+  std::string server_date;
   std::string error;  // human-readable, for the colophon
 };
 
