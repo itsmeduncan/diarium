@@ -108,6 +108,14 @@ Lifecycle lifecycle_from_wake() {
 //
 // Replies are one line: OK ..., or ERR <reason>.
 bool serial_console(device::DeviceHal& d) {
+  // Only worth opening when a host might be there. Anything that talks to
+  // this device resets it first, so a wake from deep sleep has nobody to wait
+  // for — and 1.5 s is most of the time between a finger and a page.
+  const esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+  if (cause == ESP_SLEEP_WAKEUP_EXT1 || cause == ESP_SLEEP_WAKEUP_TIMER) {
+    return false;
+  }
+
   Serial.println("READY");
   bool force_compose = false;
 
@@ -305,9 +313,12 @@ void compose_wake(device::DeviceHal& d) {
 }  // namespace
 
 void setup() {
+  const uint32_t t_boot = millis();
   Serial.begin(115200);
-  delay(300);
+  // Only a host that just reset us is listening; a woken reader is not.
+  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_UNDEFINED) delay(300);
   panel.begin();
+  Serial.printf("[t] panel.begin %u\n", (unsigned)(millis() - t_boot));
   Serial.println("\nrsspaper");
 
   static device::DeviceHal d(&panel);  // claims the framebuffer first
@@ -324,21 +335,26 @@ void setup() {
     return;
   }
   // Before anything else, in case the host has something to say.
+  uint32_t t_mark = millis();
   const bool asked_to_compose = serial_console(d);
+  Serial.printf("[t] console %u\n", (unsigned)(millis() - t_mark));
 
   if (asked_to_compose || lifecycle_from_wake() == Lifecycle::Compose) {
     compose_wake(d);  // does not return: it sleeps
   }
 
+  t_mark = millis();
   const uint32_t t0 = millis();
   if (!load_paper(d)) return;
+  Serial.printf("[t] load_paper %u\n", (unsigned)(millis() - t_mark));
   Serial.printf("loaded in %u ms: %u pages, %u stories\n",
                 (unsigned)(millis() - t0), (unsigned)edition.pages.size(),
                 (unsigned)edition.stories.size());
 
   // What is actually on the card. A config that is not found should say so
-  // rather than leaving the reader to wonder.
-  {
+  // rather than leaving the reader to wonder. Diagnostics for a host, so it
+  // is skipped on the wakes where nobody is reading the serial line.
+  if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_UNDEFINED) {
     FsFile dir = panel.getSdFat().open("/", O_READ);
     FsFile entry;
     Serial.println("card contents:");
@@ -382,7 +398,10 @@ void setup() {
   reader->load_clippings("clippings.dat");
   reader->load_read_state("read.dat");
   reader->load_frontlight("light.dat");
+  t_mark = millis();
   reader->render();
+  Serial.printf("[t] first render %u\n", (unsigned)(millis() - t_mark));
+  Serial.printf("[t] TOTAL to a visible page %u\n", (unsigned)(millis() - t_boot));
   session.touched(millis());
   Serial.printf("dated %s (rtc %ld)\n",
                 format_masthead_date(edition.date).c_str(),
