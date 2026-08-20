@@ -21,10 +21,13 @@ namespace rsspaper {
 
 // How to push the framebuffer to the panel.
 //
-// The 6FLICK does a 1-bit partial refresh in ~225 ms and a 3-bit greyscale
-// full refresh in ~1.26 s. Partial is what makes page turns feel like paper;
-// full is what clears the ghosting partial leaves behind. Choosing between
-// them is a policy decision, made above the HAL.
+// Measured on a 6FLICK: a 1-bit partial refresh takes ~0.46 s and a 3-bit
+// greyscale full refresh ~1.74 s. Partial is what makes page turns feel like
+// paper; full is what clears the ghosting partial leaves behind. Choosing
+// between them is a policy decision, made above the HAL.
+//
+// The mode is part of the contract, not an implementation detail: the panel
+// driver ignores a partial update unless it is in 1-bit mode.
 enum class RefreshMode : uint8_t {
   Partial,   // fast, 1-bit, accumulates ghosting
   Full,      // slow, 3-bit greyscale, clears the panel

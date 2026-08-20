@@ -40,14 +40,19 @@ support follows — tracked on the
 | Edition persistence               | working — compose once, read from storage         |
 | Clippings                         | working — fold a corner, it survives the edition  |
 | HTTP fetcher with conditional GET | not started                                       |
-| Inkplate 6FLICK target            | not started                                       |
+| Inkplate 6FLICK target            | working — reads an edition off the card by touch  |
 
 ## Hardware
 
 The first target is the [Soldered Inkplate
-6FLICK](https://soldered.com/product/inkplate-6flick/): ESP32, 8 MB PSRAM, a 6"
-1024×758 panel with ~225 ms 1-bit partial refresh and ~1.26 s 3-bit greyscale
-full refresh, capacitive touch, a 64-step frontlight, and ~23 µA in deep sleep.
+6FLICK](https://soldered.com/product/inkplate-6flick/): ESP32, 8 MB PSRAM of
+which 4 MB is addressable — plain ESP32 maps no more — 4 MB of flash, a 6"
+1024×758 panel, capacitive touch, a 64-step frontlight, and ~23 µA in deep
+sleep.
+
+Measured on the board rather than taken from the datasheet: a 3-bit greyscale
+full refresh is ~1.74 s and a 1-bit partial refresh ~0.46 s. Storage is the
+microSD card, so the scarce flash stays free.
 
 Nothing above the HAL includes an Inkplate header. Porting to another
 ESP32-class e-ink board means implementing `src/hal/hal.h` — display, touch,
@@ -110,8 +115,8 @@ make read
 #  h  fold this corner   c    clippings
 ```
 
-It reports what the panel would have spent: partial refreshes are ~225 ms,
-full ones ~1.26 s, and the ratio is a design decision you can see.
+It reports what the panel would have spent: partial refreshes are ~0.46 s,
+full ones ~1.74 s, and the ratio is a design decision you can see.
 
 ## Configuration
 

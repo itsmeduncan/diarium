@@ -259,6 +259,49 @@ your finger is the kind of bug that only shows up on hardware.
 
 ---
 
+### 26. Storage is the microSD card, not flash
+
+The board has 4 MB of flash, not the 16 MB the early sketches assumed. A font
+pack (733 KB) and a composed edition (360 KB) in a flash partition would have
+taken most of it and permanently forfeited OTA. So `IStorage` maps to the card
+and flash holds firmware only.
+
+This also settles the config question: `feeds.toml` is edited on a computer and
+carried on the card, which is the option that issue called the most honest
+about what the product is. No captive portal, no QR handshake, no server.
+
+The costs are real. A card is required hardware; SD reads are slower than flash
+(984 ms against 567 ms for the font pack, paid on every cold wake); and a bad
+card is a normal state rather than a hypothetical — the first card used here
+was formatted HFS+ and unreadable while answering perfectly at block level,
+which is why an unreadable card renders a page rather than failing.
+
+### 27. Two phase-separated firmware lifecycles
+
+A resident `Edition` costs ~221 KB of internal RAM, because deserialising it
+makes thousands of small allocations and the Arduino allocator forces anything
+under ~16 KB into internal RAM rather than PSRAM. That leaves ~69 KB, which is
+less than WiFi and mbedTLS need.
+
+So a compose wake never constructs a `Reader`, and a read wake never brings up
+the radio. The two heavy consumers are separated by a deep sleep, which makes
+the budget work by construction rather than by careful sequencing.
+
+### 28. Sleep policy is portable, the HAL only provides the primitive
+
+`Session` lives in `src/core/ui/` rather than `src/device/`, so the transitions
+between resident, dozing and asleep can be tested against `SimPower` on a
+laptop. Sleep behaviour that exists only in device code is debuggable only on
+the device, which is the worst place to debug it.
+
+### 29. The Inkplate library is LGPL-3.0, and stays below the HAL
+
+Every other dependency here is public domain, MIT or OFL. The Soldered Inkplate
+library is LGPL-3.0. It is confined to `src/device/`, so the portable core is
+unaffected and a port to another panel inherits nothing from it — but
+distributing firmware binaries carries a relinking obligation, and that is a
+deliberate acceptance rather than an oversight.
+
 ## Open questions
 
 Tracked as issues, so there is one place to update rather than two:
