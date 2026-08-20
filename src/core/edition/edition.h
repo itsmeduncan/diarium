@@ -73,7 +73,7 @@ struct ComposeStats {
 // ends.
 struct StoryRef {
   // The item's dedup key. Stable across editions, which is what lets a
-  // clipping saved on Tuesday find its story again on Thursday.
+  // story read on Tuesday be recognised in Thursday's paper and left out.
   uint64_t key = 0;
   std::string title;
   std::string section;

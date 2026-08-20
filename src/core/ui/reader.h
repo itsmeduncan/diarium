@@ -18,7 +18,6 @@
 #include <string>
 #include <vector>
 
-#include "core/edition/clippings.h"
 #include "core/edition/seen_store.h"
 #include "core/edition/edition.h"
 #include "core/render/page_renderer.h"
@@ -39,7 +38,6 @@ enum class ReaderMode : uint8_t {
   Article,    // one article in a continuous oldest-first pass
   Story,      // the full text of a story opened from a lede
   Sections,   // the jump list
-  Clippings,  // stories you folded the corner of
   Finished,   // the news ran out
 };
 
@@ -72,11 +70,6 @@ class Reader {
   Reader(const Edition& edition, const FontPack& fonts, Hal hal,
          ReaderPolicy policy = ReaderPolicy());
 
-  // Loads saved clippings from storage. Absent or unreadable is not an error:
-  // you simply have none.
-  void load_clippings(const std::string& path);
-  const class Clippings& clippings() const { return clippings_; }
-
   // Draws the current page and pushes it to the panel.
   void render();
 
@@ -103,10 +96,6 @@ class Reader {
   bool back();
   bool toggle_sections();
   bool jump_to_section(size_t index);
-  bool toggle_clippings_view();
-  // Folds the corner of whatever is under the finger, or of the open story.
-  // Returns true if it is now saved.
-  bool toggle_clipping_at(int x, int y);
 
   // The continuous pass: every article you have not read, oldest first, one
   // swipe at a time until there are none left.
@@ -148,13 +137,9 @@ class Reader {
   void set_page(size_t page, bool context_change);
   RefreshMode choose_refresh(bool context_change);
   void render_section_overlay();
-  void render_clippings();
   // Row geometry, shared by hit-testing and drawing so a tap can never
   // land on a different row than the one under the finger.
   size_t section_row_at(int y) const;
-  size_t clipping_row_at(int y) const;
-  void save_clippings();
-  Clipping clipping_for(const StoryRef& story) const;
 
   const Edition& edition_;
   const FontPack& fonts_;
@@ -181,8 +166,6 @@ class Reader {
   int light_last_on_ = 24;  // what "on" means when it is switched back on
   SeenStore read_;
   std::string read_path_;
-  class Clippings clippings_;
-  std::string clippings_path_;
   int partials_since_full_ = 0;
   bool needs_render_ = true;
   // Set when the next render shows a wholly different page, so it gets a full

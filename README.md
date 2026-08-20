@@ -43,7 +43,6 @@ support follows — tracked on the
 | Hyphenation (Liang/TeX patterns)  | working — justified text is now viable            |
 | OPML import                       | working                                           |
 | Edition persistence               | working — compose once, read from storage         |
-| Clippings                         | working — fold a corner, it survives the edition  |
 | HTTP fetcher with conditional GET | working — verified live, most feeds answer 304    |
 | Inkplate 6FLICK target            | working — fetches, composes and is read by touch  |
 | Read state and carry-over         | working — unread stories keep until you read them |
@@ -171,7 +170,6 @@ make read
 #  n  the next unread article    j/k  scroll within it
 #  p  the previous article       1-9  open the Nth story here
 #  b  back                       s    section list
-#  h  fold this corner           c    clippings
 #  g  home: the contents page (a long press in the bottom-left corner)
 ```
 
@@ -190,7 +188,6 @@ The keys above stand in for these. Reading is a line rather than a tree, so
 | Swipe up | further into the story | — | — |
 | Swipe down | back up the story | the section list | the section list |
 | Tap | — | open the story under your finger | — |
-| Long press | — | fold that story's corner | fold this story's corner |
 
 Two corners mean the same thing wherever you are. The top right is the light:
 a tap switches it, a long press steps the brightness round. The bottom left is
@@ -199,9 +196,8 @@ or the end of the news alike. Going home is not a back — it does not restore
 where you were, and nothing becomes unread by leaving, so swiping onward
 resumes at the oldest story still outstanding.
 
-In the section list and clippings, a tap picks a row and a swipe up goes back;
-a long press on a clipping takes it out again. The last row of the section
-list is **Mark everything read**, which takes two taps — the first arms it and
+In the section list, a tap picks a section and a swipe up goes back. Its last
+row is **Mark everything read**, which takes two taps — the first arms it and
 says so.
 
 ## Configuration

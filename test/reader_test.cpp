@@ -70,8 +70,8 @@ class FakePower final : public IPower {
   int mv = 4000;
 };
 
-// A real store rather than a black hole: clippings and read state are only
-// worth anything if they survive being written and read back.
+// A real store rather than a black hole: the read state is only worth
+// anything if it survives being written and read back.
 class FakeStorage final : public IStorage {
  public:
   bool read(const std::string& path, std::string* out) override {
@@ -652,7 +652,7 @@ TEST_CASE("reading: marking everything read") {
     REQUIRE(r.handle(down));
     REQUIRE(r.mode() == ReaderMode::Sections);
 
-    const size_t row = ed.section_marks.size() + 1;
+    const size_t row = ed.section_marks.size();
     REQUIRE(tap_row(r, row));
     CHECK(r.mode() == ReaderMode::Sections);  // armed, not fired
 
@@ -668,7 +668,7 @@ TEST_CASE("reading: marking everything read") {
       GestureEvent down;
       down.kind = Gesture::SwipeDown;
       REQUIRE(r.handle(down));
-      const size_t row = ed.section_marks.size() + 1;
+      const size_t row = ed.section_marks.size();
       REQUIRE(tap_row(r, row));
       REQUIRE(tap_row(r, row));
     }
@@ -903,17 +903,6 @@ TEST_CASE("reading: the way home") {
     const StoryRef* next = r.open_story();
     REQUIRE(next != nullptr);
     CHECK(next->key != was);
-  }
-
-  SUBCASE("the clippings list keeps its long press") {
-    Rig rig;
-    Reader r(ed, *fonts, rig.hal());
-    r.load_read_state("read.dat");
-    REQUIRE(r.toggle_clippings_view());
-    REQUIRE(r.mode() == ReaderMode::Clippings);
-
-    r.handle(corner(Gesture::LongPress));
-    CHECK(r.mode() == ReaderMode::Clippings);
   }
 
   SUBCASE("the light is still the other corner") {

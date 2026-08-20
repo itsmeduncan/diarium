@@ -395,7 +395,6 @@ void setup() {
   Hal hal = d.as_hal();
   static Reader r(edition, fonts, hal);
   reader = &r;
-  reader->load_clippings("clippings.dat");
   reader->load_read_state("read.dat");
   reader->load_frontlight("light.dat");
   t_mark = millis();
