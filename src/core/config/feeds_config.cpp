@@ -109,7 +109,7 @@ bool parse_feeds_toml(const std::string& text, FeedList* out,
                       std::string* error) {
   *out = FeedList();
 
-  enum class Table { None, Edition, Feed };
+  enum class Table { None, Edition, Feed, Wifi };
   Table table = Table::None;
 
   size_t start = 0;
@@ -144,6 +144,8 @@ bool parse_feeds_toml(const std::string& text, FeedList* out,
         table = Table::Feed;
       } else if (name == "[edition]") {
         table = Table::Edition;
+      } else if (name == "[wifi]") {
+        table = Table::Wifi;
       } else {
         // An unknown table is skipped rather than fatal: a config written for
         // a newer build should still boot on an older one.
@@ -193,6 +195,17 @@ bool parse_feeds_toml(const std::string& text, FeedList* out,
         }
       }
       // Unknown keys are ignored, same reasoning as unknown tables.
+      continue;
+    }
+
+    if (table == Table::Wifi) {
+      // Two keys, and no error for anything else: a config written for a
+      // newer build should still boot on an older one.
+      if (key == "ssid") {
+        out->wifi.ssid = value;
+      } else if (key == "password") {
+        out->wifi.password = value;
+      }
       continue;
     }
 
