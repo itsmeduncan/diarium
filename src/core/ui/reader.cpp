@@ -438,6 +438,8 @@ void Reader::render() {
     }
   }
 
+  render_battery_mark();
+
   const bool context_change = pending_context_change_;
   pending_context_change_ = false;
   hal_.display->flush(choose_refresh(context_change));
@@ -572,6 +574,28 @@ bool Reader::scroll_up() {
   const StoryRef& s = edition_.stories[order_[order_pos_]];
   set_page(s.first_page + static_cast<size_t>(article_page_), false);
   return true;
+}
+
+void Reader::render_battery_mark() {
+  if (hal_.power == nullptr || hal_.display == nullptr) return;
+  const int mv = hal_.power->battery_millivolts();
+  // A reading of zero means no measurement rather than an empty cell.
+  if (mv <= 0 || mv >= policy_.low_battery_mv) return;
+
+  Framebuffer& fb = hal_.display->framebuffer();
+
+  // Centred in the bottom margin, on the folio's line. The margins themselves
+  // are taken: folio_left sits against the left margin and folio_right is
+  // right-aligned against the other, so the middle is the only space that is
+  // reliably empty on every page.
+  const int w = 26;
+  const int h = 13;
+  const int x = (kPageWidth - w) / 2;
+  const int y = kPageHeight - 30;
+
+  fb.frame_rect(x, y, w, h, kInk);
+  fb.fill_rect(x + w, y + 4, 3, h - 8, kInk);  // the terminal
+  fb.fill_rect(x + 3, y + 3, 5, h - 6, kInk);  // what is left of the charge
 }
 
 void Reader::render_finished() {
