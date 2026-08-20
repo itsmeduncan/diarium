@@ -17,6 +17,9 @@ struct HttpHead {
   std::string last_modified;
   std::string location;
   std::string content_encoding;
+  // The server's clock, as RFC 1123. On a device with no RTC battery and no
+  // NTP, this is how the paper learns what day it is.
+  std::string date;
   long long content_length = -1;  // -1 means unstated
   bool chunked = false;
 };

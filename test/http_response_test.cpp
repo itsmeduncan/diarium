@@ -116,3 +116,20 @@ TEST_CASE("an absurd header value is clipped rather than stored whole") {
   REQUIRE(p.done());
   CHECK(p.head().etag.size() <= 1024);
 }
+
+TEST_CASE("the server's date is carried, because the device has no other clock") {
+  HttpHeadParser p = parse_all(
+      "HTTP/1.1 200 OK\r\nDate: Wed, 19 Aug 2026 09:14:02 GMT\r\n\r\n");
+  REQUIRE(p.done());
+  CHECK(p.head().date == "Wed, 19 Aug 2026 09:14:02 GMT");
+}
+
+TEST_CASE("a 304 still carries the date") {
+  // Most mornings most feeds answer 304, so if only 200s set the clock it
+  // would drift on exactly the days nothing changed.
+  HttpHeadParser p = parse_all(
+      "HTTP/1.1 304 Not Modified\r\ndate: Wed, 19 Aug 2026 09:14:02 GMT\r\n\r\n");
+  REQUIRE(p.done());
+  CHECK(p.head().status == 304);
+  CHECK(p.head().date == "Wed, 19 Aug 2026 09:14:02 GMT");
+}

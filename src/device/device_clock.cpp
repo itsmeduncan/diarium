@@ -15,6 +15,12 @@ void DeviceClock::seed_if_unset(Epoch when) {
   panel_->rtc.setEpoch(static_cast<uint32_t>(when));
 }
 
+void DeviceClock::set_now(Epoch when) {
+  constexpr Epoch kPlausible = 1577836800;  // 2020-01-01
+  if (when == kNoDate || when < kPlausible) return;
+  panel_->rtc.setEpoch(static_cast<uint32_t>(when));
+}
+
 void DeviceClock::set_wake_alarm(Epoch when) {
   if (when == kNoDate) return;
   // Match on second, minute, hour and day: a once-a-day alarm at a wall-clock

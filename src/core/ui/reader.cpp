@@ -1,5 +1,7 @@
 #include "core/ui/reader.h"
 
+#include "core/ui/contents.h"
+
 #include <cstdlib>
 
 #include "core/base/str.h"
@@ -59,8 +61,6 @@ bool Reader::next_page() {
     return true;
   }
 
-  // The last browse page is the colophon, which already says the paper has
-  // ended. There is nothing after it.
   if (page_ + 1 >= edition_.browse_page_count) return false;
   set_page(page_ + 1, false);
   return true;
@@ -499,6 +499,18 @@ void Reader::render() {
     render_clippings();
   } else if (mode_ == ReaderMode::Finished) {
     render_finished();
+  } else if (mode_ == ReaderMode::Browse && page_ == 0) {
+    // Page one is drawn rather than composed: it is a view of what is left to
+    // read, and that changes as you read while the edition does not. The
+    // pages behind it are the composed ledes, still there to be flipped
+    // through and clipped from.
+    std::vector<bool> unread;
+    unread.reserve(order_.size());
+    for (size_t i = 0; i < order_.size(); ++i) {
+      unread.push_back(!read_.has(edition_.stories[order_[i]].key));
+    }
+    render_contents(fonts_, edition_, order_, unread, "composed on device",
+                    &hal_.display->framebuffer());
   } else {
     if (page_ >= edition_.pages.size()) return;
     renderer_.render(edition_.pages[page_], &hal_.display->framebuffer());

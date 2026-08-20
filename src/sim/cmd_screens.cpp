@@ -12,6 +12,8 @@
 #include "core/edition/edition_store.h"
 #include "core/render/framebuffer.h"
 #include "core/text/font_pack.h"
+#include "core/io/file_byte_source.h"
+#include "core/ui/contents.h"
 #include "core/ui/notice.h"
 #include "sim/commands.h"
 #include "sim/fixtures.h"
@@ -59,6 +61,23 @@ int cmd_screens(const std::vector<std::string>& args) {
       return 1;
     }
     std::printf("  %s\n", path.c_str());
+  }
+
+  // The contents page needs a real edition, since it is a view of one.
+  const std::string edition_path = flag(args, "--edition", "out/edition.rspe");
+  std::string blob;
+  if (read_file(edition_path, &blob)) {
+    Edition ed;
+    std::string load_error;
+    if (deserialize_edition(blob, &ed, &load_error)) {
+      const std::vector<size_t> order = ed.reading_order();
+      const std::vector<bool> unread(order.size(), true);
+      render_contents(fonts, ed, order, unread, "composed on device", &fb);
+      const std::string p = out_dir + "/contents.png";
+      if (write_png(fb, depth, p)) std::printf("  %s\n", p.c_str());
+    } else {
+      std::fprintf(stderr, "screens: %s\n", load_error.c_str());
+    }
   }
 
   render_sleep_page(fonts, title, date_line, &fb);

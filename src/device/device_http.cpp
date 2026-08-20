@@ -142,6 +142,7 @@ std::unique_ptr<ByteSource> DeviceHttpClient::get(const HttpRequest& request,
     res.status = head.status;
     res.etag = head.etag;
     res.last_modified = head.last_modified;
+    res.server_date = head.date;
 
     if (head.status == 304) {
       res.error.clear();  // not an error: nothing has changed

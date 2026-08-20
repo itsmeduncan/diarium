@@ -160,6 +160,9 @@ void compose_wake(device::DeviceHal& d) {
     d.power.deep_sleep_until(kNoDate);
   }
 
+  // The offset has to be in hand before anything is dated.
+  d.clock.set_utc_offset(config.edition.utc_offset_minutes * 60);
+
   FeedCache cache;
   std::string blob;
   if (d.storage.read("/cache.dat", &blob)) cache.deserialize(blob);
@@ -168,7 +171,7 @@ void compose_wake(device::DeviceHal& d) {
   if (config.wifi.configured()) {
     device::DeviceWifi wifi;
     if (wifi.connect(config.wifi)) {
-      device::fetch_all(config, &d.http, &d.storage, &cache, &fetched);
+      device::fetch_all(config, &d.http, &d.storage, &cache, &d.clock, &fetched);
       wifi.disconnect();  // before anything heavy is built
       Serial.printf("fetched %u, unchanged %u, failed %u, %u bytes in %u ms\n",
                     (unsigned)fetched.feeds_fetched,
@@ -209,8 +212,11 @@ void compose_wake(device::DeviceHal& d) {
   }
 
   const uint32_t t0 = millis();
+  // Local, not UTC: a paper is dated the day the reader is having, and at
+  // nine in the evening those are not the same day.
+  const Epoch local_now = d.clock.now() + d.clock.utc_offset_seconds();
   Edition ed = device::compose_from_card(config, fonts, &d.storage, &read_state,
-                                         d.clock.now(), fetched);
+                                         local_now, fetched);
   Serial.printf("composed %u pages, %u stories in %u ms\n",
                 (unsigned)ed.pages.size(), (unsigned)ed.stories.size(),
                 (unsigned)(millis() - t0));
@@ -301,6 +307,9 @@ void setup() {
     Serial.printf("feeds.toml: %s\n", config_error.c_str());
   }
 
+  // Only a fallback now: a compose wake sets the clock from the servers it
+  // talks to. Seeding from an edition's own date is how the device came to
+  // believe it was permanently the day those fixtures were composed.
   d.clock.seed_if_unset(edition.date);
   d.input.begin();
 
@@ -312,6 +321,9 @@ void setup() {
   reader->load_frontlight("light.dat");
   reader->render();
   session.touched(millis());
+  Serial.printf("dated %s (rtc %ld)\n",
+                format_masthead_date(edition.date).c_str(),
+                (long)d.clock.now());
   Serial.printf("reading — %s\n", reader->position().c_str());
 }
 
