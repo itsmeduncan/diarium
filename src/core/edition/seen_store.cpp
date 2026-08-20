@@ -9,9 +9,16 @@
 namespace rsspaper {
 
 bool SeenStore::load(const std::string& path, Epoch now) {
-  entries_.clear();
   std::string raw;
-  if (!read_file(path, &raw)) return false;  // no store yet is not an error
+  if (!read_file(path, &raw)) {
+    entries_.clear();
+    return false;  // no store yet is not an error
+  }
+  return deserialize(raw, now);
+}
+
+bool SeenStore::deserialize(const std::string& raw, Epoch now) {
+  entries_.clear();
 
   const Epoch cutoff =
       now == kNoDate ? kNoDate
@@ -41,12 +48,16 @@ bool SeenStore::load(const std::string& path, Epoch now) {
 }
 
 bool SeenStore::save(const std::string& path) const {
+  return write_file(path, serialize_seen_store(*this));
+}
+
+std::string serialize_seen_store(const SeenStore& store) {
   std::string out =
       "# rsspaper seen-store: dedup key (hex) and first-seen epoch\n";
-  for (const Entry& e : entries_) {
+  for (const SeenStore::Entry& e : store.entries_) {
     out += to_hex64(e.key) + " " + std::to_string(e.when) + "\n";
   }
-  return write_file(path, out);
+  return out;
 }
 
 bool SeenStore::has(uint64_t key) const {

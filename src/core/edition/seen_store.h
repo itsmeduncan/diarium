@@ -21,8 +21,15 @@ class SeenStore {
   // enough that the file stays under a few KB.
   explicit SeenStore(int retain_days = 30) : retain_days_(retain_days) {}
 
+  // Path-based, for the desktop. On device these reach stdio rather than the
+  // card, so the firmware uses the blob API below and does its own I/O
+  // through IStorage — the same split clippings already uses.
   bool load(const std::string& path, Epoch now);
   bool save(const std::string& path) const;
+
+  // Replaces the contents. Entries older than `retain_days` before `now` are
+  // dropped. An empty blob is an empty store, not a failure.
+  bool deserialize(const std::string& blob, Epoch now);
 
   bool has(uint64_t key) const;
   // Records the key. Returns false if it was already there, which is the
@@ -30,6 +37,9 @@ class SeenStore {
   bool mark(uint64_t key, Epoch when);
 
   size_t size() const { return entries_.size(); }
+
+ private:
+  friend std::string serialize_seen_store(const SeenStore& store);
 
  private:
   struct Entry {
@@ -40,5 +50,7 @@ class SeenStore {
   int retain_days_;
   std::vector<Entry> entries_;
 };
+
+std::string serialize_seen_store(const SeenStore& store);
 
 }  // namespace rsspaper

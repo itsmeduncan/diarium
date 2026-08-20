@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <esp_sleep.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -15,7 +16,13 @@
 #include "core/ui/gesture.h"
 #include "core/ui/reader.h"
 #include "core/ui/session.h"
+#include "core/edition/seen_store.h"
+#include "core/net/feed_cache.h"
+#include "device/compose.h"
 #include "device/device_hal.h"
+#include "device/device_wifi.h"
+#include "device/device_http.h"
+#include "device/device_wifi.h"
 
 using namespace rsspaper;
 
@@ -84,6 +91,87 @@ Lifecycle lifecycle_from_wake() {
   return (fired & (1ULL << GPIO_NUM_39)) ? Lifecycle::Compose : Lifecycle::Read;
 }
 
+// Fetch, compose, persist, sleep. Never constructs a Reader, and the radio is
+// off before the edition is laid out — the two must not be resident together
+// (DECISIONS 27).
+void compose_wake(device::DeviceHal& d) {
+  Serial.println("compose wake");
+
+  FeedList config;
+  std::string toml;
+  std::string config_error;
+  if (!d.storage.read("/feeds.toml", &toml)) {
+    Serial.println("no feeds.toml on the card — nothing to compose");
+    d.power.deep_sleep_until(kNoDate);
+  }
+  if (!parse_feeds_toml(toml, &config, &config_error)) {
+    Serial.printf("feeds.toml: %s\n", config_error.c_str());
+    d.power.deep_sleep_until(kNoDate);
+  }
+
+  FeedCache cache;
+  std::string blob;
+  if (d.storage.read("/cache.dat", &blob)) cache.deserialize(blob);
+
+  device::ComposeReport fetched;
+  if (config.wifi.configured()) {
+    device::DeviceWifi wifi;
+    if (wifi.connect(config.wifi)) {
+      device::fetch_all(config, &d.http, &d.storage, &cache, &fetched);
+      wifi.disconnect();  // before anything heavy is built
+      Serial.printf("fetched %u, unchanged %u, failed %u, %u bytes in %u ms\n",
+                    (unsigned)fetched.feeds_fetched,
+                    (unsigned)fetched.feeds_unchanged,
+                    (unsigned)fetched.feeds_failed,
+                    (unsigned)fetched.bytes_downloaded,
+                    (unsigned)fetched.elapsed_ms);
+      d.storage.write("/cache.dat", cache.serialize());
+    } else {
+      Serial.println("wifi: could not join — composing from what is cached");
+    }
+  } else {
+    Serial.println("no [wifi] section — composing from what is cached");
+  }
+
+  // The font pack is needed to lay out, and only now that the radio is off.
+  std::string fontblob;
+  if (!d.storage.read("/literata.rfp", &fontblob)) {
+    Serial.println("no font pack — cannot compose");
+    d.power.deep_sleep_until(kNoDate);
+  }
+  std::vector<uint8_t> bytes(fontblob.begin(), fontblob.end());
+  fontblob.clear();
+  fontblob.shrink_to_fit();
+  std::string error;
+  if (!fonts.load(std::move(bytes), &error)) {
+    Serial.printf("font pack: %s\n", error.c_str());
+    d.power.deep_sleep_until(kNoDate);
+  }
+
+  SeenStore seen;
+  if (d.storage.read("/seen.dat", &blob)) seen.deserialize(blob, d.clock.now());
+
+  const uint32_t t0 = millis();
+  Edition ed = device::compose_from_card(config, fonts, &d.storage, &seen,
+                                         d.clock.now(), fetched);
+  Serial.printf("composed %u pages, %u stories in %u ms\n",
+                (unsigned)ed.pages.size(), (unsigned)ed.stories.size(),
+                (unsigned)(millis() - t0));
+
+  if (ed.pages.empty()) {
+    Serial.println("nothing to print — keeping yesterday's paper");
+  } else if (d.storage.write("/edition.rspe", serialize_edition(ed))) {
+    d.storage.write("/seen.dat", serialize_seen_store(seen));
+    Serial.println("saved");
+  } else {
+    Serial.println("could not save the edition");
+  }
+
+  // Tomorrow, at the same time. wake_at is honoured once #5 owns the policy.
+  d.clock.set_wake_alarm(d.clock.now() + 24 * 60 * 60);
+  d.power.deep_sleep_until(kNoDate);
+}
+
 }  // namespace
 
 void setup() {
@@ -106,12 +194,7 @@ void setup() {
     return;
   }
   if (lifecycle_from_wake() == Lifecycle::Compose) {
-    // Never constructs a Reader and never holds an Edition while the radio is
-    // up. That separation is what keeps issue #3 inside the internal-RAM
-    // budget; until #3 lands there is nothing to fetch, so re-arm and sleep.
-    Serial.println("compose wake: no network yet");
-    d.clock.set_wake_alarm(d.clock.now() + 24 * 60 * 60);
-    d.power.deep_sleep_until(kNoDate);
+    compose_wake(d);  // does not return: it sleeps
   }
 
   const uint32_t t0 = millis();
@@ -119,6 +202,22 @@ void setup() {
   Serial.printf("loaded in %u ms: %u pages, %u stories\n",
                 (unsigned)(millis() - t0), (unsigned)edition.pages.size(),
                 (unsigned)edition.stories.size());
+
+  // What is actually on the card. A config that is not found should say so
+  // rather than leaving the reader to wonder.
+  {
+    FsFile dir = panel.getSdFat().open("/", O_READ);
+    FsFile entry;
+    Serial.println("card contents:");
+    char name[64];
+    while (entry.openNext(&dir, O_READ)) {
+      entry.getName(name, sizeof(name));
+      Serial.printf("  %-28s %8u bytes%s\n", name, (unsigned)entry.fileSize(),
+                    entry.isDir() ? "  <dir>" : "");
+      entry.close();
+    }
+    dir.close();
+  }
 
   // The offset travels on the card: no network to ask, no keyboard to be
   // asked. A missing or broken feeds.toml costs the local time, not the paper.
@@ -131,7 +230,9 @@ void setup() {
     Serial.printf("feeds.toml: %u feeds, utc%+d min\n",
                   (unsigned)config.feeds.size(),
                   config.edition.utc_offset_minutes);
-  } else if (!toml.empty()) {
+  } else if (toml.empty()) {
+    Serial.println("feeds.toml: not on the card");
+  } else {
     Serial.printf("feeds.toml: %s\n", config_error.c_str());
   }
 
