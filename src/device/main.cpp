@@ -1,6 +1,7 @@
 // The device composition root: pick a lifecycle from the wake reason, build
 // the HAL, run. No policy lives here — that is what src/core/ is for.
 #include <Arduino.h>
+#include <esp_sleep.h>
 
 #include <string>
 #include <vector>
@@ -70,6 +71,19 @@ bool load_paper(device::DeviceHal& d) {
   return true;
 }
 
+enum class Lifecycle { Compose, Read };
+
+Lifecycle lifecycle_from_wake() {
+  // An RTC alarm means it is time to build tomorrow's paper. Anything else —
+  // the wake button, a reset, first power-on — means someone wants to read.
+  // Both wake sources are ext1, so ask which pin actually fired.
+  if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_EXT1) {
+    return Lifecycle::Read;
+  }
+  const uint64_t fired = esp_sleep_get_ext1_wakeup_status();
+  return (fired & (1ULL << GPIO_NUM_39)) ? Lifecycle::Compose : Lifecycle::Read;
+}
+
 }  // namespace
 
 void setup() {
@@ -91,6 +105,15 @@ void setup() {
                     : "Insert a card with feeds.toml and an edition on it.");
     return;
   }
+  if (lifecycle_from_wake() == Lifecycle::Compose) {
+    // Never constructs a Reader and never holds an Edition while the radio is
+    // up. That separation is what keeps issue #3 inside the internal-RAM
+    // budget; until #3 lands there is nothing to fetch, so re-arm and sleep.
+    Serial.println("compose wake: no network yet");
+    d.clock.set_wake_alarm(d.clock.now() + 24 * 60 * 60);
+    d.power.deep_sleep_until(kNoDate);
+  }
+
   const uint32_t t0 = millis();
   if (!load_paper(d)) return;
   Serial.printf("loaded in %u ms: %u pages, %u stories\n",
