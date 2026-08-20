@@ -53,7 +53,9 @@ The first target is the [Soldered Inkplate
 6FLICK](https://soldered.com/product/inkplate-6flick/): ESP32, 8 MB PSRAM of
 which 4 MB is addressable — plain ESP32 maps no more — 4 MB of flash, a 6"
 1024×758 panel, capacitive touch, a 64-step frontlight, and ~23 µA in deep
-sleep.
+sleep — a figure from the panel's own specification, taken before a microSD
+card was fitted. Actual draw in this configuration has not been measured, and
+no claim about how long a charge lasts is made here until it has been.
 
 Measured on the board rather than taken from the datasheet: a 3-bit greyscale
 full refresh is ~1.74 s and a 1-bit partial refresh ~0.46 s. Storage is the
