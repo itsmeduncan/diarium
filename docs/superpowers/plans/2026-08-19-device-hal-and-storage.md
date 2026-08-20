@@ -51,21 +51,26 @@ coredump,   data, coredump, 0x3F0000, 0x10000
 
 - [ ] **Step 2: Create `src/device/platformio.ini`**
 
-`src_dir = .` keeps device sources here; `-I../..` makes `#include "core/..."` resolve against the repo root.
+`src_dir = .` keeps device sources here; `-I..` points at `src/`, which is what `#include "core/..."` and `#include "hal/..."` resolve against.
+
+`src_dir` is a `[platformio]` section option — it is silently ignored inside
+an `[env:]` block, and the build fails with "Nothing to build".
 
 ```ini
+[platformio]
+src_dir = .
+
 [env:inkplate6flick]
 platform = espressif32
 board = esp32dev
 framework = arduino
 board_build.partitions = partitions_rsspaper.csv
-src_dir = .
 build_flags =
     -DARDUINO_INKPLATE6FLICK
     -DBOARD_HAS_PSRAM
     -mfix-esp32-psram-cache-issue
     -std=gnu++17
-    -I../..
+    -I..
 build_unflags = -std=gnu++11
 build_src_filter = +<*.cpp> +<../core/**/*.cpp>
 lib_deps = e-radionicacom/InkplateLibrary@^11.1.3

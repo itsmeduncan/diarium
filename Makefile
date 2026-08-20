@@ -85,3 +85,7 @@ $(BUILD)/%.o: %.cpp
 
 clean:
 	rm -rf $(BUILD) $(BIN) out
+
+.PHONY: device
+device:
+	cd src/device && pio run
