@@ -320,16 +320,22 @@ TEST_CASE("the budget keeps the newest stories, not the first in the feed") {
   CHECK(ed.stories[2].title == "Day 4");
 }
 
-TEST_CASE("a zero budget produces no edition rather than a broken one") {
+TEST_CASE("no ceiling means every story is published") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
   ComposeOptions opts;
   opts.now = 1786864000;
   opts.max_age_days = 3650;
-  opts.max_items = 0;
-  const Edition ed = compose_edition(two_sections(), *fonts, opts);
-  CHECK(ed.stories.empty());
-  CHECK(ed.stats.items_published == 0);
+  opts.max_items = 0;  // the default: no ceiling
+
+  std::vector<Section> sections = two_sections();
+  size_t offered = 0;
+  for (const Section& s : sections) offered += s.items.size();
+
+  const Edition ed = compose_edition(std::move(sections), *fonts, opts);
+  CHECK(ed.stories.size() == offered);
+  CHECK(ed.stats.items_published == offered);
+  CHECK(ed.stats.dropped_over_budget == 0);
 }
 
 TEST_CASE("the paper ends with a colophon that says so") {

@@ -25,8 +25,14 @@ wake_at = "05:30"
 # Minutes east of UTC. The device has no network to ask and no keyboard to be
 # asked, so the offset travels with this file.
 utc_offset_minutes = 0
-# Hard ceiling on the edition. A paper that never ends is a feed.
-max_items = 40
+# Ceiling on the whole edition. There isn't one by default: if you are a week
+# behind, a ceiling is what stops the paper catching you up. What bounds the
+# edition is the per-feed max_items below, and max_age_days further down.
+#
+# Set it to a whole number if you would rather have a paper of a predictable
+# length. When it bites, every section gets two stories before any section
+# gets more, so a busy section can't take the whole paper.
+# max_items = 40
 # "justified" or "ragged". Justified needs hyphenation to look right in the
 # narrow front-page columns; with it on, either reads well.
 body_alignment = "ragged"

@@ -5,8 +5,11 @@
 RSSpaper is a newspaper, not a feed. Before proposing a feature, check it
 against these:
 
-- **Bounded editions.** A refresh produces a front page, sections, and an end.
-  Nothing that makes the reading session open-ended.
+- **Editions end.** A refresh produces a front page, sections, and an end you
+  can reach. How long it is depends on your feeds and the age window — there
+  is no ceiling by default, because one is what stops the paper catching you
+  up after a week away. What is ruled out is the session never ending: no
+  infinite scroll, no "more like this" at the bottom.
 - **On-device only.** No server, no accounts, no cloud, no telemetry. The only
   network requests are to the user's own feed URLs.
 - **Calm.** No notifications, no badges, no counts of what is outstanding, no
