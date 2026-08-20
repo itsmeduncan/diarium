@@ -31,16 +31,19 @@ support follows — tracked on the
 | RSS 2.0 / RSS 1.0 / Atom parser   | working, exercised against 12 real feeds          |
 | HTML → block model                | working                                           |
 | Type + layout engine              | working — widow/orphan control, two optical sizes |
-| Edition composer                  | working — front page, sections, dedup across days |
+| Edition composer                  | working — front page, sections, dedup on read state |
 | Desktop simulator (PNG output)    | working — 8-bit, 3-bit and 1-bit dithered         |
-| HAL (six interfaces)              | working — simulator implements all six            |
-| Reader UI (gestures, page turns)  | working — open a story, come back, jump sections  |
+| HAL (six interfaces)              | working — simulator and device implement all six  |
+| Reader UI (gestures, page turns)  | working — swipe through the news, scroll, go back |
 | Hyphenation (Liang/TeX patterns)  | working — justified text is now viable            |
 | OPML import                       | working                                           |
 | Edition persistence               | working — compose once, read from storage         |
 | Clippings                         | working — fold a corner, it survives the edition  |
-| HTTP fetcher with conditional GET | not started                                       |
-| Inkplate 6FLICK target            | working — reads an edition off the card by touch  |
+| HTTP fetcher with conditional GET | working — verified live, most feeds answer 304    |
+| Inkplate 6FLICK target            | working — fetches, composes and is read by touch  |
+| Read state and carry-over         | working — unread stories keep until you read them |
+| Frontlight, battery mark          | working — threshold is a guess until measured     |
+| Power loop (wake, compose, sleep) | working — draw over a day is not yet measured     |
 
 ## Hardware
 
