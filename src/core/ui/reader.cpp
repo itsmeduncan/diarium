@@ -210,6 +210,12 @@ bool Reader::in_light_corner(int x, int y) const {
   return x >= kPageWidth - 140 && y <= 140;
 }
 
+// The opposite corner, the same size. Two corners, two things you can always
+// reach: the light, and the way out.
+bool Reader::in_home_corner(int x, int y) const {
+  return x <= 140 && y >= kPageHeight - 140;
+}
+
 void Reader::load_frontlight(const std::string& path) {
   light_path_ = path;
   std::string blob;
@@ -255,6 +261,16 @@ bool Reader::handle_frontlight(const GestureEvent& event) {
 bool Reader::handle(const GestureEvent& event) {
   // The light is reachable from wherever you are, including mid-article.
   if (handle_frontlight(event)) return false;
+
+  // So is the way out. A long press rather than a tap, because this is the
+  // one gesture that abandons where you are, and the corner is furniture
+  // rather than anything the page laid out. Not in the clippings list: there
+  // a long press already means "take this one out", the rows reach into the
+  // corner, and the list has its own way back.
+  if (event.kind == Gesture::LongPress && mode_ != ReaderMode::Clippings &&
+      in_home_corner(event.x, event.y)) {
+    return go_home();
+  }
 
   // The continuous pass has its own gestures: right goes onward through the
   // news, and up and down move within the article you are on.
@@ -679,6 +695,20 @@ bool Reader::mark_everything_read() {
   mode_ = ReaderMode::Finished;
   needs_render_ = true;
   pending_context_change_ = true;
+  return true;
+}
+
+// The contents page is home: a view of what is left to read. This is not a
+// "back" — reading is a line and there is no stack to pop — so it does not
+// restore where you were, it puts the paper down. Nothing becomes unread by
+// coming here, so swiping onward resumes at the oldest story still
+// outstanding, which is the one after whatever was on screen.
+bool Reader::go_home() {
+  if (mode_ == ReaderMode::Browse && page_ == 0) return false;
+  confirm_mark_all_ = false;
+  mode_ = ReaderMode::Browse;
+  have_story_ = false;
+  set_page(0, true);
   return true;
 }
 

@@ -172,10 +172,37 @@ make read
 #  p  the previous article       1-9  open the Nth story here
 #  b  back                       s    section list
 #  h  fold this corner           c    clippings
+#  g  home: the contents page (a long press in the bottom-left corner)
 ```
 
 It reports what the panel would have spent: partial refreshes are ~0.46 s,
 full ones ~1.74 s, and the ratio is a design decision you can see.
+
+### Navigation
+
+The keys above stand in for these. Reading is a line rather than a tree, so
+"onward" is rightwards everywhere and there is no stack to pop:
+
+| Gesture | Reading the pass | Contents page and ledes | A story from a lede |
+| --- | --- | --- | --- |
+| Swipe right | the next unread story | start reading | the previous page |
+| Swipe left | the previous story | the next page | onward, then back to the lede |
+| Swipe up | further into the story | — | — |
+| Swipe down | back up the story | the section list | the section list |
+| Tap | — | open the story under your finger | — |
+| Long press | — | fold that story's corner | fold this story's corner |
+
+Two corners mean the same thing wherever you are. The top right is the light:
+a tap switches it, a long press steps the brightness round. The bottom left is
+home: a long press returns to the contents page, from an article, a lede page
+or the end of the news alike. Going home is not a back — it does not restore
+where you were, and nothing becomes unread by leaving, so swiping onward
+resumes at the oldest story still outstanding.
+
+In the section list and clippings, a tap picks a row and a swipe up goes back;
+a long press on a clipping takes it out again. The last row of the section
+list is **Mark everything read**, which takes two taps — the first arms it and
+says so.
 
 ## Configuration
 

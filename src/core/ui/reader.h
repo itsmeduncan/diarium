@@ -118,6 +118,9 @@ class Reader {
   // Clears the whole backlog. Two taps: a carry-over pile with no exit is an
   // inbox, and an exit that fires on a mis-tap is worse.
   bool mark_everything_read();
+  // Back to the contents page from wherever you are. A long press in the
+  // bottom-left corner, which is furniture rather than a control on the page.
+  bool go_home();
 
   // The frontlight. A tap in the top corner switches it; a long press there
   // steps the brightness round. It is a light with a switch: nothing reacts
@@ -132,6 +135,7 @@ class Reader {
   // percentage, no icon that animates, and nothing at all when it is fine.
   void render_battery_mark();
   bool in_light_corner(int x, int y) const;
+  bool in_home_corner(int x, int y) const;
   bool handle_frontlight(const GestureEvent& event);
   void save_frontlight();
   void render_finished();
