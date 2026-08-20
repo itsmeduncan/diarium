@@ -98,8 +98,13 @@ std::unique_ptr<ByteSource> DeviceHttpClient::get(const HttpRequest& request,
     }
 
     auto tls = std::unique_ptr<WiFiClientSecure>(new WiFiClientSecure());
-    // Encrypted but unverified — see DECISIONS 31. Deliberate, and written
-    // down rather than left implicit.
+    // Encrypted but unverified, deliberately. Validating a certificate
+    // needs a CA bundle in flash and a correct clock, and this device learns
+    // the date from the Date headers of the very servers it would be
+    // validating — so at first boot the check would be circular. It fetches
+    // public feeds and sends no credentials: `parse_url` discards any
+    // userinfo, so nothing secret can ride along. This buys privacy from a
+    // passive observer, not authenticity of the publisher.
     tls->setInsecure();
     tls->setTimeout(request.timeout_ms / 1000);
 

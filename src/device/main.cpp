@@ -198,8 +198,7 @@ bool serial_console(device::DeviceHal& d) {
 }
 
 // Fetch, compose, persist, sleep. Never constructs a Reader, and the radio is
-// off before the edition is laid out — the two must not be resident together
-// (DECISIONS 27).
+// off before the edition is laid out — the two must not be resident together.
 void compose_wake(device::DeviceHal& d) {
   Serial.println("compose wake");
 

@@ -47,8 +47,11 @@ above the HAL, and it writes PNGs you can actually look at.
   so no build system needs a codegen step, but it is an output: edit
   `assets/hyphenation/hyph-en-us.tex` and re-run `tools/hyphgen`. Its header
   says the same thing, and that is the only generated file in the tree.
-- **Log non-obvious choices in `DECISIONS.md`.** Especially the ones you'd
-  otherwise have to re-derive in six months.
+- **Explain a non-obvious choice where it lives.** A comment next to the
+  code, and the argument in the pull request that made the change. Not a
+  separate decisions file — this repo had one, and it drifted: a comment in
+  `device_http.cpp` cited a numbered decision about unverified TLS that the
+  file had never contained.
 
 ## Tests
 

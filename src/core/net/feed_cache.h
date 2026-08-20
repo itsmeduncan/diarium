@@ -14,8 +14,9 @@ struct FeedValidators {
   std::string last_modified;
 };
 
-// Takes data, not a HAL: only the reader drives the HAL (DECISIONS 22), so
-// the caller does the reading and writing and hands the bytes over.
+// Takes data, not a HAL: nothing in `src/core/` touches the HAL except the
+// reader, so the caller does the reading and writing and hands the bytes
+// over.
 class FeedCache {
  public:
   std::string serialize() const;
