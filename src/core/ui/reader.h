@@ -53,6 +53,12 @@ struct ReaderPolicy {
   // Opening a story or coming back always gets a full refresh: the whole page
   // changes, and partial-refreshing a wholly different page looks like dirt.
   bool full_refresh_on_context_change = true;
+
+  // Below this, the paper says so. A guess until someone runs a cell down and
+  // measures where "one more edition left" actually falls: lithium discharge
+  // is flat through most of its range, which is exactly why a percentage
+  // would be a lie.
+  int low_battery_mv = 3500;
 };
 
 class Reader {
@@ -108,6 +114,9 @@ class Reader {
 
  private:
   void mark_current_read();
+  // A discreet mark in the furniture when the battery is genuinely low. No
+  // percentage, no icon that animates, and nothing at all when it is fine.
+  void render_battery_mark();
   void render_finished();
   size_t unread_remaining() const;
 

@@ -66,7 +66,8 @@ class FakeClock final : public IClock {
 class FakePower final : public IPower {
  public:
   void deep_sleep_until(Epoch) override {}
-  int battery_millivolts() const override { return 4000; }
+  int battery_millivolts() const override { return mv; }
+  int mv = 4000;
 };
 
 // A real store rather than a black hole: clippings and read state are only
@@ -565,5 +566,63 @@ TEST_CASE("reading: the continuous oldest-first pass") {
     fresh.load_read_state("read.dat");
     fresh.handle(right);
     CHECK(fresh.mode() == ReaderMode::Finished);
+  }
+}
+
+// A discreet mark when the battery is genuinely low, and nothing at all when
+// it is fine. No percentage, because lithium discharge is flat through most
+// of its range and any percentage would be a lie exactly where it matters.
+TEST_CASE("reading: the battery mark") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+  Edition ed = make_edition(*fonts);
+
+  // Counts ink in the middle of the bottom margin, where the mark lives. The
+  // folio's own text is at the margins, so this strip is empty without it.
+  auto corner_ink = [](const Framebuffer& fb) {
+    size_t n = 0;
+    for (int y = fb.height() - 34; y < fb.height() - 14; ++y) {
+      for (int x = fb.width() / 2 - 20; x < fb.width() / 2 + 20; ++x) {
+        if (fb.get(x, y) != kPaper) ++n;
+      }
+    }
+    return n;
+  };
+
+  SUBCASE("a healthy cell is not mentioned") {
+    Rig rig;
+    rig.power.mv = 4100;
+    Reader r(ed, *fonts, rig.hal());
+    r.render();
+    CHECK(corner_ink(rig.display.framebuffer()) == 0);
+  }
+
+  SUBCASE("a low cell gets a mark") {
+    Rig rig;
+    rig.power.mv = 3400;
+    Reader r(ed, *fonts, rig.hal());
+    r.render();
+    CHECK(corner_ink(rig.display.framebuffer()) > 0);
+  }
+
+  SUBCASE("no measurement is not an empty battery") {
+    Rig rig;
+    rig.power.mv = 0;
+    Reader r(ed, *fonts, rig.hal());
+    r.render();
+    CHECK(corner_ink(rig.display.framebuffer()) == 0);
+  }
+
+  SUBCASE("the mark appears on every kind of page, not just the ledes") {
+    Rig rig;
+    rig.power.mv = 3400;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));
+    r.render();
+    CHECK(r.mode() == ReaderMode::Article);
+    CHECK(corner_ink(rig.display.framebuffer()) > 0);
   }
 }

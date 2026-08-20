@@ -90,6 +90,58 @@ Lifecycle lifecycle_from_wake() {
              : Lifecycle::Read;
 }
 
+// Accepts one file over the serial line in the moment after boot, so config
+// can reach the card without the card leaving the device. Nothing here logs
+// what it receives: this is how wifi credentials arrive.
+//
+//   host sends:  PUT <path> <bytes>\n  followed by exactly <bytes> bytes
+//   device says: READY, then OK <bytes> or ERR <reason>
+bool serial_receive(device::DeviceHal& d) {
+  Serial.println("READY");  // the host waits for this before sending
+
+  std::string header;
+  const uint32_t deadline = millis() + 2000;
+  while (millis() < deadline) {
+    if (!Serial.available()) continue;
+    const char c = static_cast<char>(Serial.read());
+    if (c == '\n') break;
+    if (c != '\r' && header.size() < 128) header.push_back(c);
+  }
+  if (header.compare(0, 4, "PUT ") != 0) return false;
+
+  const size_t sp = header.find(' ', 4);
+  if (sp == std::string::npos) {
+    Serial.println("ERR malformed header");
+    return false;
+  }
+  const std::string path = header.substr(4, sp - 4);
+  const long want = atol(header.c_str() + sp + 1);
+  if (want <= 0 || want > 256L * 1024) {
+    Serial.println("ERR implausible length");
+    return false;
+  }
+
+  std::string body;
+  body.reserve(static_cast<size_t>(want));
+  uint32_t last = millis();
+  while (body.size() < static_cast<size_t>(want)) {
+    if (Serial.available()) {
+      body.push_back(static_cast<char>(Serial.read()));
+      last = millis();
+    } else if (millis() - last > 5000) {
+      Serial.printf("ERR truncated at %u of %ld\n", (unsigned)body.size(), want);
+      return false;
+    }
+  }
+
+  if (!d.storage.write(path, body)) {
+    Serial.println("ERR could not write to the card");
+    return false;
+  }
+  Serial.printf("OK %u bytes to %s\n", (unsigned)body.size(), path.c_str());
+  return true;
+}
+
 // Fetch, compose, persist, sleep. Never constructs a Reader, and the radio is
 // off before the edition is laid out — the two must not be resident together
 // (DECISIONS 27).
@@ -157,8 +209,11 @@ void compose_wake(device::DeviceHal& d) {
                 (unsigned)ed.pages.size(), (unsigned)ed.stories.size(),
                 (unsigned)(millis() - t0));
 
-  if (ed.pages.empty()) {
-    Serial.println("nothing to print — keeping yesterday's paper");
+  // A colophon and nothing else is not a paper. Composing twice in a morning
+  // finds everything already seen, and replacing a good edition with an empty
+  // one loses the reader their news for no gain.
+  if (ed.stories.empty()) {
+    Serial.println("nothing new — keeping the paper already on the card");
   } else if (d.storage.write("/edition.rspe", serialize_edition(ed))) {
     d.storage.write("/seen.dat", serialize_seen_store(seen));
     Serial.println("saved");
@@ -193,6 +248,9 @@ void setup() {
                     : "Insert a card with feeds.toml and an edition on it.");
     return;
   }
+  // Before anything else, in case the host has a file for us.
+  serial_receive(d);
+
   if (lifecycle_from_wake() == Lifecycle::Compose) {
     compose_wake(d);  // does not return: it sleeps
   }
