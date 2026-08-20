@@ -17,6 +17,8 @@ int cmd_parse(const std::vector<std::string>& args);
 int cmd_compose(const std::vector<std::string>& args);
 int cmd_read(const std::vector<std::string>& args);
 int cmd_opml(const std::vector<std::string>& args);
+// The screens the device draws rather than the composer lays out.
+int cmd_screens(const std::vector<std::string>& args);
 
 }  // namespace sim
 }  // namespace rsspaper
