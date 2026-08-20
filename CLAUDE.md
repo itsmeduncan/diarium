@@ -138,7 +138,11 @@ Key boundaries worth understanding before changing anything:
 
 ## Conventions
 
-- Record non-obvious decisions in `DECISIONS.md`, with the reasoning.
+- **The code carries the reasoning, and the PR carries the change.** A
+  non-obvious choice goes in a comment next to the thing it explains, where it
+  cannot drift away from the code it justifies, and the argument for making it
+  goes in the pull request. There is no decisions file; there was one, and it
+  went stale.
 - **Ask before adding any third-party dependency.** The vendored set is
   `stb_truetype`, `stb_image_write` (public domain), `doctest` (MIT), and
   Literata (SIL OFL). Everything else is written here.

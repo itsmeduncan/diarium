@@ -32,7 +32,7 @@ struct ComposeReport {
 };
 
 // Two phases, deliberately separate, because the radio and the composed
-// edition must not be in memory at once (DECISIONS 27).
+// edition must not be in memory at once.
 //
 // Phase one: fetch every configured feed onto the card and nothing else. Each
 // body is kept, so a 304 costs a handshake and the stories still appear —
