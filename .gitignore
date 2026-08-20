@@ -16,3 +16,7 @@ compile_commands.json
 *.swp
 .cache/
 src/device/.pio/
+
+# A local config with real credentials. The committed config/feeds.toml is a
+# sample; anything with a password in it belongs on the card, never in git.
+config/feeds.local.toml

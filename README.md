@@ -120,13 +120,20 @@ full ones ~1.74 s, and the ratio is a design decision you can see.
 
 ## Configuration
 
-Feeds live in a single `config/feeds.toml` on device storage — a URL, a section
-name, and how many items to take:
+Feeds live in a single `feeds.toml` on the card — a URL, a section name, and
+how many items to take. The card is also how wifi credentials reach a device
+with no keyboard, which is the whole reason storage lives there rather than in
+flash:
 
 ```toml
+[wifi]
+ssid = "your-network"   # omit the section and the device never fetches
+password = "..."        # never commit this; see config/feeds.local.toml
+
 [edition]
 title = "RSSpaper"      # the nameplate across the top of page one
 max_items = 40          # a paper that never ends is a feed
+utc_offset_minutes = 0  # no network to ask, no keyboard to be asked
 
 [[feed]]
 url     = "https://daringfireball.net/feeds/main"

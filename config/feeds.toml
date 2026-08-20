@@ -1,14 +1,30 @@
 # RSSpaper edition configuration.
 #
-# This is the whole of the user-facing configuration. It lives on device
-# storage (LittleFS or SD) and is read at wake. Section order here is section
-# order in the paper.
+# This is the whole of the user-facing configuration. It lives on the microSD
+# card and is read at wake. Section order here is section order in the paper.
+#
+# This copy is a committed sample. The one the device reads is the one on the
+# card — and if you put wifi credentials in it, keep that copy off the card
+# only: `config/feeds.local.toml` is gitignored for exactly that reason.
+
+# Credentials for the one network this device ever joins. Omit the section
+# entirely and the device simply never fetches — it will still read whatever
+# edition is already on the card.
+#
+# NEVER commit real credentials. Edit config/feeds.local.toml instead and copy
+# that onto the card.
+[wifi]
+ssid = "YOUR-NETWORK"
+password = "YOUR-PASSWORD"
 
 [edition]
 # The nameplate across the top of page one.
 title = "RSSpaper"
 # Local time to wake, compose and go back to sleep. 24-hour.
 wake_at = "05:30"
+# Minutes east of UTC. The device has no network to ask and no keyboard to be
+# asked, so the offset travels with this file.
+utc_offset_minutes = 0
 # Hard ceiling on the edition. A paper that never ends is a feed.
 max_items = 40
 # "justified" or "ragged". Justified needs hyphenation to look right in the
