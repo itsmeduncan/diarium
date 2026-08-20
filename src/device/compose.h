@@ -43,9 +43,15 @@ void fetch_all(const FeedList& config, IHttpClient* http, IStorage* storage,
 
 // Phase two: parse what is on the card and lay out the paper. Call it with
 // the radio already off.
+//
+// `already_read` is the filter: anything in it is left out, anything else is
+// carried into this edition whether or not it appeared in an earlier one. It
+// is deliberately the reader's read-state rather than a record of what was
+// printed, so a story nobody got to is still news tomorrow. It is not
+// modified — composing marks nothing read.
 Edition compose_from_card(const FeedList& config, const FontPack& fonts,
-                          IStorage* storage, SeenStore* seen, Epoch now,
-                          const ComposeReport& fetched);
+                          IStorage* storage, const SeenStore* already_read,
+                          Epoch now, const ComposeReport& fetched);
 
 }  // namespace device
 }  // namespace rsspaper

@@ -94,8 +94,8 @@ void fetch_all(const FeedList& config, IHttpClient* http, IStorage* storage,
 }
 
 Edition compose_from_card(const FeedList& config, const FontPack& fonts,
-                          IStorage* storage, SeenStore* seen, Epoch now,
-                          const ComposeReport& fetched) {
+                          IStorage* storage, const SeenStore* already_read,
+                          Epoch now, const ComposeReport& fetched) {
   std::vector<Section> sections;
   for (const std::string& name : config.section_order()) {
     sections.push_back(Section{name, {}});
@@ -139,11 +139,11 @@ Edition compose_from_card(const FeedList& config, const FontPack& fonts,
   Epoch when = now != kNoDate ? now : newest;
   if (when == kNoDate) when = 0;
 
-  if (seen != nullptr) {
+  if (already_read != nullptr) {
     for (Section& s : sections) {
       std::vector<Item> kept;
       for (Item& it : s.items) {
-        if (!seen->mark(it.dedup_key(), when)) continue;  // ran already
+        if (already_read->has(it.dedup_key())) continue;  // finished with
         kept.push_back(std::move(it));
       }
       s.items = std::move(kept);

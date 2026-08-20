@@ -199,11 +199,17 @@ void compose_wake(device::DeviceHal& d) {
     d.power.deep_sleep_until(kNoDate);
   }
 
-  SeenStore seen;
-  if (d.storage.read("/seen.dat", &blob)) seen.deserialize(blob, d.clock.now());
+  // Dedup against what the reader has read, not against what the composer
+  // printed. A story nobody got to is still news tomorrow; a story that was
+  // read is finished with. max_age_days is what stops carry-over accumulating
+  // past the point of being news at all.
+  SeenStore read_state;
+  if (d.storage.read("/read.dat", &blob)) {
+    read_state.deserialize(blob, d.clock.now());
+  }
 
   const uint32_t t0 = millis();
-  Edition ed = device::compose_from_card(config, fonts, &d.storage, &seen,
+  Edition ed = device::compose_from_card(config, fonts, &d.storage, &read_state,
                                          d.clock.now(), fetched);
   Serial.printf("composed %u pages, %u stories in %u ms\n",
                 (unsigned)ed.pages.size(), (unsigned)ed.stories.size(),
@@ -215,7 +221,8 @@ void compose_wake(device::DeviceHal& d) {
   if (ed.stories.empty()) {
     Serial.println("nothing new — keeping the paper already on the card");
   } else if (d.storage.write("/edition.rspe", serialize_edition(ed))) {
-    d.storage.write("/seen.dat", serialize_seen_store(seen));
+    // The read state is the reader's to write, not the composer's: composing
+    // must not mark anything read.
     Serial.println("saved");
   } else {
     Serial.println("could not save the edition");
@@ -302,6 +309,7 @@ void setup() {
   reader = &r;
   reader->load_clippings("clippings.dat");
   reader->load_read_state("read.dat");
+  reader->load_frontlight("light.dat");
   reader->render();
   session.touched(millis());
   Serial.printf("reading — %s\n", reader->position().c_str());
