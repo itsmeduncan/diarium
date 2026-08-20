@@ -93,13 +93,28 @@ make device-flash      # build it and put it on the board
 make device-log        # watch what it says
 
 make device-ls                                      # what is on the card
-make device-put FILE=config/feeds.local.toml AS=/feeds.toml
+make device-put FILE=config/feeds.local.toml DEST=/feeds.toml
 make device-rm PATH_ON_CARD=/read.dat               # forget what you have read
 make device-compose    # fetch and compose now, rather than waiting for wake_at
 ```
 
 The board is found automatically; `RSSPAPER_PORT` picks one if a machine has
-more than one attached. A file's bytes go straight from
+more than one attached. `make help` lists everything.
+
+The console the device runs is one line at a time, so it is usable by hand
+over any terminal and not only by these commands:
+
+```
+PUT <path> <bytes>   followed by exactly that many bytes
+LS                   list the card
+RM <path>            remove one file
+COMPOSE              take the compose path on this boot
+GO                   stop listening
+```
+
+Every command answers with a line starting `OK` or `ERR`. The console is open
+for a moment after boot and closes on `GO`, so it costs a reset to reach and
+nothing at all while reading. A file's bytes go straight from
 disk to the port and are never printed, which is what makes it safe to send a
 `feeds.toml` with wifi credentials in it — keep that copy in
 `config/feeds.local.toml`, which is gitignored, and never in the committed

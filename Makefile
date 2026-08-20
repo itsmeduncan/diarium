@@ -97,32 +97,72 @@ device:
 # one that always does, so fall back to that rather than asking anyone to
 # install anything.
 DEVICE_PY := $(shell for p in python3 \
+	"$$HOME/.platformio/penv/bin/python" \
 	/opt/homebrew/opt/platformio/libexec/bin/python3 \
-	"$$HOME/.platformio/penv/bin/python"; do \
+	/usr/local/opt/platformio/libexec/bin/python3; do \
 	command -v "$$p" >/dev/null 2>&1 && "$$p" -c "import serial" >/dev/null 2>&1 \
 	  && echo "$$p" && break; done)
+
+# Both guards explain themselves rather than failing several lines later with
+# something about a missing file.
+define need_pio
+	@command -v pio >/dev/null 2>&1 || { 	  echo "PlatformIO is not installed. It builds and flashes the firmware:"; 	  echo "  brew install platformio    # or: pip install platformio"; 	  exit 1; }
+endef
+
+define need_device_py
+	@test -n "$(DEVICE_PY)" || { 	  echo "No python with pyserial found, which the serial console needs:"; 	  echo "  pip install pyserial       # or install PlatformIO, which ships one"; 	  exit 1; }
+endef
+
 DEVICE := $(DEVICE_PY) tools/device.py
 
 .PHONY: device-flash device-log device-ls device-put device-rm device-compose
 device-flash:
+	$(call need_pio)
 	cd src/device && pio run -t upload
 
 device-log:
+	$(call need_device_py)
 	$(DEVICE) log
 
 device-ls:
+	$(call need_device_py)
 	$(DEVICE) ls
 
-# make device-put FILE=config/feeds.local.toml AS=/feeds.toml
+# make device-put FILE=config/feeds.local.toml DEST=/feeds.toml
+#
+# DEST, not AS: make defines AS itself as the assembler, so an unset AS
+# silently expands to "as" and the file lands on the card called /as.
 device-put:
-	@test -n "$(FILE)" || { echo "usage: make device-put FILE=<path> [AS=/name]"; exit 2; }
-	$(DEVICE) put $(FILE) $(AS)
+	$(call need_device_py)
+	@test -n "$(FILE)" || { echo "usage: make device-put FILE=<path> [DEST=/name]"; exit 2; }
+	$(DEVICE) put $(FILE) $(DEST)
 
-# make device-rm PATH=/read.dat
+# make device-rm PATH_ON_CARD=/read.dat
 device-rm:
+	$(call need_device_py)
 	@test -n "$(PATH_ON_CARD)" || { echo "usage: make device-rm PATH_ON_CARD=/name"; exit 2; }
 	$(DEVICE) rm $(PATH_ON_CARD)
 
 # Fetch and compose now, rather than waiting for wake_at.
 device-compose:
+	$(call need_device_py)
 	$(DEVICE) compose
+
+.PHONY: help
+help:
+	@echo "On a computer:"
+	@echo "  make                 simulator, tests and the font pack"
+	@echo "  make check           run the tests and the portability gate"
+	@echo "  make edition         compose from the fixture feeds into out/"
+	@echo "  make read            read that edition from the keyboard"
+	@echo ""
+	@echo "On the device (needs PlatformIO):"
+	@echo "  make device          build the firmware"
+	@echo "  make device-flash    build it and put it on the board"
+	@echo "  make device-log      watch what it says"
+	@echo "  make device-ls       what is on the card"
+	@echo "  make device-put FILE=<path> [DEST=/name]"
+	@echo "  make device-rm PATH_ON_CARD=/name"
+	@echo "  make device-compose  fetch and compose now"
+	@echo ""
+	@echo "RSSPAPER_PORT picks the board if more than one is attached."
