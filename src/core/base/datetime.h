@@ -31,6 +31,11 @@ CivilTime civil_from_epoch(Epoch t);
 Epoch epoch_from_civil(const CivilTime& c);
 
 // "Friday, 15 August 2026" — the masthead date line.
+// Seconds from `local_now` until the next occurrence of `hh:mm` local time.
+// A time already past today is tomorrow's. Anything unparseable is a day,
+// because a device that never wakes is worse than one that wakes late.
+uint32_t seconds_until_local_time(const std::string& hh_mm, Epoch local_now);
+
 std::string format_masthead_date(Epoch t);
 // "15 Aug 2026" — compact, for bylines and section indexes.
 std::string format_short_date(Epoch t);

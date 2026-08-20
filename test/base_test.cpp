@@ -131,3 +131,38 @@ TEST_CASE("date formatting") {
   CHECK(format_short_date(t) == "15 Aug 2026");
   CHECK(format_clock(t) == "06:05");
 }
+
+// When the next paper is due. The device sleeps for a duration, not until a
+// wall-clock time, so this is the sum that decides whether the news arrives
+// in the morning or whenever you last put the thing down.
+TEST_CASE("scheduling the next edition") {
+  // Wednesday 19 August 2026, 21:25 local.
+  const Epoch evening = epoch_from_civil(CivilTime{2026, 8, 19, 21, 25, 0});
+
+  SUBCASE("half an hour past the hour waits almost a whole day") {
+    const Epoch morning = epoch_from_civil(CivilTime{2026, 8, 19, 6, 0, 0});
+    CHECK(seconds_until_local_time("05:30", morning) == 23 * 3600 + 30 * 60);
+  }
+
+  SUBCASE("a time already past today waits for tomorrow") {
+    const uint32_t s = seconds_until_local_time("05:30", evening);
+    // 21:25 to 05:30 is 8h05m.
+    CHECK(s == 8 * 3600 + 5 * 60);
+  }
+
+  SUBCASE("a time still ahead today does not wait a day") {
+    const Epoch small_hours = epoch_from_civil(CivilTime{2026, 8, 20, 3, 0, 0});
+    CHECK(seconds_until_local_time("05:30", small_hours) == 2 * 3600 + 30 * 60);
+  }
+
+  SUBCASE("exactly now means tomorrow, not a zero-second sleep") {
+    const Epoch on_the_dot = epoch_from_civil(CivilTime{2026, 8, 20, 5, 30, 0});
+    CHECK(seconds_until_local_time("05:30", on_the_dot) == 24 * 3600);
+  }
+
+  SUBCASE("a malformed time falls back to a day rather than never waking") {
+    CHECK(seconds_until_local_time("", evening) == 24 * 3600);
+    CHECK(seconds_until_local_time("breakfast", evening) == 24 * 3600);
+    CHECK(seconds_until_local_time("25:00", evening) == 24 * 3600);
+  }
+}
