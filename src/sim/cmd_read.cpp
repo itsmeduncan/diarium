@@ -32,8 +32,9 @@ namespace {
 void print_help() {
   std::printf(
       "\n"
-      "  n / space   turn the page forward      (swipe left)\n"
-      "  p           turn the page back         (swipe right)\n"
+      "  n / space   the next unread article    (swipe right)\n"
+      "  p           the previous article       (swipe left)\n"
+      "  j / k       scroll down / up within an article  (swipe up/down)\n"
       "  1-9         open the Nth story on this page   (tap a lede)\n"
       "  b           back to where you were     (swipe up in the overlay)\n"
       "  s           section list               (swipe down)\n"
@@ -187,10 +188,18 @@ int cmd_read(const std::vector<std::string>& args) {
 
     bool changed = false;
     if (cmd == "n" || cmd == " ") {
-      synth_swipe(&input, &reader, -200, 0);
+      // Rightwards is onward through the news, which is what the reader does
+      // now; the key labelled "next" has to send the gesture that means next.
+      synth_swipe(&input, &reader, 200, 0);
       changed = true;
     } else if (cmd == "p") {
-      synth_swipe(&input, &reader, 200, 0);
+      synth_swipe(&input, &reader, -200, 0);
+      changed = true;
+    } else if (cmd == "j") {
+      synth_swipe(&input, &reader, 0, -200);
+      changed = true;
+    } else if (cmd == "k") {
+      synth_swipe(&input, &reader, 0, 200);
       changed = true;
     } else if (cmd == "s") {
       synth_swipe(&input, &reader, 0, 200);
