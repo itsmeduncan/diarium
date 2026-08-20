@@ -8,6 +8,12 @@ namespace rsspaper {
 namespace device {
 namespace {
 
+// The panel's raster, which is landscape whatever the pages are. Rotation is
+// this file's business precisely because nothing above the HAL should have to
+// know the difference.
+constexpr int kPanelWidth = 1024;
+constexpr int kPanelHeight = 758;
+
 // The panel's own buffer layouts, written a byte at a time rather than a
 // pixel at a time. Per-pixel calls through the library cost 540-750 ms for a
 // frame, which is a third of a page turn spent on packing.
@@ -15,9 +21,10 @@ namespace {
 // 3-bit: DMemory4Bit, two pixels per byte, even x in the high nibble.
 // 1-bit: _partial, eight pixels per byte, x % 8 selecting the bit LSB-first,
 //        and a set bit meaning ink.
-constexpr int kThreeBitStride = 1024 / 2;
-constexpr int kOneBitStride = 1024 / 8;
-constexpr size_t kOneBitBytes = 1024u * 758u / 8u;
+constexpr int kThreeBitStride = kPanelWidth / 2;
+constexpr int kOneBitStride = kPanelWidth / 8;
+constexpr size_t kOneBitBytes =
+    static_cast<size_t>(kPanelWidth) * kPanelHeight / 8;
 
 }  // namespace
 
@@ -26,6 +33,23 @@ void DeviceDisplay::blit_3bit() {
   uint8_t* dst = panel_->DMemory4Bit;
   if (dst == nullptr) return;
   const int w = fb_.width();
+#if RSSPAPER_PORTRAIT
+  // Walk the destination in order so the writes stay sequential; the reads
+  // then run down a framebuffer column, missing a cache line per pixel. That
+  // is the expensive half of rotating here rather than in the renderer, and it
+  // is not free: measured on the board, the first render goes from 2433 ms
+  // landscape to 3725 ms portrait. A tiled transpose would buy most of it
+  // back, and is the thing to try if portrait is kept.
+  for (int py = 0; py < kPanelHeight; ++py) {
+    const uint8_t* col = src + (w - 1 - py);
+    uint8_t* d = dst + static_cast<size_t>(py) * kThreeBitStride;
+    for (int px = 0; px < kPanelWidth; px += 2) {
+      const uint8_t a = col[static_cast<size_t>(px) * w];
+      const uint8_t b = col[static_cast<size_t>(px + 1) * w];
+      *d++ = static_cast<uint8_t>(((a >> 5) << 4) | (b >> 5));
+    }
+  }
+#else
   const int h = fb_.height();
   for (int y = 0; y < h; ++y) {
     const uint8_t* s = src + static_cast<size_t>(y) * w;
@@ -34,6 +58,7 @@ void DeviceDisplay::blit_3bit() {
       *d++ = static_cast<uint8_t>(((s[x] >> 5) << 4) | (s[x + 1] >> 5));
     }
   }
+#endif
 }
 
 void DeviceDisplay::blit_1bit() {
@@ -47,6 +72,24 @@ void DeviceDisplay::blit_1bit() {
   uint8_t* dst = panel_->_partial;
   if (dst == nullptr) return;
   const int w = fb_.width();
+#if RSSPAPER_PORTRAIT
+  // Packing along the panel's width rather than the framebuffer's also fixes
+  // the landscape path's hidden assumption that the width divides by 8: 1024
+  // does, 758 does not, and the unrotated loop would drop the last 6 columns.
+  for (int py = 0; py < kPanelHeight; ++py) {
+    const uint8_t* col = src + (w - 1 - py);
+    uint8_t* d = dst + static_cast<size_t>(py) * kOneBitStride;
+    for (int xb = 0; xb < kPanelWidth / 8; ++xb) {
+      uint8_t bits = 0;
+      for (int k = 0; k < 8; ++k) {
+        if (col[static_cast<size_t>(xb * 8 + k) * w] < 128) {
+          bits = static_cast<uint8_t>(bits | (1u << k));
+        }
+      }
+      *d++ = bits;
+    }
+  }
+#else
   const int h = fb_.height();
   for (int y = 0; y < h; ++y) {
     const uint8_t* s = src + static_cast<size_t>(y) * w;
@@ -66,6 +109,7 @@ void DeviceDisplay::blit_1bit() {
       *d++ = bits;
     }
   }
+#endif
 }
 
 // partialUpdate() diffs the new frame against DMemoryNew, which the library

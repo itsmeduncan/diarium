@@ -86,9 +86,12 @@ $(BUILD)/%.o: %.cpp
 clean:
 	rm -rf $(BUILD) $(BIN) out
 
-.PHONY: device
+.PHONY: device device-portrait
 device:
-	cd src/device && pio run
+	cd src/device && pio run -e inkplate6flick
+
+device-portrait:
+	cd src/device && pio run -e inkplate6flick-portrait
 
 # The device is talked to over its serial console. The port is found
 # automatically; set RSSPAPER_PORT if a machine has more than one board.
@@ -115,10 +118,16 @@ endef
 
 DEVICE := $(DEVICE_PY) tools/device.py
 
-.PHONY: device-flash device-log device-ls device-put device-rm device-compose
+.PHONY: device-flash device-flash-portrait device-log device-ls device-put device-rm device-compose
 device-flash:
 	$(call need_pio)
-	cd src/device && pio run -t upload
+	cd src/device && pio run -e inkplate6flick -t upload
+
+# The orientation experiment on the board. Same firmware, panel rotated 90
+# degrees in the blit; see src/core/layout/page.h for what it is answering.
+device-flash-portrait:
+	$(call need_pio)
+	cd src/device && pio run -e inkplate6flick-portrait -t upload
 
 device-log:
 	$(call need_device_py)
@@ -159,6 +168,7 @@ help:
 	@echo "On the device (needs PlatformIO):"
 	@echo "  make device          build the firmware"
 	@echo "  make device-flash    build it and put it on the board"
+	@echo "  make device-flash-portrait   the same, rotated 90 degrees"
 	@echo "  make device-log      watch what it says"
 	@echo "  make device-ls       what is on the card"
 	@echo "  make device-put FILE=<path> [DEST=/name]"

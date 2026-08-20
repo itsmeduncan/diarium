@@ -17,8 +17,19 @@ namespace rsspaper {
 // The panel. Fixed here because layout decisions (measure, leading, column
 // count) were made for this geometry; a different panel wants its own review,
 // not a scaled page.
+//
+// RSSPAPER_PORTRAIT swaps the axes so the orientation question can be looked at
+// rather than argued about. It is a scaffold for that experiment, not a
+// supported mode: the panel raster is landscape-native, so a real portrait
+// build would also need setRotation behind the HAL, and the front page's
+// column count and the type scale would both want a fresh review at 758 wide.
+#if RSSPAPER_PORTRAIT
+constexpr int kPageWidth = 758;
+constexpr int kPageHeight = 1024;
+#else
 constexpr int kPageWidth = 1024;
 constexpr int kPageHeight = 758;
+#endif
 
 // One margin, used by both the paginator's frames and the renderer's
 // furniture. They must agree or rules won't line up with columns.
