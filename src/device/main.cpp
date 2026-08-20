@@ -1,110 +1,117 @@
-// The device composition root. Nothing above src/hal/ knows this file exists.
+// The device composition root: pick a lifecycle from the wake reason, build
+// the HAL, run. No policy lives here — that is what src/core/ is for.
 #include <Arduino.h>
 
 #include <string>
+#include <vector>
 
 #include "Inkplate.h"
-#include "device/device_clock.h"
-#include "device/device_display.h"
-#include "device/device_http.h"
-#include "device/device_input.h"
-#include "device/device_power.h"
-#include "device/device_storage.h"
+#include "core/edition/edition.h"
+#include "core/edition/edition_store.h"
+#include "core/text/font_pack.h"
+#include "core/ui/gesture.h"
+#include "core/ui/reader.h"
+#include "core/ui/session.h"
+#include "device/device_hal.h"
 
 using namespace rsspaper;
 
 namespace {
+
 Inkplate panel(INKPLATE_3BIT);
+
+// Long-lived and large: these are what the firmware owns for a reading
+// session, and they are deliberately not on the stack.
+device::DeviceHal* hal_impl = nullptr;
+FontPack fonts;
+Edition edition;
+Reader* reader = nullptr;
+Session session{SessionThresholds{}};
+GestureRecognizer gestures;
+
+bool load_paper(device::DeviceHal& d) {
+  std::string blob;
+  if (!d.storage.read("/literata.rfp", &blob)) {
+    Serial.println("no font pack on the card");
+    return false;
+  }
+  std::vector<uint8_t> bytes(blob.begin(), blob.end());
+  blob.clear();
+  blob.shrink_to_fit();
+
+  std::string error;
+  if (!fonts.load(std::move(bytes), &error)) {
+    Serial.printf("font pack: %s\n", error.c_str());
+    return false;
+  }
+  if (!d.storage.read("/edition.rspe", &blob)) {
+    Serial.println("no edition on the card");
+    return false;
+  }
+  if (!deserialize_edition(blob, &edition, &error)) {
+    Serial.printf("edition: %s\n", error.c_str());
+    return false;
+  }
+  return !edition.pages.empty();
 }
+
+}  // namespace
 
 void setup() {
   Serial.begin(115200);
   delay(300);
   panel.begin();
-  Serial.printf("\nrsspaper: panel %dx%d\n", panel.width(), panel.height());
+  Serial.println("\nrsspaper");
 
-  // Constructed first: the 776 KB framebuffer needs a contiguous PSRAM block,
-  // and anything loaded before it fragments PSRAM enough to fail the claim.
-  static device::DeviceDisplay display(&panel);
-  Serial.printf("framebuffer: %dx%d, psram free %u\n", display.width(),
-                display.height(), (unsigned)ESP.getFreePsram());
+  static device::DeviceHal d(&panel);  // claims the framebuffer first
+  hal_impl = &d;
 
-  static device::DeviceStorage storage(&panel);
-  Serial.printf("card: %s\n", storage.mount() ? "mounted" : "unavailable");
-
-  // Verify the packing round-trips before trusting anything drawn with it:
-  // a wrong nibble order would be exactly as fast and completely wrong.
-  {
-    Framebuffer& v = display.framebuffer();
-    v.fill(kPaper);
-    v.set(0, 0, 0);     // 0>>5 = 0, even x -> high nibble
-    v.set(1, 0, 255);   // 255>>5 = 7, odd x -> low nibble
-    v.set(2, 0, 96);    // 96>>5 = 3, even x -> high nibble
-    display.flush(RefreshMode::Full);
-    const uint8_t b0 = panel.DMemory4Bit[0];
-    const uint8_t b1 = panel.DMemory4Bit[1];
-    Serial.printf("3bit pack: byte0=0x%02X (want 0x07) byte1=0x%02X (want 0x37) %s\n",
-                  b0, b1, (b0 == 0x07 && b1 == 0x37) ? "OK" : "WRONG");
-
-    v.fill(kPaper);
-    v.set(0, 0, 0);     // ink -> bit 0
-    v.set(3, 0, 0);     // ink -> bit 3
-    display.flush(RefreshMode::Partial);
-    const uint8_t p0 = panel._partial[0];
-    Serial.printf("1bit pack: byte0=0x%02X (want 0x09) %s\n", p0,
-                  p0 == 0x09 ? "OK" : "WRONG");
+  if (!d.storage.mount()) {
+    Serial.printf("card %s\n", d.storage.state() == device::CardState::NoCard
+                                   ? "absent" : "unreadable");
+    return;
   }
+  const uint32_t t0 = millis();
+  if (!load_paper(d)) return;
+  Serial.printf("loaded in %u ms: %u pages, %u stories\n",
+                (unsigned)(millis() - t0), (unsigned)edition.pages.size(),
+                (unsigned)edition.stories.size());
 
-  Framebuffer& fb = display.framebuffer();
-  fb.fill(kPaper);
-  fb.frame_rect(40, 40, fb.width() - 80, fb.height() - 80, kInk);
-  fb.fill_rect(100, 100, 200, 100, 96);
-  display.flush(RefreshMode::Full);
-  Serial.printf("full    blit %3u ms  refresh %4u ms\n",
-                (unsigned)display.last_blit_ms(), (unsigned)display.last_flush_ms());
+  d.clock.seed_if_unset(edition.date);
+  d.input.begin();
 
-  fb.fill_rect(100, 300, 200, 100, 32);
-  display.flush(RefreshMode::Partial);
-  Serial.printf("partial blit %3u ms  refresh %4u ms\n",
-                (unsigned)display.last_blit_ms(), (unsigned)display.last_flush_ms());
-
-  fb.fill_rect(400, 300, 200, 100, kInk);
-  display.flush(RefreshMode::Partial);
-  Serial.printf("partial blit %3u ms  refresh %4u ms\n",
-                (unsigned)display.last_blit_ms(), (unsigned)display.last_flush_ms());
-
-  static device::DeviceInput input(&panel);
-  static device::DeviceClock clock_(&panel);
-  static device::DevicePower power(&panel);
-  static device::DeviceHttpClient http;
-  power.set_storage(&storage);
-
-  Serial.printf("touch init: %d\n", (int)input.begin());
-  Serial.printf("rtc epoch: %ld\n", (long)clock_.now());
-  Serial.printf("battery: %d mV\n", power.battery_millivolts());
-
-  HttpResponse r;
-  const bool stubbed = http.get(HttpRequest{}, &r) == nullptr;
-  Serial.printf("http stub: null=%d status=%d error=%s\n", (int)stubbed,
-                r.status, r.error.c_str());
-
-  Hal hal;
-  hal.display = &display;
-  hal.input = &input;
-  hal.clock = &clock_;
-  hal.power = &power;
-  hal.storage = &storage;
-  hal.http = &http;
-  Serial.printf("hal complete: %d\n", (int)hal.complete());
-
-  Serial.println("touch the panel:");
-  for (int i = 0; i < 60; ++i) {
-    TouchPoint p[2];
-    const size_t n = input.poll(p, 2);
-    if (n > 0) Serial.printf("  touch %u at %d,%d\n", (unsigned)n, p[0].x, p[0].y);
-    delay(100);
-  }
-  Serial.println("done.");
+  Hal hal = d.as_hal();
+  static Reader r(edition, fonts, hal);
+  reader = &r;
+  reader->load_clippings("clippings.dat");
+  reader->render();
+  session.touched(millis());
+  Serial.printf("reading — %s\n", reader->position().c_str());
 }
 
-void loop() {}
+void loop() {
+  if (reader == nullptr) { delay(1000); return; }
+
+  TouchPoint p[2];
+  const size_t n = hal_impl->input.poll(p, 2);
+  const uint32_t now = millis();
+
+  // Release coordinates are ignored by the recogniser, so a lifted finger is
+  // reported as a release at the origin rather than a move to it.
+  const GestureEvent e = n > 0 ? gestures.update(true, p[0].x, p[0].y, now)
+                               : gestures.update(false, 0, 0, now);
+  if (e.kind != Gesture::None) {
+    session.touched(now);
+    if (reader->handle(e)) {
+      reader->tick();
+      Serial.printf("%s\n", reader->position().c_str());
+    }
+  }
+
+  if (session.intent(now) == SessionIntent::Sleep) {
+    Serial.println("sleeping");
+    Serial.flush();
+    hal_impl->power.deep_sleep_until(kNoDate);
+  }
+  delay(20);
+}
