@@ -37,6 +37,7 @@ void print_help() {
       "  j / k       scroll down / up within an article  (swipe up/down)\n"
       "  1-9         open the Nth story on this page   (tap a lede)\n"
       "  b           back to where you were     (swipe up in the overlay)\n"
+      "  g           home: the contents page   (long press, bottom left)\n"
       "  s           section list               (swipe down)\n"
       "  c           clippings\n"
       "  h           hold — fold this story's corner   (long press)\n"
@@ -68,6 +69,17 @@ void synth_tap(SimInput* input, Reader* reader, int x, int y) {
   input->advance(60);
   const GestureEvent e = local.update(false, x, y, input->millis());
   if (e.kind != Gesture::None) reader->handle(e);
+}
+
+void synth_long_press(SimInput* input, Reader* reader, int x, int y) {
+  GestureRecognizer local;
+  input->advance(200);
+  GestureEvent e = local.update(true, x, y, input->millis());
+  input->advance(800);  // past long_press_ms, without moving
+  e = local.update(true, x, y, input->millis());
+  if (e.kind != Gesture::None) reader->handle(e);
+  input->advance(20);
+  local.update(false, x, y, input->millis());
 }
 
 // The ledes on the current page, top to bottom, so a digit key can pick one.
@@ -156,6 +168,9 @@ int cmd_read(const std::vector<std::string>& args) {
 
   Reader reader(ed, fonts, hal);
   reader.load_clippings("clippings.dat");
+  // The reading order is built here, so this is not optional: without it the
+  // pass has nothing to walk and the first swipe says the news ran out.
+  reader.load_read_state("read.dat");
   reader.render();
 
   std::printf("RSSpaper — %s\n", format_masthead_date(ed.date).c_str());
@@ -203,6 +218,9 @@ int cmd_read(const std::vector<std::string>& args) {
       changed = true;
     } else if (cmd == "s") {
       synth_swipe(&input, &reader, 0, 200);
+      changed = true;
+    } else if (cmd == "g") {
+      synth_long_press(&input, &reader, 40, kPageHeight - 40);
       changed = true;
     } else if (cmd == "b") {
       changed = reader.back();
