@@ -773,3 +773,166 @@ TEST_CASE("reading: the frontlight") {
     CHECK(rig.display.frontlight() == 0);
   }
 }
+
+// The way out. Reading is a line rather than a tree, so there is nothing to
+// go "back" to mid-pass — but there has to be a way to put the paper down and
+// see what is left.
+TEST_CASE("reading: the way home") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+  Edition ed = make_edition(*fonts);
+
+  auto corner = [](Gesture kind) {
+    GestureEvent e;
+    e.kind = kind;
+    e.x = 40;
+    e.y = kPageHeight - 40;
+    return e;
+  };
+  auto middle = [](Gesture kind) {
+    GestureEvent e;
+    e.kind = kind;
+    e.x = kPageWidth / 2;
+    e.y = kPageHeight / 2;
+    return e;
+  };
+
+  SUBCASE("a long press in the bottom corner leaves an article for the contents") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));  // into the pass
+    REQUIRE(r.handle(right));  // and onward, so this is not page one already
+    REQUIRE(r.mode() == ReaderMode::Article);
+
+    REQUIRE(r.handle(corner(Gesture::LongPress)));
+    CHECK(r.mode() == ReaderMode::Browse);
+    CHECK(r.current_page() == 0);
+  }
+
+  SUBCASE("a tap in the corner is not the way home") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));
+    REQUIRE(r.mode() == ReaderMode::Article);
+
+    r.handle(corner(Gesture::Tap));
+    CHECK(r.mode() == ReaderMode::Article);
+  }
+
+  SUBCASE("a long press elsewhere on the page is not the way home") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));
+    REQUIRE(r.mode() == ReaderMode::Article);
+
+    r.handle(middle(Gesture::LongPress));
+    CHECK(r.mode() == ReaderMode::Article);
+  }
+
+  SUBCASE("it comes back from a lede page too") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+
+    GestureEvent left;
+    left.kind = Gesture::SwipeLeft;
+    REQUIRE(r.handle(left));
+    REQUIRE(r.current_page() == 1);
+
+    REQUIRE(r.handle(corner(Gesture::LongPress)));
+    CHECK(r.mode() == ReaderMode::Browse);
+    CHECK(r.current_page() == 0);
+  }
+
+  SUBCASE("and from the end of the news") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    for (size_t i = 0; i < ed.stories.size() + 2; ++i) r.handle(right);
+    REQUIRE(r.mode() == ReaderMode::Finished);
+
+    REQUIRE(r.handle(corner(Gesture::LongPress)));
+    CHECK(r.mode() == ReaderMode::Browse);
+    CHECK(r.current_page() == 0);
+  }
+
+  SUBCASE("already home is not a page turn") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    REQUIRE(r.mode() == ReaderMode::Browse);
+    REQUIRE(r.current_page() == 0);
+
+    CHECK_FALSE(r.handle(corner(Gesture::LongPress)));
+  }
+
+  SUBCASE("going home does not lose your place in the pass") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));
+    REQUIRE(r.handle(right));
+    const StoryRef* third = nullptr;
+    REQUIRE(r.handle(right));
+    third = r.open_story();
+    REQUIRE(third != nullptr);
+    const uint64_t was = third->key;
+
+    REQUIRE(r.handle(corner(Gesture::LongPress)));
+    REQUIRE(r.mode() == ReaderMode::Browse);
+
+    // Resuming picks up the oldest thing still unread, which is the one after
+    // the article that was on screen — it was marked read on arrival.
+    REQUIRE(r.handle(right));
+    REQUIRE(r.mode() == ReaderMode::Article);
+    const StoryRef* next = r.open_story();
+    REQUIRE(next != nullptr);
+    CHECK(next->key != was);
+  }
+
+  SUBCASE("the clippings list keeps its long press") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    REQUIRE(r.toggle_clippings_view());
+    REQUIRE(r.mode() == ReaderMode::Clippings);
+
+    r.handle(corner(Gesture::LongPress));
+    CHECK(r.mode() == ReaderMode::Clippings);
+  }
+
+  SUBCASE("the light is still the other corner") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    r.load_frontlight("light.dat");
+
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    REQUIRE(r.handle(right));
+    REQUIRE(r.mode() == ReaderMode::Article);
+
+    GestureEvent light;
+    light.kind = Gesture::Tap;
+    light.x = kPageWidth - 40;
+    light.y = 40;
+    r.handle(light);
+    CHECK(rig.display.frontlight() > 0);
+    CHECK(r.mode() == ReaderMode::Article);
+  }
+}

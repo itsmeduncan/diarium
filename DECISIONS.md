@@ -410,6 +410,42 @@ feed, because a feed's stories change and each one's full text is its own.
 It costs card space and buys correctness on the mornings when little has
 changed, which is most of them.
 
+### 36. Two corners: the light, and the way out
+
+Decision 32 made reading a line, and a line has no "back" — so mid-article
+there was nothing to go back *to*, and nothing that went home. Swipe-down is
+spent on scrolling within the article, swipe-left walks back through stories
+and dead-ends at the first, and the end page only returns you into the pass.
+The section list, and with it "Mark everything read", was unreachable from the
+one place you would want it.
+
+A long press in the bottom-left corner now returns to the contents page,
+mirroring the frontlight in the top-right: same size box, same deliberate
+gesture, opposite corner. Two corners you can always reach, and nothing else
+claims them.
+
+A long press rather than a tap because this is the one gesture that abandons
+where you are, and 650 ms of deliberate contact is the cheapest confirmation
+there is — cheaper than a modal, which decision 27's two-tap arming already
+ruled out for the neighbouring case. The corner is furniture rather than
+anything the page laid out: on a composed page the folio sits there, and the
+paginator's bottom margin means a lede's tap region can reach into it, so the
+corner takes precedence over clipping a lede that overlaps it. That story can
+still be opened and clipped from its own page.
+
+The clippings list is the one exception. There a long press already means
+"take this one out", its rows extend into the corner, and it has its own way
+back — so the corner stays out of it.
+
+Going home is not a "back": it does not restore where you were, and nothing
+becomes unread by leaving. Swiping onward resumes at the oldest story still
+outstanding, which is the one after whatever was on screen, because articles
+are marked read on arrival.
+
+Discoverability is unsolved. The gesture is invisible, and a newspaper does not
+carry a help line. The contents page's own hint is the only place that could
+say so without putting furniture on every article page.
+
 ## Open questions
 
 Tracked as issues, so there is one place to update rather than two:
