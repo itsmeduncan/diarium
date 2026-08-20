@@ -23,7 +23,7 @@ class SeenStore {
 
   // Path-based, for the desktop. On device these reach stdio rather than the
   // card, so the firmware uses the blob API below and does its own I/O
-  // through IStorage — the same split clippings already uses.
+  // through IStorage.
   bool load(const std::string& path, Epoch now);
   bool save(const std::string& path) const;
 

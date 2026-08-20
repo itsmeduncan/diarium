@@ -225,7 +225,7 @@ TEST_CASE("a story pointing past the pages is refused") {
 
 // The seen-store as a blob. The path-based API reaches stdio, which on device
 // is not the SD card — so the device needs to do its own reading and writing
-// through IStorage, exactly as the reader does for clippings.
+// through IStorage, exactly as the reader does for the read state.
 TEST_CASE("seen store round-trips through a blob") {
   SeenStore store;
   store.mark(0xABCDEF0123456789ull, 1000);

@@ -241,21 +241,25 @@ telling a reader where one ends and the next begins — and running paragraphs
 together, which is what the type scale did until now, made body text a slab.
 One em, and none on the paragraph that opens a story.
 
-### 25. Clippings are a folded corner, not a service
+### 25. Clippings were built, and then removed
 
-No tags, no folders, no sync, no export. A saved story keeps
-its headline, where it came from, and when you saved it, and survives the
-edition it was cut from. The list is capped — a folder that only grows is a
-slow leak on a device with no eviction policy — and the oldest falls off.
+They were a folded corner rather than a service: no tags, no folders, no sync,
+no export, and a capped list so a folder that only grows could not become a
+slow leak on a device with no eviction policy.
 
-`StoryRef` gained a stable key (the item's dedup key) so a clipping saved on
-Tuesday can find its story again in Thursday's edition. Tapping one that isn't
-in the current edition does nothing: it still has its headline, but there is
-nothing to turn to. That bumped the edition format to version 2.
+They are gone. Nobody wanted them, and a feature nobody wants is not free — it
+was a sixth reader mode, a second overlay with its own row geometry, a second
+file on the card, and a long press that meant something different depending on
+where you were standing. Removing it made the way home (decision 36) a rule
+with no exception.
 
-Row geometry for both overlays lives in one constant per view, used by the
-drawing and the hit test, because a tap landing on the row above the one under
-your finger is the kind of bug that only shows up on hardware.
+Two things it left behind, both worth keeping. `StoryRef`'s stable key — the
+item's dedup key — was added so a clipping saved on Tuesday could find its
+story again on Thursday; the read-store now uses it for the same reason, and
+it is why the edition format is at version 2. And overlay row geometry still
+lives in one shared constant used by both the drawing and the hit test,
+because a tap landing on the row above the one under your finger is the kind
+of bug that only shows up on hardware.
 
 ---
 
@@ -428,23 +432,15 @@ A long press rather than a tap because this is the one gesture that abandons
 where you are, and 650 ms of deliberate contact is the cheapest confirmation
 there is — cheaper than a modal, which decision 27's two-tap arming already
 ruled out for the neighbouring case. The corner is furniture rather than
-anything the page laid out: on a composed page the folio sits there, and the
-paginator's bottom margin means a lede's tap region can reach into it, so the
-corner takes precedence over clipping a lede that overlaps it. That story can
-still be opened and clipped from its own page.
-
-The clippings list is the one exception. There a long press already means
-"take this one out", its rows extend into the corner, and it has its own way
-back — so the corner stays out of it.
+anything the page laid out: on a composed page the folio sits there, and
+nothing else claims it. It is the same gesture in the same place in every
+mode, with no exception — which it could not have been while the clippings
+list used a long press to mean "take this one out" (decision 25).
 
 Going home is not a "back": it does not restore where you were, and nothing
 becomes unread by leaving. Swiping onward resumes at the oldest story still
 outstanding, which is the one after whatever was on screen, because articles
 are marked read on arrival.
-
-Discoverability is unsolved. The gesture is invisible, and a newspaper does not
-carry a help line. The contents page's own hint is the only place that could
-say so without putting furniture on every article page.
 
 ## Open questions
 
