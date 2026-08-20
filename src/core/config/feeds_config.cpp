@@ -75,6 +75,19 @@ bool parse_size(const std::string& raw, size_t* out) {
   return true;
 }
 
+// Signed, because half the world is west of Greenwich.
+bool parse_offset_minutes(const std::string& raw, int* out) {
+  const std::string v = unquote(raw);
+  if (v.empty()) return false;
+  const bool negative = v[0] == '-';
+  const std::string digits = negative ? v.substr(1) : v;
+  size_t n = 0;
+  if (!parse_size(digits, &n)) return false;
+  if (n > 24 * 60) return false;
+  *out = negative ? -static_cast<int>(n) : static_cast<int>(n);
+  return true;
+}
+
 }  // namespace
 
 std::vector<std::string> FeedList::section_order() const {
@@ -152,6 +165,10 @@ bool parse_feeds_toml(const std::string& text, FeedList* out,
       } else if (key == "max_items") {
         if (!parse_size(raw, &out->edition.max_items)) {
           return fail("max_items must be a whole number");
+        }
+      } else if (key == "utc_offset_minutes") {
+        if (!parse_offset_minutes(raw, &out->edition.utc_offset_minutes)) {
+          return fail("utc_offset_minutes must be whole minutes east of UTC");
         }
       } else if (key == "max_age_days") {
         size_t n = 0;

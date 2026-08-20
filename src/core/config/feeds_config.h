@@ -26,6 +26,9 @@ struct FeedEntry {
 struct EditionConfig {
   std::string title = "RSSpaper";
   std::string wake_at = "05:30";  // local time, 24-hour
+  // Minutes east of UTC. The device has no network to ask and no keyboard to
+  // be asked, so the offset travels with the config on the card.
+  int utc_offset_minutes = 0;
   size_t max_items = 40;
   int max_age_days = 3;
   int front_page_columns = 2;

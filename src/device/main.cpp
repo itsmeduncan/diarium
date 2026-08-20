@@ -8,7 +8,9 @@
 #include "Inkplate.h"
 #include "core/edition/edition.h"
 #include "core/edition/edition_store.h"
+#include "core/config/feeds_config.h"
 #include "core/text/font_pack.h"
+#include "core/ui/notice.h"
 #include "core/ui/gesture.h"
 #include "core/ui/reader.h"
 #include "core/ui/session.h"
@@ -29,10 +31,18 @@ Reader* reader = nullptr;
 Session session{SessionThresholds{}};
 GestureRecognizer gestures;
 
+// Says what went wrong on the panel rather than only down the serial line,
+// which nobody reading a newspaper is watching.
+void show_notice(device::DeviceHal& d, const char* headline, const char* body) {
+  render_notice(fonts, headline, body, &d.display.framebuffer());
+  d.display.flush(RefreshMode::Full);
+  Serial.printf("%s — %s\n", headline, body);
+}
+
 bool load_paper(device::DeviceHal& d) {
   std::string blob;
   if (!d.storage.read("/literata.rfp", &blob)) {
-    Serial.println("no font pack on the card");
+    show_notice(d, "No type", "The card has no literata.rfp on it.");
     return false;
   }
   std::vector<uint8_t> bytes(blob.begin(), blob.end());
@@ -41,18 +51,23 @@ bool load_paper(device::DeviceHal& d) {
 
   std::string error;
   if (!fonts.load(std::move(bytes), &error)) {
-    Serial.printf("font pack: %s\n", error.c_str());
+    show_notice(d, "No type", error.c_str());
     return false;
   }
   if (!d.storage.read("/edition.rspe", &blob)) {
-    Serial.println("no edition on the card");
+    show_notice(d, "No paper yet",
+                "The card has no edition on it. Compose one and copy it over.");
     return false;
   }
   if (!deserialize_edition(blob, &edition, &error)) {
-    Serial.printf("edition: %s\n", error.c_str());
+    show_notice(d, "Paper unreadable", error.c_str());
     return false;
   }
-  return !edition.pages.empty();
+  if (edition.pages.empty()) {
+    show_notice(d, "No paper yet", "The edition on the card has no pages.");
+    return false;
+  }
+  return true;
 }
 
 }  // namespace
@@ -67,8 +82,13 @@ void setup() {
   hal_impl = &d;
 
   if (!d.storage.mount()) {
-    Serial.printf("card %s\n", d.storage.state() == device::CardState::NoCard
-                                   ? "absent" : "unreadable");
+    // No font pack is available either — the card is where it lives — so this
+    // notice is the one that has to survive having no type at all.
+    const bool unreadable = d.storage.state() == device::CardState::Unreadable;
+    show_notice(d, unreadable ? "Card unreadable" : "No card",
+                unreadable
+                    ? "The card answers but its filesystem does not. Format it as exFAT."
+                    : "Insert a card with feeds.toml and an edition on it.");
     return;
   }
   const uint32_t t0 = millis();
@@ -76,6 +96,21 @@ void setup() {
   Serial.printf("loaded in %u ms: %u pages, %u stories\n",
                 (unsigned)(millis() - t0), (unsigned)edition.pages.size(),
                 (unsigned)edition.stories.size());
+
+  // The offset travels on the card: no network to ask, no keyboard to be
+  // asked. A missing or broken feeds.toml costs the local time, not the paper.
+  FeedList config;
+  std::string toml;
+  std::string config_error;
+  if (d.storage.read("/feeds.toml", &toml) &&
+      parse_feeds_toml(toml, &config, &config_error)) {
+    d.clock.set_utc_offset(config.edition.utc_offset_minutes * 60);
+    Serial.printf("feeds.toml: %u feeds, utc%+d min\n",
+                  (unsigned)config.feeds.size(),
+                  config.edition.utc_offset_minutes);
+  } else if (!toml.empty()) {
+    Serial.printf("feeds.toml: %s\n", config_error.c_str());
+  }
 
   d.clock.seed_if_unset(edition.date);
   d.input.begin();
