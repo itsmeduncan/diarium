@@ -9,8 +9,10 @@ against these:
   Nothing that makes the reading session open-ended.
 - **On-device only.** No server, no accounts, no cloud, no telemetry. The only
   network requests are to the user's own feed URLs.
-- **Calm.** No notifications, no badges, no unread counts, no streaks, no
-  recommendations, no AI curation.
+- **Calm.** No notifications, no badges, no counts of what is outstanding, no
+  streaks, no recommendations, no AI curation. The paper remembers what you
+  have read so it can leave it out and carry forward what you missed; that is
+  the only thing reading history is ever used for.
 - **Reverse-chronological within sections.** That is the ranking.
 
 Features that are good ideas for a different product are still no.

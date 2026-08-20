@@ -243,7 +243,7 @@ One em, and none on the paragraph that opens a story.
 
 ### 25. Clippings are a folded corner, not a service
 
-No tags, no folders, no sync, no export, no unread state. A saved story keeps
+No tags, no folders, no sync, no export. A saved story keeps
 its headline, where it came from, and when you saved it, and survives the
 edition it was cut from. The list is capped — a folder that only grows is a
 slow leak on a device with no eviction policy — and the oldest falls off.
@@ -321,6 +321,30 @@ same arithmetic, and the simulator inherits the reduction for free.
 
 It costs ~276 ms a page turn, taking a turn from ~0.52 s to ~0.80 s. That is
 the right trade: a reader looks at small type far more than at the clock.
+
+### 31. The paper remembers what you have read, and nothing else about you
+
+This reverses an earlier position. The thesis said "no unread state" and
+listed unread counts alongside badges and streaks as things this product would
+not have.
+
+The distinction that was missing: a *count* of what is outstanding is an
+anxiety mechanic — it accumulates, it asks to be cleared, and it makes the
+reader responsible for the software's backlog. *Filtering* on what has already
+been read is the opposite. It makes the paper shorter, keeps it finishable,
+and means a story you did not get to on Tuesday is still there on Wednesday
+rather than gone.
+
+The composer already filtered on history — `SeenStore` has always dropped
+stories that ran in a previous edition, so yesterday's paper does not reappear
+today. The change is whose history it is: what the composer printed, or what
+the reader actually read.
+
+What this does not license: a number anywhere in the furniture saying how much
+is unread, a badge, a nagging empty state, or reading history used for
+ordering. Reverse-chronological within a section remains the entire ranking.
+The reader gets a way to declare the whole thing read, because a carry-over
+pile with no exit is an inbox.
 
 ## Open questions
 

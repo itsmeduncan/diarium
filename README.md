@@ -9,10 +9,15 @@ and then it is done. You read it, you reach the end, you put it down.
 You flip through ledes — a dozen pages for forty stories — and open the ones
 you want in full, then come back. The paper has a last page.
 
-There is no infinite scroll. There are no unread counts, no badges, no
-notifications, no engagement mechanics, and no algorithmic curation. Stories
-run in reverse-chronological order within their section, which is the whole of
-the ranking logic and always will be.
+There is no infinite scroll. There are no badges, no notifications, no
+engagement mechanics, and no algorithmic curation. Stories run in
+reverse-chronological order within their section, which is the whole of the
+ranking logic and always will be.
+
+The paper does remember what you have read, so it does not reprint it and so
+that something you did not get to is still there tomorrow. That is the only
+use it makes of your reading history: there is no count of what is
+outstanding, nothing that accumulates, and nothing that asks to be cleared.
 
 **Everything runs on the device.** There is no server, no account, and no
 companion app. The only network requests RSSpaper ever makes are to the feed
