@@ -82,6 +82,32 @@ make edition    # compose an edition from the fixture feeds into out/
 `make` needs nothing but a C++17 compiler. If you have CMake, `cmake -B build
 && cmake --build build` builds the same targets and is what CI uses.
 
+## On the device
+
+The firmware needs PlatformIO. Everything else goes over the serial console,
+because the device has no keyboard and its card does not come out:
+
+```sh
+make device            # build the firmware
+make device-flash      # build it and put it on the board
+make device-log        # watch what it says
+
+make device-ls                                      # what is on the card
+make device-put FILE=config/feeds.local.toml AS=/feeds.toml
+make device-rm PATH_ON_CARD=/read.dat               # forget what you have read
+make device-compose    # fetch and compose now, rather than waiting for wake_at
+```
+
+`RSSPAPER_PORT` overrides the serial port. A file's bytes go straight from
+disk to the port and are never printed, which is what makes it safe to send a
+`feeds.toml` with wifi credentials in it — keep that copy in
+`config/feeds.local.toml`, which is gitignored, and never in the committed
+sample.
+
+`make device-compose` is the one to reach for while working on the fetcher: a
+compose takes a couple of minutes, and it prints what it fetched, what
+answered 304, and when the next edition is due.
+
 Inspect what the parser makes of a feed:
 
 ```sh
