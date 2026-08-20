@@ -28,6 +28,12 @@
 
 namespace rsspaper {
 
+// Where the rows of an overlay list begin, and how tall each one is. Shared
+// so that hit-testing, drawing and tests cannot disagree about which row is
+// under a finger.
+constexpr int kOverlayFirstY = 180;
+constexpr int kOverlayRowHeight = 64;
+
 enum class ReaderMode : uint8_t {
   Browse,     // the overview: the front page you land on
   Article,    // one article in a continuous oldest-first pass
@@ -109,6 +115,14 @@ class Reader {
   bool previous_article();
   bool scroll_down();
   bool scroll_up();
+  // Clears the whole backlog. Two taps: a carry-over pile with no exit is an
+  // inbox, and an exit that fires on a mis-tap is worse.
+  bool mark_everything_read();
+
+  // The frontlight. A tap in the top corner switches it; a long press there
+  // steps the brightness round. It is a light with a switch: nothing reacts
+  // to the room and nothing ramps.
+  void load_frontlight(const std::string& path);
   // Stories already read, so a second pass does not show them again.
   void load_read_state(const std::string& path);
 
@@ -117,6 +131,9 @@ class Reader {
   // A discreet mark in the furniture when the battery is genuinely low. No
   // percentage, no icon that animates, and nothing at all when it is fine.
   void render_battery_mark();
+  bool in_light_corner(int x, int y) const;
+  bool handle_frontlight(const GestureEvent& event);
+  void save_frontlight();
   void render_finished();
   size_t unread_remaining() const;
 
@@ -154,6 +171,10 @@ class Reader {
   std::vector<size_t> order_;
   size_t order_pos_ = 0;
   int article_page_ = 0;
+  bool confirm_mark_all_ = false;
+  std::string light_path_;
+  int light_level_ = 0;   // 0 is off
+  int light_last_on_ = 24;  // what "on" means when it is switched back on
   SeenStore read_;
   std::string read_path_;
   class Clippings clippings_;

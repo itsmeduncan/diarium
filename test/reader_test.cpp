@@ -626,3 +626,150 @@ TEST_CASE("reading: the battery mark") {
     CHECK(corner_ink(rig.display.framebuffer()) > 0);
   }
 }
+
+// The way out of a backlog. Two taps, because a carry-over pile with no exit
+// is an inbox and an exit that fires on a mis-tap is worse than one.
+TEST_CASE("reading: marking everything read") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+  Edition ed = make_edition(*fonts);
+
+  auto tap_row = [&](Reader& r, size_t row) {
+    GestureEvent e;
+    e.kind = Gesture::Tap;
+    e.x = kPageWidth / 2;
+    e.y = kOverlayFirstY + static_cast<int>(row) * kOverlayRowHeight + 4;
+    return r.handle(e);
+  };
+
+  SUBCASE("one tap arms it, a second clears the backlog") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+
+    GestureEvent down;
+    down.kind = Gesture::SwipeDown;
+    REQUIRE(r.handle(down));
+    REQUIRE(r.mode() == ReaderMode::Sections);
+
+    const size_t row = ed.section_marks.size() + 1;
+    REQUIRE(tap_row(r, row));
+    CHECK(r.mode() == ReaderMode::Sections);  // armed, not fired
+
+    REQUIRE(tap_row(r, row));
+    CHECK(r.mode() == ReaderMode::Finished);
+  }
+
+  SUBCASE("everything really is read afterwards") {
+    Rig rig;
+    {
+      Reader r(ed, *fonts, rig.hal());
+      r.load_read_state("read.dat");
+      GestureEvent down;
+      down.kind = Gesture::SwipeDown;
+      REQUIRE(r.handle(down));
+      const size_t row = ed.section_marks.size() + 1;
+      REQUIRE(tap_row(r, row));
+      REQUIRE(tap_row(r, row));
+    }
+
+    Reader fresh(ed, *fonts, rig.hal());
+    fresh.load_read_state("read.dat");
+    GestureEvent right;
+    right.kind = Gesture::SwipeRight;
+    fresh.handle(right);
+    CHECK(fresh.mode() == ReaderMode::Finished);
+  }
+
+  SUBCASE("tapping a section still jumps rather than arming anything") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_read_state("read.dat");
+    GestureEvent down;
+    down.kind = Gesture::SwipeDown;
+    REQUIRE(r.handle(down));
+    if (ed.section_marks.empty()) return;
+    REQUIRE(tap_row(r, 0));
+    CHECK(r.mode() == ReaderMode::Browse);
+  }
+}
+
+// A light with a switch. Nothing reacts to the room, nothing ramps, and the
+// level survives being put down.
+TEST_CASE("reading: the frontlight") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+  Edition ed = make_edition(*fonts);
+
+  auto corner = [](Gesture kind) {
+    GestureEvent e;
+    e.kind = kind;
+    e.x = kPageWidth - 40;
+    e.y = 40;
+    return e;
+  };
+
+  SUBCASE("a corner tap switches it on and off again") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_frontlight("light.dat");
+    CHECK(rig.display.frontlight() == 0);
+
+    r.handle(corner(Gesture::Tap));
+    CHECK(rig.display.frontlight() > 0);
+
+    r.handle(corner(Gesture::Tap));
+    CHECK(rig.display.frontlight() == 0);
+  }
+
+  SUBCASE("a long press in the corner steps the brightness") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_frontlight("light.dat");
+    r.handle(corner(Gesture::LongPress));
+    const int first = rig.display.frontlight();
+    CHECK(first > 0);
+    r.handle(corner(Gesture::LongPress));
+    CHECK(rig.display.frontlight() > first);
+  }
+
+  SUBCASE("stepping past the top comes back round to off") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_frontlight("light.dat");
+    bool saw_zero_again = false;
+    for (int i = 0; i < 12; ++i) {
+      r.handle(corner(Gesture::LongPress));
+      if (i > 0 && rig.display.frontlight() == 0) saw_zero_again = true;
+    }
+    CHECK(saw_zero_again);
+  }
+
+  SUBCASE("the level survives the reader being rebuilt") {
+    Rig rig;
+    {
+      Reader r(ed, *fonts, rig.hal());
+      r.load_frontlight("light.dat");
+      r.handle(corner(Gesture::Tap));
+    }
+    const int was = rig.display.frontlight();
+    REQUIRE(was > 0);
+
+    rig.display.set_frontlight(0);
+    Reader again(ed, *fonts, rig.hal());
+    again.load_frontlight("light.dat");
+    CHECK(rig.display.frontlight() == was);
+  }
+
+  SUBCASE("a tap away from the corner is not the light") {
+    Rig rig;
+    Reader r(ed, *fonts, rig.hal());
+    r.load_frontlight("light.dat");
+    GestureEvent e;
+    e.kind = Gesture::Tap;
+    e.x = kPageWidth / 2;
+    e.y = kPageHeight / 2;
+    r.handle(e);
+    CHECK(rig.display.frontlight() == 0);
+  }
+}

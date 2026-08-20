@@ -1,5 +1,7 @@
 #include "core/ui/reader.h"
 
+#include <cstdlib>
+
 #include "core/base/str.h"
 #include "core/edition/clippings.h"
 #include "core/layout/type_scale.h"
@@ -203,7 +205,57 @@ bool Reader::jump_to_section(size_t index) {
   return true;
 }
 
+// The top-right corner, big enough to find in the dark without looking.
+bool Reader::in_light_corner(int x, int y) const {
+  return x >= kPageWidth - 140 && y <= 140;
+}
+
+void Reader::load_frontlight(const std::string& path) {
+  light_path_ = path;
+  std::string blob;
+  if (hal_.storage != nullptr && hal_.storage->read(path, &blob)) {
+    const int v = std::atoi(blob.c_str());
+    if (v >= 0 && v <= 63) light_level_ = v;
+    if (light_level_ > 0) light_last_on_ = light_level_;
+  }
+  if (hal_.display != nullptr) hal_.display->set_frontlight(light_level_);
+}
+
+void Reader::save_frontlight() {
+  // Storage rather than RTC memory: a level that survives sleep but not a
+  // battery pull is a setting that vanishes for no reason the reader can see.
+  if (hal_.storage == nullptr || light_path_.empty()) return;
+  hal_.storage->write(light_path_, std::to_string(light_level_));
+}
+
+// Returns whether the gesture was the light's. Changing the light needs no
+// redraw — the light is its own feedback — so this never asks for one.
+bool Reader::handle_frontlight(const GestureEvent& event) {
+  if (hal_.display == nullptr) return false;
+  if (!in_light_corner(event.x, event.y)) return false;
+
+  if (event.kind == Gesture::Tap) {
+    light_level_ = light_level_ > 0 ? 0 : light_last_on_;
+  } else if (event.kind == Gesture::LongPress) {
+    // Steps round rather than stopping at the top, so one gesture reaches
+    // every level without needing a second one to go back down.
+    const int step = hal_.display->max_frontlight() / 8;
+    light_level_ += step > 0 ? step : 1;
+    if (light_level_ > hal_.display->max_frontlight()) light_level_ = 0;
+  } else {
+    return false;
+  }
+
+  if (light_level_ > 0) light_last_on_ = light_level_;
+  hal_.display->set_frontlight(light_level_);
+  save_frontlight();
+  return true;
+}
+
 bool Reader::handle(const GestureEvent& event) {
+  // The light is reachable from wherever you are, including mid-article.
+  if (handle_frontlight(event)) return false;
+
   // The continuous pass has its own gestures: right goes onward through the
   // news, and up and down move within the article you are on.
   if (mode_ == ReaderMode::Article) {
@@ -247,8 +299,16 @@ bool Reader::handle(const GestureEvent& event) {
       if (mode_ == ReaderMode::Sections) {
         const size_t rows = edition_.section_marks.size();
         const size_t index = section_row_at(event.y);
-        if (index == rows) return toggle_clippings_view();  // the last row
-        if (index < rows) return jump_to_section(index);
+        if (index < rows) {
+          confirm_mark_all_ = false;
+          return jump_to_section(index);
+        }
+        if (index == rows) {
+          confirm_mark_all_ = false;
+          return toggle_clippings_view();
+        }
+        if (index == rows + 1) return mark_everything_read();
+        confirm_mark_all_ = false;
         return back();
       }
       if (mode_ == ReaderMode::Clippings) {
@@ -294,8 +354,8 @@ bool Reader::tick() {
 }
 
 namespace {
-constexpr int kOverlayFirstY = 180;
-constexpr int kOverlayRowHeight = 64;
+// Overlay row geometry now lives in the header, so hit-testing, drawing and
+// the tests all agree about where a row is.
 // A clipping is two lines — headline and provenance — so its rows are taller
 // than a section's, and the hit test has to use the same number the drawing
 // does or a tap lands on the neighbour.
@@ -407,6 +467,20 @@ void Reader::render_section_overlay() {
     const std::string label =
         "Clippings (" + std::to_string(clippings_.size()) + ")";
     fb.draw_text(body, label, kSideMargin * kSubpixel, y + body.ascent(), kInk);
+    y += row_height;
+    fb.fill_rect(kSideMargin, y - 18, kPageWidth - 2 * kSideMargin, 1, 190);
+  }
+
+  // And below it, the way out of a backlog. A second tap confirms, because a
+  // mis-tap that silently discards a week of unread news would be worse than
+  // any modal.
+  if (body.valid() && y + row_height <= kPageHeight - 60) {
+    const size_t left = unread_remaining();
+    const std::string label =
+        confirm_mark_all_ ? "Tap again to mark everything read"
+                          : "Mark everything read";
+    fb.draw_text(body, label, kSideMargin * kSubpixel, y + body.ascent(),
+                 left == 0 ? 150 : kInk);
   }
 
   if (meta.valid()) {
@@ -573,6 +647,26 @@ bool Reader::scroll_up() {
   --article_page_;
   const StoryRef& s = edition_.stories[order_[order_pos_]];
   set_page(s.first_page + static_cast<size_t>(article_page_), false);
+  return true;
+}
+
+// Two taps, not one: the first arms it and says so, the second does it.
+bool Reader::mark_everything_read() {
+  if (!confirm_mark_all_) {
+    confirm_mark_all_ = true;
+    needs_render_ = true;
+    return true;
+  }
+  confirm_mark_all_ = false;
+
+  for (const StoryRef& s : edition_.stories) read_.mark(s.key, edition_.date);
+  if (hal_.storage != nullptr && !read_path_.empty()) {
+    hal_.storage->write(read_path_, serialize_seen_store(read_));
+  }
+
+  mode_ = ReaderMode::Finished;
+  needs_render_ = true;
+  pending_context_change_ = true;
   return true;
 }
 
