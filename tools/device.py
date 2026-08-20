@@ -18,13 +18,30 @@ import os
 import sys
 import time
 
+import glob
+
 try:
     import serial
 except ImportError:
-    sys.exit("needs pyserial. PlatformIO ships one:\n"
-             "  /opt/homebrew/opt/platformio/libexec/bin/python3 tools/device.py ...")
+    sys.exit("needs pyserial: pip install pyserial, or use the python "
+             "PlatformIO ships, which already has it.")
 
-PORT = os.environ.get("RSSPAPER_PORT", "/dev/cu.usbserial-110")
+
+def find_port():
+    """The board, wherever it turned up. A hardcoded device node is one
+    person's USB slot on one afternoon."""
+    env = os.environ.get("RSSPAPER_PORT")
+    if env:
+        return env
+    for pattern in ("/dev/cu.usbserial*", "/dev/cu.SLAB*", "/dev/cu.wchusb*",
+                    "/dev/ttyUSB*", "/dev/ttyACM*"):
+        found = sorted(glob.glob(pattern))
+        if found:
+            return found[0]
+    sys.exit("no board found. Plug one in, or set RSSPAPER_PORT.")
+
+
+PORT = find_port()
 BAUD = 115200
 
 

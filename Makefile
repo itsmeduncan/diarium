@@ -90,10 +90,18 @@ clean:
 device:
 	cd src/device && pio run
 
-# The device is talked to over its serial console. Override the port with
-# RSSPAPER_PORT if it is not the usual one.
-PIO_PY := /opt/homebrew/opt/platformio/libexec/bin/python3
-DEVICE := $(PIO_PY) tools/device.py
+# The device is talked to over its serial console. The port is found
+# automatically; set RSSPAPER_PORT if a machine has more than one board.
+#
+# The console needs pyserial. A plain python3 usually has it; PlatformIO ships
+# one that always does, so fall back to that rather than asking anyone to
+# install anything.
+DEVICE_PY := $(shell for p in python3 \
+	/opt/homebrew/opt/platformio/libexec/bin/python3 \
+	"$$HOME/.platformio/penv/bin/python"; do \
+	command -v "$$p" >/dev/null 2>&1 && "$$p" -c "import serial" >/dev/null 2>&1 \
+	  && echo "$$p" && break; done)
+DEVICE := $(DEVICE_PY) tools/device.py
 
 .PHONY: device-flash device-log device-ls device-put device-rm device-compose
 device-flash:
