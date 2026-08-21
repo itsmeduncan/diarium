@@ -205,7 +205,7 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   size_t lead_element_count = 0;
 
   if (lead != nullptr) {
-    const int lead_measure = kPageWidth - 2 * PageTemplate().margin_left;
+    const int lead_measure = page_width() - 2 * PageTemplate().margin_left;
     front.push_back(element(TextRole::Kicker, sections[lead_section].name));
     front.push_back(element(
         fit_lead_headline(lead->title, lead_measure, fonts, hyphenator),
@@ -251,13 +251,13 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   // guessed constant.
   front_tmpl.banner_height =
       measure_flow_height(front, lead_element_count,
-                          kPageWidth - front_tmpl.margin_left -
+                          page_width() - front_tmpl.margin_left -
                               front_tmpl.margin_right,
                           fonts, hyphenator);
   // The banner may take most of the page below the nameplate, but not all of
   // it: something has to be left for the section teasers that make a front
   // page a front page.
-  const int banner_cap = (kPageHeight - front_tmpl.first_page_header -
+  const int banner_cap = (page_height() - front_tmpl.first_page_header -
                           front_tmpl.margin_top - front_tmpl.margin_bottom) *
                          5 / 8;
   if (front_tmpl.banner_height > banner_cap) {

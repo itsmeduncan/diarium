@@ -14,11 +14,25 @@
 
 namespace diarium {
 
-// The panel. Fixed here because layout decisions (measure, leading, column
-// count) were made for this geometry; a different panel wants its own review,
-// not a scaled page.
-constexpr int kPageWidth = 1024;
-constexpr int kPageHeight = 758;
+// The panel is 1024x758 of raster whichever way it is stood; orientation
+// chooses how a page is laid onto it. Portrait (758x1024) is the product
+// default and lands via config; landscape is the opt-in. The type scale is
+// physical — sized to the ~212 PPI panel — so it does not move with the axes;
+// only the measure and the front page's column count do.
+enum class Orientation : uint8_t { Landscape, Portrait };
+
+// Orientation is a compose-time property: an edition's pages bake in absolute
+// positions, so it must be chosen before any layout runs and not change under
+// a composed edition. Set once at startup from EditionConfig, read-only
+// thereafter. A function rather than a constant because it is chosen at
+// runtime; write-once-before-read leaves it as good as constant for the
+// single-threaded pipeline that reads it. The core keeps no default opinion —
+// it stays landscape until told — because the default that ships is expressed
+// in config, where the reader can see and change it.
+void set_orientation(Orientation o);
+Orientation orientation();
+int page_width();
+int page_height();
 
 // One margin, used by both the paginator's frames and the renderer's
 // furniture. They must agree or rules won't line up with columns.

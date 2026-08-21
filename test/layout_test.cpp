@@ -53,6 +53,25 @@ std::string line_text(const BrokenLine& line) {
 
 }  // namespace
 
+TEST_CASE("orientation swaps the page axes onto the same panel") {
+  // The global is landscape until told, so this saves and restores it: a leak
+  // into a later case would show up as a page mysteriously the wrong shape.
+  const Orientation saved = orientation();
+
+  set_orientation(Orientation::Landscape);
+  CHECK(page_width() == 1024);
+  CHECK(page_height() == 758);
+
+  set_orientation(Orientation::Portrait);
+  CHECK(page_width() == 758);
+  CHECK(page_height() == 1024);
+
+  // The panel's raster is 1024x758 either way; only the long axis moves.
+  CHECK(page_width() * page_height() == 1024 * 758);
+
+  set_orientation(saved);
+}
+
 TEST_CASE("font pack loads and reports plausible metrics") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;  // no pack built; nothing to assert
@@ -244,12 +263,12 @@ TEST_CASE("frames: columns tile the measure and the banner spans it") {
 
   const std::vector<Frame> front = frames_for(tmpl, true);
   REQUIRE(front.size() == 3);  // banner + 2 columns
-  CHECK(front[0].w == kPageWidth - tmpl.margin_left - tmpl.margin_right);
+  CHECK(front[0].w == page_width() - tmpl.margin_left - tmpl.margin_right);
   CHECK(front[0].y == tmpl.margin_top + tmpl.first_page_header);
   CHECK(front[1].y == front[0].y + tmpl.banner_height);
   CHECK(front[1].y == front[2].y);
   CHECK(front[2].x > front[1].x + front[1].w);  // gutter between them
-  CHECK(front[2].x + front[2].w <= kPageWidth - tmpl.margin_right);
+  CHECK(front[2].x + front[2].w <= page_width() - tmpl.margin_right);
 
   const std::vector<Frame> inner = frames_for(tmpl, false);
   REQUIRE(inner.size() == 2);  // no banner, no header reserve
@@ -282,10 +301,10 @@ TEST_CASE("pagination places every line inside its frame") {
     CHECK_FALSE(page.lines.empty());
     for (const Line& line : page.lines) {
       CHECK(line.baseline > 0);
-      CHECK(line.baseline < kPageHeight);
+      CHECK(line.baseline < page_height());
       for (const PositionedRun& r : line.runs) {
         CHECK(to_px(r.x) >= 0);
-        CHECK(to_px(r.x) < kPageWidth);
+        CHECK(to_px(r.x) < page_width());
       }
     }
   }
@@ -317,7 +336,7 @@ TEST_CASE("a page break starts a new page") {
   for (const Placement& p : where) {
     CHECK_FALSE(p.bounds.empty());
     CHECK(p.bounds.y >= 0);
-    CHECK(p.bounds.y + p.bounds.h <= kPageHeight);
+    CHECK(p.bounds.y + p.bounds.h <= page_height());
   }
 }
 
@@ -471,7 +490,7 @@ TEST_CASE("a placement's bounds never span a page break") {
 
   for (const Placement& p : where) {
     CHECK(p.bounds.y >= 0);
-    CHECK(p.bounds.y + p.bounds.h <= kPageHeight);
+    CHECK(p.bounds.y + p.bounds.h <= page_height());
     CHECK(p.page < pages.size());
   }
 }

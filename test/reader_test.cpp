@@ -297,7 +297,7 @@ TEST_CASE("tapping empty space opens nothing") {
   const Edition ed = make_edition(*fonts);
   Rig rig;
   Reader reader(ed, *fonts, rig.hal());
-  CHECK_FALSE(reader.open_story_at(5, kPageHeight - 5));
+  CHECK_FALSE(reader.open_story_at(5, page_height() - 5));
   CHECK(reader.mode() == ReaderMode::Browse);
 }
 
@@ -637,7 +637,7 @@ TEST_CASE("reading: marking everything read") {
   auto tap_row = [&](Reader& r, size_t row) {
     GestureEvent e;
     e.kind = Gesture::Tap;
-    e.x = kPageWidth / 2;
+    e.x = page_width() / 2;
     e.y = kOverlayFirstY + static_cast<int>(row) * kOverlayRowHeight + 4;
     return r.handle(e);
   };
@@ -704,7 +704,7 @@ TEST_CASE("reading: the frontlight") {
   auto corner = [](Gesture kind) {
     GestureEvent e;
     e.kind = kind;
-    e.x = kPageWidth - 40;
+    e.x = page_width() - 40;
     e.y = 40;
     return e;
   };
@@ -767,8 +767,8 @@ TEST_CASE("reading: the frontlight") {
     r.load_frontlight("light.dat");
     GestureEvent e;
     e.kind = Gesture::Tap;
-    e.x = kPageWidth / 2;
-    e.y = kPageHeight / 2;
+    e.x = page_width() / 2;
+    e.y = page_height() / 2;
     r.handle(e);
     CHECK(rig.display.frontlight() == 0);
   }
@@ -786,14 +786,14 @@ TEST_CASE("reading: the way home") {
     GestureEvent e;
     e.kind = kind;
     e.x = 40;
-    e.y = kPageHeight - 40;
+    e.y = page_height() - 40;
     return e;
   };
   auto middle = [](Gesture kind) {
     GestureEvent e;
     e.kind = kind;
-    e.x = kPageWidth / 2;
-    e.y = kPageHeight / 2;
+    e.x = page_width() / 2;
+    e.y = page_height() / 2;
     return e;
   };
 
@@ -918,7 +918,7 @@ TEST_CASE("reading: the way home") {
 
     GestureEvent light;
     light.kind = Gesture::Tap;
-    light.x = kPageWidth - 40;
+    light.x = page_width() - 40;
     light.y = 40;
     r.handle(light);
     CHECK(rig.display.frontlight() > 0);

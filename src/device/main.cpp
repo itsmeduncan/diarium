@@ -217,6 +217,10 @@ void compose_wake(device::DeviceHal& d) {
   // The offset has to be in hand before anything is dated.
   d.clock.set_utc_offset(config.edition.utc_offset_minutes * 60);
 
+  // Before the edition is laid out: portrait or landscape is baked into the
+  // pages, and the blits below rotate to match.
+  set_orientation(config.edition.orientation);
+
   FeedCache cache;
   std::string blob;
   if (d.storage.read("/cache.dat", &blob)) cache.deserialize(blob);
@@ -376,6 +380,9 @@ void setup() {
       parse_feeds_toml(toml, &config, &config_error)) {
     d.clock.set_utc_offset(config.edition.utc_offset_minutes * 60);
     wake_at = config.edition.wake_at;
+    // The reader's furniture must land at the same geometry the edition was
+    // composed under. A broken config falls back to landscape, below.
+    set_orientation(config.edition.orientation);
     Serial.printf("feeds.toml: %u feeds, utc%+d min\n",
                   (unsigned)config.feeds.size(),
                   config.edition.utc_offset_minutes);

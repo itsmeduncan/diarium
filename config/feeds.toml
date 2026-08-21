@@ -22,6 +22,10 @@ password = "YOUR-PASSWORD"
 title = "Diarium"
 # Local time to wake, compose and go back to sleep. 24-hour.
 wake_at = "05:30"
+# "portrait" (the default, the panel stood on its short edge) or "landscape".
+# Portrait gives a taller page and a wider reading measure; landscape is the
+# older layout. Changing this takes effect on the next composed edition.
+orientation = "portrait"
 # Minutes east of UTC. The device has no network to ask and no keyboard to be
 # asked, so the offset travels with this file.
 utc_offset_minutes = 0

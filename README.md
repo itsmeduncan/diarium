@@ -30,27 +30,27 @@ because the page is the product and the page needs to be looked at. Hardware
 support follows — tracked on the
 [1.0.0 milestone](https://github.com/itsmeduncan/diarium/milestone/1).
 
-| Piece                             | State                                             |
-| --------------------------------- | ------------------------------------------------- |
-| Streaming XML parser              | working                                           |
-| RSS 2.0 / RSS 1.0 / Atom parser   | working, exercised against 12 real feeds          |
-| HTML → block model                | working                                           |
-| Type + layout engine              | working — widow/orphan control, two optical sizes |
+| Piece                             | State                                               |
+| --------------------------------- | --------------------------------------------------- |
+| Streaming XML parser              | working                                             |
+| RSS 2.0 / RSS 1.0 / Atom parser   | working, exercised against 12 real feeds            |
+| HTML → block model                | working                                             |
+| Type + layout engine              | working — widow/orphan control, two optical sizes   |
 | Edition composer                  | working — front page, sections, dedup on read state |
-| Desktop simulator (PNG output)    | working — 8-bit, 3-bit and 1-bit dithered         |
-| HAL (six interfaces)              | working — simulator and device implement all six  |
-| Reader UI (gestures, page turns)  | working — swipe through the news, scroll, go back |
-| Hyphenation (Liang/TeX patterns)  | working — justified text is now viable            |
-| OPML import                       | working                                           |
-| Edition persistence               | working — compose once, read from storage         |
-| HTTP fetcher with conditional GET | working — verified live, most feeds answer 304    |
-| Inkplate 6FLICK target            | working — fetches, composes and is read by touch  |
-| Read state and carry-over         | working — unread stories keep until you read them |
+| Desktop simulator (PNG output)    | working — 8-bit, 3-bit and 1-bit dithered           |
+| HAL (six interfaces)              | working — simulator and device implement all six    |
+| Reader UI (gestures, page turns)  | working — swipe through the news, scroll, go back   |
+| Hyphenation (Liang/TeX patterns)  | working — justified text is now viable              |
+| OPML import                       | working                                             |
+| Edition persistence               | working — compose once, read from storage           |
+| HTTP fetcher with conditional GET | working — verified live, most feeds answer 304      |
+| Inkplate 6FLICK target            | working — fetches, composes and is read by touch    |
+| Read state and carry-over         | working — unread stories keep until you read them   |
 | Reading model                     | working — one pass, oldest first, ends when it ends |
-| Full text behind truncated feeds  | working — the article is pulled from its own page |
-| Device commands                   | working — flash, log, put, compose from make      |
-| Frontlight, battery mark          | working — threshold is a guess until measured     |
-| Power loop (wake, compose, sleep) | working — draw over a day is not yet measured     |
+| Full text behind truncated feeds  | working — the article is pulled from its own page   |
+| Device commands                   | working — flash, log, put, compose from make        |
+| Frontlight, battery mark          | working — threshold is a guess until measured       |
+| Power loop (wake, compose, sleep) | working — draw over a day is not yet measured       |
 
 ## Hardware
 
@@ -73,7 +73,8 @@ clock, power, storage, network — and nothing else.
 ## Building
 
 The desktop simulator runs the same pipeline the device runs, renders pages to
-PNG at the panel's exact 1024×758 geometry, and fakes touch from the keyboard.
+PNG at the panel's exact geometry — 758×1024 in the default portrait, 1024×758
+in landscape — and fakes touch from the keyboard.
 
 ```sh
 make            # simulator, tests and the font pack
@@ -181,13 +182,13 @@ full ones ~1.74 s, and the ratio is a design decision you can see.
 The keys above stand in for these. Reading is a line rather than a tree, so
 "onward" is rightwards everywhere and there is no stack to pop:
 
-| Gesture | Reading the pass | Contents page and ledes | A story from a lede |
-| --- | --- | --- | --- |
-| Swipe right | the next unread story | start reading | the previous page |
-| Swipe left | the previous story | the next page | onward, then back to the lede |
-| Swipe up | further into the story | — | — |
-| Swipe down | back up the story | the section list | the section list |
-| Tap | — | open the story under your finger | — |
+| Gesture     | Reading the pass       | Contents page and ledes          | A story from a lede           |
+| ----------- | ---------------------- | -------------------------------- | ----------------------------- |
+| Swipe right | the next unread story  | start reading                    | the previous page             |
+| Swipe left  | the previous story     | the next page                    | onward, then back to the lede |
+| Swipe up    | further into the story | —                                | —                             |
+| Swipe down  | back up the story      | the section list                 | the section list              |
+| Tap         | —                      | open the story under your finger | —                             |
 
 Two corners mean the same thing wherever you are. The top right is the light:
 a tap switches it, a long press steps the brightness round. The bottom left is

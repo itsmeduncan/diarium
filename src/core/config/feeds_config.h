@@ -34,6 +34,10 @@ struct EditionConfig {
   int max_age_days = 3;
   int front_page_columns = 2;
   Align body_alignment = Align::Left;
+  // Portrait out of the box: the panel reads better stood on its short edge.
+  // Landscape is a one-line opt-in here. This is a compose-time choice — change
+  // it and the next composed edition takes it; a cached one keeps its shape.
+  Orientation orientation = Orientation::Portrait;
   // Liang hyphenation. Worth having ragged too — it evens the rag — and
   // essential for justified text in a narrow column.
   bool hyphenate = true;

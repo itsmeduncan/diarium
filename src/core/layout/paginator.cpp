@@ -23,7 +23,7 @@ int line_height(const RoleStyle& style) {
 std::vector<Frame> frames_for(const PageTemplate& tmpl, bool first_page) {
   std::vector<Frame> frames;
   int top = tmpl.margin_top + (first_page ? tmpl.first_page_header : 0);
-  const int usable_w = kPageWidth - tmpl.margin_left - tmpl.margin_right;
+  const int usable_w = page_width() - tmpl.margin_left - tmpl.margin_right;
   const int cols = tmpl.columns < 1 ? 1 : tmpl.columns;
   const int col_w = (usable_w - tmpl.gutter * (cols - 1)) / cols;
 
@@ -39,7 +39,7 @@ std::vector<Frame> frames_for(const PageTemplate& tmpl, bool first_page) {
     top += tmpl.banner_height;
   }
 
-  const int usable_h = kPageHeight - top - tmpl.margin_bottom;
+  const int usable_h = page_height() - top - tmpl.margin_bottom;
   for (int i = 0; i < cols; ++i) {
     Frame f;
     f.x = tmpl.margin_left + i * (col_w + tmpl.gutter);

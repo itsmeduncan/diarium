@@ -48,6 +48,10 @@ int cmd_compose(const std::vector<std::string>& args) {
     return 1;
   }
 
+  // Before anything is laid out: the page geometry every frame is measured
+  // against is chosen here, and the composed edition bakes it in.
+  set_orientation(config.edition.orientation);
+
   FontPack fonts;
   if (!fonts.load_file(fonts_path, &error)) {
     std::fprintf(stderr, "compose: %s\n", error.c_str());
