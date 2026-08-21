@@ -36,9 +36,13 @@ HomeSummary summarize_home(const Edition& edition,
 
 // Draws the home page: nameplate, the unread count and its per-section
 // breakdown, the freshness strap, and the hint to swipe onward.
+//
+// `confirm_clear` shows the tap-to-clear prompt in place of the swipe hint,
+// for when a first tap has armed clearing the whole backlog and it is
+// waiting on a second tap to confirm.
 void render_home(const FontPack& fonts, const Edition& edition,
                  const std::vector<size_t>& order,
                  const std::vector<bool>& unread, const std::string& strap,
-                 Framebuffer* fb);
+                 Framebuffer* fb, bool confirm_clear = false);
 
 }  // namespace diarium
