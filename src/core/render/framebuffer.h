@@ -26,6 +26,13 @@ class Framebuffer {
  public:
   Framebuffer(int width = page_width(), int height = page_height());
 
+  // Re-dimensions the canvas in place. The device builds its framebuffer once,
+  // to claim the PSRAM early, before it has read the card and knows the
+  // orientation; this swaps width for height to match once it does. Portrait
+  // and landscape are the same panel and the same pixel count, so the common
+  // case does not reallocate.
+  void resize(int width, int height);
+
   int width() const { return w_; }
   int height() const { return h_; }
   const uint8_t* pixels() const { return px_.data(); }

@@ -9,6 +9,14 @@ Framebuffer::Framebuffer(int width, int height)
   px_.assign(static_cast<size_t>(w_) * static_cast<size_t>(h_), kPaper);
 }
 
+void Framebuffer::resize(int width, int height) {
+  w_ = width > 0 ? width : 1;
+  h_ = height > 0 ? height : 1;
+  // assign() keeps the existing allocation when the count is unchanged, which
+  // is exactly the portrait/landscape swap on the same panel.
+  px_.assign(static_cast<size_t>(w_) * static_cast<size_t>(h_), kPaper);
+}
+
 void Framebuffer::fill(uint8_t grey) {
   for (uint8_t& p : px_) p = grey;
 }
