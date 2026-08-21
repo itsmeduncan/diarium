@@ -246,7 +246,7 @@ bool compose_from_card(const FeedList& config, const FontPack& fonts,
   // the one story that overshoots the budget as it is laid out. When it bites,
   // the paper is a little shorter that day rather than the compose crashing —
   // and feeds.toml's max_items still bounds the story count above this.
-  opts.max_pages = 120;
+  opts.max_pages = 1000;  // streaming: RAM no longer the wall — high sanity cap
   opts.max_age_days = config.edition.max_age_days;
   opts.body_alignment = config.edition.body_alignment;
   opts.hyphenate = config.edition.hyphenate;
