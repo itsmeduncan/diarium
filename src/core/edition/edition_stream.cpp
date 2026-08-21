@@ -103,7 +103,7 @@ bool StreamingEditionReader::open(const std::string& file, std::string* error) {
   const std::string index_bytes = file.substr(index_offset);
   Reader index_reader(index_bytes);
   const uint32_t story_count = index_reader.u32();
-  if (!index_reader.plausible_count(story_count, 37)) {
+  if (!index_reader.plausible_count(story_count, 41)) {
     return fail("stream edition index is corrupt");
   }
 
