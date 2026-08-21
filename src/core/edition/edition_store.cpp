@@ -5,30 +5,32 @@
 namespace diarium {
 namespace {
 
-void put_u8(std::string& out, uint8_t v) {
-  out.push_back(static_cast<char>(v));
+void put_u8(ByteSink& out, uint8_t v) { out.write(&v, 1); }
+void put_u32(ByteSink& out, uint32_t v) {
+  const uint8_t b[4] = {
+      static_cast<uint8_t>(v & 0xFF),
+      static_cast<uint8_t>((v >> 8) & 0xFF),
+      static_cast<uint8_t>((v >> 16) & 0xFF),
+      static_cast<uint8_t>((v >> 24) & 0xFF),
+  };
+  out.write(b, 4);
 }
-void put_u32(std::string& out, uint32_t v) {
-  out.push_back(static_cast<char>(v & 0xFF));
-  out.push_back(static_cast<char>((v >> 8) & 0xFF));
-  out.push_back(static_cast<char>((v >> 16) & 0xFF));
-  out.push_back(static_cast<char>((v >> 24) & 0xFF));
-}
-void put_i32(std::string& out, int32_t v) {
+void put_i32(ByteSink& out, int32_t v) {
   put_u32(out, static_cast<uint32_t>(v));
 }
-void put_u16(std::string& out, uint16_t v) {
-  out.push_back(static_cast<char>(v & 0xFF));
-  out.push_back(static_cast<char>((v >> 8) & 0xFF));
+void put_u16(ByteSink& out, uint16_t v) {
+  const uint8_t b[2] = {static_cast<uint8_t>(v & 0xFF),
+                         static_cast<uint8_t>((v >> 8) & 0xFF)};
+  out.write(b, 2);
 }
-void put_i64(std::string& out, int64_t v) {
+void put_i64(ByteSink& out, int64_t v) {
   const uint64_t u = static_cast<uint64_t>(v);
   put_u32(out, static_cast<uint32_t>(u & 0xFFFFFFFFu));
   put_u32(out, static_cast<uint32_t>(u >> 32));
 }
-void put_str(std::string& out, const std::string& s) {
+void put_str(ByteSink& out, const std::string& s) {
   put_u32(out, static_cast<uint32_t>(s.size()));
-  out += s;
+  out.write(s.data(), s.size());
 }
 
 // A cursor that can't read off the end. Every failure is the same failure —
@@ -111,71 +113,76 @@ class Reader {
 
 }  // namespace
 
+void write_page(ByteSink& out, const Page& p) {
+  put_u8(out, p.is_front_page ? 1 : 0);
+  put_str(out, p.folio_left);
+  put_str(out, p.folio_right);
+
+  put_u32(out, static_cast<uint32_t>(p.lines.size()));
+  for (const Line& line : p.lines) {
+    put_i32(out, line.baseline);
+    put_u32(out, static_cast<uint32_t>(line.runs.size()));
+    for (const PositionedRun& r : line.runs) {
+      put_u8(out, static_cast<uint8_t>(r.face));
+      put_i32(out, r.x);
+      put_str(out, r.text);
+    }
+  }
+
+  put_u32(out, static_cast<uint32_t>(p.rules.size()));
+  for (const Rule& r : p.rules) {
+    put_i32(out, r.x);
+    put_i32(out, r.y);
+    put_i32(out, r.w);
+    put_i32(out, r.h);
+    put_u8(out, r.grey);
+  }
+
+  put_u32(out, static_cast<uint32_t>(p.images.size()));
+  for (const ImageSlot& s : p.images) {
+    put_i32(out, s.x);
+    put_i32(out, s.y);
+    put_i32(out, s.w);
+    put_i32(out, s.h);
+    put_str(out, s.alt);
+  }
+}
+
 std::string serialize_edition(const Edition& ed) {
   std::string out;
   // Pages dominate; roughly 3 KB each in practice.
   out.reserve(ed.pages.size() * 3072 + 1024);
+  StringSink sink(&out);
 
-  put_u32(out, kEditionMagic);
-  put_u16(out, kEditionVersion);
-  put_u16(out, 0);  // flags
+  put_u32(sink, kEditionMagic);
+  put_u16(sink, kEditionVersion);
+  put_u16(sink, 0);  // flags
 
-  put_i64(out, ed.date);
-  put_str(out, ed.title);
+  put_i64(sink, ed.date);
+  put_str(sink, ed.title);
 
-  put_u32(out, static_cast<uint32_t>(ed.stats.items_in));
-  put_u32(out, static_cast<uint32_t>(ed.stats.dropped_seen));
-  put_u32(out, static_cast<uint32_t>(ed.stats.dropped_stale));
-  put_u32(out, static_cast<uint32_t>(ed.stats.dropped_over_budget));
-  put_u32(out, static_cast<uint32_t>(ed.stats.items_published));
-  put_u32(out, static_cast<uint32_t>(ed.stats.truncated_published));
+  put_u32(sink, static_cast<uint32_t>(ed.stats.items_in));
+  put_u32(sink, static_cast<uint32_t>(ed.stats.dropped_seen));
+  put_u32(sink, static_cast<uint32_t>(ed.stats.dropped_stale));
+  put_u32(sink, static_cast<uint32_t>(ed.stats.dropped_over_budget));
+  put_u32(sink, static_cast<uint32_t>(ed.stats.items_published));
+  put_u32(sink, static_cast<uint32_t>(ed.stats.truncated_published));
 
-  put_u32(out, static_cast<uint32_t>(ed.stories.size()));
+  put_u32(sink, static_cast<uint32_t>(ed.stories.size()));
   for (const StoryRef& s : ed.stories) {
-    put_i64(out, static_cast<int64_t>(s.key));
-    put_str(out, s.title);
-    put_str(out, s.section);
-    put_str(out, s.source);
-    put_u32(out, static_cast<uint32_t>(s.first_page));
-    put_u32(out, static_cast<uint32_t>(s.page_count));
-    put_u8(out, s.truncated ? 1 : 0);
-    put_i64(out, static_cast<int64_t>(s.published));
+    put_i64(sink, static_cast<int64_t>(s.key));
+    put_str(sink, s.title);
+    put_str(sink, s.section);
+    put_str(sink, s.source);
+    put_u32(sink, static_cast<uint32_t>(s.first_page));
+    put_u32(sink, static_cast<uint32_t>(s.page_count));
+    put_u8(sink, s.truncated ? 1 : 0);
+    put_i64(sink, static_cast<int64_t>(s.published));
   }
 
-  put_u32(out, static_cast<uint32_t>(ed.pages.size()));
+  put_u32(sink, static_cast<uint32_t>(ed.pages.size()));
   for (const Page& p : ed.pages) {
-    put_u8(out, p.is_front_page ? 1 : 0);
-    put_str(out, p.folio_left);
-    put_str(out, p.folio_right);
-
-    put_u32(out, static_cast<uint32_t>(p.lines.size()));
-    for (const Line& line : p.lines) {
-      put_i32(out, line.baseline);
-      put_u32(out, static_cast<uint32_t>(line.runs.size()));
-      for (const PositionedRun& r : line.runs) {
-        put_u8(out, static_cast<uint8_t>(r.face));
-        put_i32(out, r.x);
-        put_str(out, r.text);
-      }
-    }
-
-    put_u32(out, static_cast<uint32_t>(p.rules.size()));
-    for (const Rule& r : p.rules) {
-      put_i32(out, r.x);
-      put_i32(out, r.y);
-      put_i32(out, r.w);
-      put_i32(out, r.h);
-      put_u8(out, r.grey);
-    }
-
-    put_u32(out, static_cast<uint32_t>(p.images.size()));
-    for (const ImageSlot& s : p.images) {
-      put_i32(out, s.x);
-      put_i32(out, s.y);
-      put_i32(out, s.w);
-      put_i32(out, s.h);
-      put_str(out, s.alt);
-    }
+    write_page(sink, p);
   }
 
   return out;

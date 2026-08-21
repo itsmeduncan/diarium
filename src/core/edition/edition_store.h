@@ -18,6 +18,8 @@
 #include <string>
 
 #include "core/edition/edition.h"
+#include "core/io/byte_sink.h"
+#include "core/layout/page.h"
 
 namespace diarium {
 
@@ -36,6 +38,11 @@ constexpr uint16_t kEditionVersion = 4;
 constexpr uint16_t kMinEditionVersion = 4;
 
 std::string serialize_edition(const Edition& edition);
+
+// The per-page encoding, shared by the whole-blob v4 writer above and the
+// streaming v5 writer (edition_stream.h) — a page looks the same on disk
+// either way.
+void write_page(ByteSink& sink, const Page& page);
 
 // Returns false and leaves `edition` untouched if the blob is truncated,
 // corrupt, or written by a newer build. A stale cache must degrade into
