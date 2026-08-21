@@ -4,7 +4,7 @@
 # src/hal. This file must stay in sync with the Makefile, which exists so a
 # clone builds with nothing but a compiler.
 cmake_minimum_required(VERSION 3.16)
-project(rsspaper CXX)
+project(diarium CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,29 +23,29 @@ file(GLOB_RECURSE SIM_SOURCES CONFIGURE_DEPENDS src/sim/*.cpp src/hal/*.cpp)
 file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS test/*.cpp)
 file(GLOB FONTGEN_SOURCES CONFIGURE_DEPENDS tools/fontgen/*.cpp)
 
-add_library(rsspaper_core STATIC ${CORE_SOURCES})
-target_include_directories(rsspaper_core PUBLIC src ${CMAKE_SOURCE_DIR})
+add_library(diarium_core STATIC ${CORE_SOURCES})
+target_include_directories(diarium_core PUBLIC src ${CMAKE_SOURCE_DIR})
 # SYSTEM so vendored headers don't spray warnings over ours.
-target_include_directories(rsspaper_core SYSTEM PUBLIC third_party)
+target_include_directories(diarium_core SYSTEM PUBLIC third_party)
 
-add_executable(rsspaper-sim ${SIM_SOURCES})
-target_link_libraries(rsspaper-sim PRIVATE rsspaper_core)
-target_include_directories(rsspaper-sim SYSTEM PRIVATE third_party/stb)
+add_executable(diarium-sim ${SIM_SOURCES})
+target_link_libraries(diarium-sim PRIVATE diarium_core)
+target_include_directories(diarium-sim SYSTEM PRIVATE third_party/stb)
 
 if(TEST_SOURCES)
   enable_testing()
-  add_executable(rsspaper-tests ${TEST_SOURCES})
-  target_link_libraries(rsspaper-tests PRIVATE rsspaper_core)
-  target_include_directories(rsspaper-tests SYSTEM PRIVATE third_party/doctest)
+  add_executable(diarium-tests ${TEST_SOURCES})
+  target_link_libraries(diarium-tests PRIVATE diarium_core)
+  target_include_directories(diarium-tests SYSTEM PRIVATE third_party/doctest)
   # Tests read test/fixtures relative to the repository root.
   add_test(NAME unit
-           COMMAND rsspaper-tests
+           COMMAND diarium-tests
            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 endif()
 
 if(FONTGEN_SOURCES)
   add_executable(fontgen ${FONTGEN_SOURCES})
-  target_link_libraries(fontgen PRIVATE rsspaper_core)
+  target_link_libraries(fontgen PRIVATE diarium_core)
   target_include_directories(fontgen SYSTEM PRIVATE third_party/stb)
 
   # Bake the font pack as part of the build so the simulator always has one.

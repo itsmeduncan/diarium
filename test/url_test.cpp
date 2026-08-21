@@ -7,7 +7,7 @@
 
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 TEST_CASE("splits a plain https url") {
   Url u;

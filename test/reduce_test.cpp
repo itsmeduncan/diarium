@@ -8,7 +8,7 @@
 #include "core/render/framebuffer.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 

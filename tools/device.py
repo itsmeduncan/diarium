@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Talk to an RSSpaper device over its serial console.
+"""Talk to an Diarium device over its serial console.
 
 The device has no keyboard and its card does not come out, so this is how a
 file gets onto it, how the card is inspected, and how a compose is asked for
@@ -11,7 +11,7 @@ without editing the firmware to force one.
     tools/device.py rm PATH              remove a file from the card
     tools/device.py compose              fetch and compose now
 
-The board is found automatically. Set RSSPAPER_PORT if a machine has more
+The board is found automatically. Set DIARIUM_PORT if a machine has more
 than one attached.
 
 A file's bytes go straight from disk to the port and are never printed, which
@@ -57,22 +57,22 @@ class DeviceError(Exception):
 
 
 def find_port():
-    env = os.environ.get("RSSPAPER_PORT")
+    env = os.environ.get("DIARIUM_PORT")
     if env:
         if not os.path.exists(env):
-            raise DeviceError("RSSPAPER_PORT is %s, which is not there." % env)
+            raise DeviceError("DIARIUM_PORT is %s, which is not there." % env)
         return env
     found = []
     for pattern in PORT_PATTERNS:
         found.extend(sorted(glob.glob(pattern)))
     if not found:
         raise DeviceError(
-            "No board found. Plug one in, or set RSSPAPER_PORT.\n"
+            "No board found. Plug one in, or set DIARIUM_PORT.\n"
             "Looked for: " + ", ".join(PORT_PATTERNS))
     if len(found) > 1:
         raise DeviceError(
             "More than one board is attached:\n  " + "\n  ".join(found) +
-            "\nPick one with RSSPAPER_PORT.")
+            "\nPick one with DIARIUM_PORT.")
     return found[0]
 
 

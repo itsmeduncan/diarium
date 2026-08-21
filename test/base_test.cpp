@@ -3,7 +3,7 @@
 #include "core/xml/entities.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 TEST_CASE("utf8 round-trips and rejects malformed input") {
   std::string s;

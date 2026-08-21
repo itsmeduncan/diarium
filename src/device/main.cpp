@@ -26,7 +26,7 @@
 #include "device/device_http.h"
 #include "device/device_wifi.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 
@@ -318,7 +318,7 @@ void setup() {
   if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_UNDEFINED) delay(300);
   panel.begin();
   Serial.printf("[t] panel.begin %u\n", (unsigned)(millis() - t_boot));
-  Serial.println("\nrsspaper");
+  Serial.println("\ndiarium");
 
   static device::DeviceHal d(&panel);  // claims the framebuffer first
   hal_impl = &d;

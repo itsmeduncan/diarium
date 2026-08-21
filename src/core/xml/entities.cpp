@@ -4,7 +4,7 @@
 
 #include "core/base/str.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 struct Entity {
@@ -136,4 +136,4 @@ std::string decode_entities(const std::string& s) {
   return out;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

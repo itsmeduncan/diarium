@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
   }
 
   std::string raw;
-  if (!rsspaper::read_file(argv[1], &raw)) {
+  if (!diarium::read_file(argv[1], &raw)) {
     std::fprintf(stderr, "hyphgen: cannot read %s\n", argv[1]);
     return 1;
   }
@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
     std::string token;
     const std::string src = patterns_block + " ";
     for (char c : src) {
-      if (rsspaper::is_space(c)) {
+      if (diarium::is_space(c)) {
         if (!token.empty()) {
           Pattern p;
           if (parse_pattern(token, &p)) patterns.push_back(std::move(p));
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
     std::string token;
     const std::string src = exceptions_block + " ";
     for (char c : src) {
-      if (rsspaper::is_space(c)) {
+      if (diarium::is_space(c)) {
         if (!token.empty()) exceptions.push_back(token);
         token.clear();
         continue;
@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
       "// modification, are permitted in any medium without royalty provided\n"
       "// the copyright notice and this notice are preserved.\n"
       "\n#include \"core/layout/hyphenator.h\"\n"
-      "\nnamespace rsspaper {\nnamespace hyphen_en {\n\n";
+      "\nnamespace diarium {\nnamespace hyphen_en {\n\n";
 
   char buf[128];
   std::snprintf(buf, sizeof(buf), "const size_t kPatternCount = %zu;\n\n",
@@ -227,9 +227,9 @@ int main(int argc, char** argv) {
                 "const size_t kExceptionCount = %zu;\n\n", exceptions.size());
   out += buf;
 
-  out += "}  // namespace hyphen_en\n}  // namespace rsspaper\n";
+  out += "}  // namespace hyphen_en\n}  // namespace diarium\n";
 
-  if (!rsspaper::write_file(argv[2], out)) {
+  if (!diarium::write_file(argv[2], out)) {
     std::fprintf(stderr, "hyphgen: cannot write %s\n", argv[2]);
     return 1;
   }

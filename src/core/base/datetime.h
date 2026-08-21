@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <string>
 
-namespace rsspaper {
+namespace diarium {
 
 // Seconds since the Unix epoch, UTC. `kNoDate` means "the feed didn't say".
 using Epoch = int64_t;
@@ -42,4 +42,4 @@ std::string format_short_date(Epoch t);
 // "09:31" — 24h, used in the status furniture.
 std::string format_clock(Epoch t);
 
-}  // namespace rsspaper
+}  // namespace diarium

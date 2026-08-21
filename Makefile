@@ -1,11 +1,11 @@
-# Desktop build for RSSpaper — simulator, tests and the font packer.
+# Desktop build for Diarium — simulator, tests and the font packer.
 #
 # This exists so a fresh clone can build with nothing but a C++17 compiler.
 # CMakeLists.txt builds the same targets and is what CI uses; if you have
 # cmake, prefer it. The two must stay in sync.
 #
-#   make sim      -> bin/rsspaper-sim
-#   make tests    -> bin/rsspaper-tests  (and `make check` runs them)
+#   make sim      -> bin/diarium-sim
+#   make tests    -> bin/diarium-tests  (and `make check` runs them)
 #   make fonts    -> build/literata.rfp
 #   make edition  -> renders PNGs from the fixture feeds into out/
 
@@ -37,18 +37,18 @@ all: sim tests fonts
 
 core: $(CORE_OBJS)
 
-sim: $(BIN)/rsspaper-sim
-$(BIN)/rsspaper-sim: $(CORE_OBJS) $(SIM_OBJS)
+sim: $(BIN)/diarium-sim
+$(BIN)/diarium-sim: $(CORE_OBJS) $(SIM_OBJS)
 	@mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-tests: $(BIN)/rsspaper-tests
-$(BIN)/rsspaper-tests: $(CORE_OBJS) $(TEST_OBJS)
+tests: $(BIN)/diarium-tests
+$(BIN)/diarium-tests: $(CORE_OBJS) $(TEST_OBJS)
 	@mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-check: $(BIN)/rsspaper-tests portability
-	$(BIN)/rsspaper-tests
+check: $(BIN)/diarium-tests portability
+	$(BIN)/diarium-tests
 
 # The invariant everything else rests on.
 portability:
@@ -71,10 +71,10 @@ $(FONT_PACK): $(BIN)/fontgen $(wildcard assets/fonts/*.ttf)
 	$(BIN)/fontgen --fonts assets/fonts --out $(FONT_PACK)
 
 edition: sim fonts
-	$(BIN)/rsspaper-sim compose --config config/feeds.toml --fonts $(FONT_PACK) --out out --fresh
+	$(BIN)/diarium-sim compose --config config/feeds.toml --fonts $(FONT_PACK) --out out --fresh
 
 read: sim fonts
-	$(BIN)/rsspaper-sim read --fonts $(FONT_PACK)
+	$(BIN)/diarium-sim read --fonts $(FONT_PACK)
 
 # Pattern rule with automatic dependency generation.
 $(BUILD)/%.o: %.cpp
@@ -91,7 +91,7 @@ device:
 	cd src/device && pio run
 
 # The device is talked to over its serial console. The port is found
-# automatically; set RSSPAPER_PORT if a machine has more than one board.
+# automatically; set DIARIUM_PORT if a machine has more than one board.
 #
 # The console needs pyserial. A plain python3 usually has it; PlatformIO ships
 # one that always does, so fall back to that rather than asking anyone to
@@ -165,4 +165,4 @@ help:
 	@echo "  make device-rm PATH_ON_CARD=/name"
 	@echo "  make device-compose  fetch and compose now"
 	@echo ""
-	@echo "RSSPAPER_PORT picks the board if more than one is attached."
+	@echo "DIARIUM_PORT picks the board if more than one is attached."

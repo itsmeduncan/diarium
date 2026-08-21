@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <string>
 
-namespace rsspaper {
+namespace diarium {
 
 class ByteSource {
  public:
@@ -66,4 +66,4 @@ class LimitedByteSource final : public ByteSource {
   bool truncated_ = false;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

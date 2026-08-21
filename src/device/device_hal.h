@@ -11,7 +11,7 @@
 #include "device/device_storage.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 struct DeviceHal {
@@ -44,4 +44,4 @@ struct DeviceHal {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

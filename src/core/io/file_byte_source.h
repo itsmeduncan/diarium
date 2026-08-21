@@ -7,7 +7,7 @@
 
 #include "core/io/byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 
 class FileByteSource final : public ByteSource {
  public:
@@ -40,4 +40,4 @@ class FileByteSource final : public ByteSource {
 bool read_file(const std::string& path, std::string* out);
 bool write_file(const std::string& path, const std::string& data);
 
-}  // namespace rsspaper
+}  // namespace diarium

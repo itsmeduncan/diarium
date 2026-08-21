@@ -5,7 +5,7 @@
 #include "core/io/byte_source.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 

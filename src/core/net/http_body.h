@@ -8,7 +8,7 @@
 #include "core/io/byte_source.h"
 #include "core/net/http_response.h"
 
-namespace rsspaper {
+namespace diarium {
 
 class HttpBodySource final : public ByteSource {
  public:
@@ -33,4 +33,4 @@ class HttpBodySource final : public ByteSource {
   bool finished_ = false;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

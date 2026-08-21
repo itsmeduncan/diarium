@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <string>
 
-namespace rsspaper {
+namespace diarium {
 
 // --- UTF-8 -----------------------------------------------------------------
 
@@ -46,4 +46,4 @@ std::string collapse_ws(const std::string& s);
 uint64_t fnv1a(const std::string& s);
 std::string to_hex64(uint64_t v);
 
-}  // namespace rsspaper
+}  // namespace diarium

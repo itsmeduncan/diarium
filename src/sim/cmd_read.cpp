@@ -1,4 +1,4 @@
-// `rsspaper-sim read` — drives the real reader through the real HAL.
+// `diarium-sim read` — drives the real reader through the real HAL.
 //
 // The keyboard stands in for the panel: a keystroke becomes a synthesised
 // touch, goes through the same gesture recogniser the device will use, and
@@ -25,7 +25,7 @@
 #include "sim/fixtures.h"
 #include "sim/sim_hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 namespace {
 
@@ -170,7 +170,7 @@ int cmd_read(const std::vector<std::string>& args) {
   reader.load_read_state("read.dat");
   reader.render();
 
-  std::printf("RSSpaper — %s\n", format_masthead_date(ed.date).c_str());
+  std::printf("Diarium — %s\n", format_masthead_date(ed.date).c_str());
   std::printf("%zu pages to flip through, %zu stories behind them\n",
               ed.browse_page_count, ed.stories.size());
   print_help();
@@ -262,4 +262,4 @@ int cmd_read(const std::vector<std::string>& args) {
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

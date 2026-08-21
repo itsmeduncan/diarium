@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 constexpr char kMagic[4] = {'R', 'S', 'C', '1'};
@@ -92,4 +92,4 @@ void FeedCache::put(const std::string& url, const FeedValidators& v) {
   entries_.push_back(Entry{url, v});
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

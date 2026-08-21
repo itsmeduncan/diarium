@@ -17,7 +17,7 @@
 #include "core/io/byte_source.h"
 #include "core/render/framebuffer.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // How to push the framebuffer to the panel.
 //
@@ -144,4 +144,4 @@ struct Hal {
   }
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

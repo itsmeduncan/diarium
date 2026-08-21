@@ -1,4 +1,4 @@
-// `rsspaper-sim screens` — renders the screens that are not composed pages.
+// `diarium-sim screens` — renders the screens that are not composed pages.
 //
 // The sleep screen, the notices, and the end of the news are all drawn by the
 // device rather than laid out by the composer, which means they are the ones
@@ -19,13 +19,13 @@
 #include "sim/fixtures.h"
 #include "sim/png_writer.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 
 int cmd_screens(const std::vector<std::string>& args) {
   const std::string fonts_path = flag(args, "--fonts", "build/literata.rfp");
   const std::string out_dir = flag(args, "--out", "out/screens");
-  const std::string title = flag(args, "--title", "RSSpaper");
+  const std::string title = flag(args, "--title", "Diarium");
 
   FontPack fonts;
   std::string error;
@@ -91,4 +91,4 @@ int cmd_screens(const std::vector<std::string>& args) {
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

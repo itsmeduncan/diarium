@@ -3,11 +3,11 @@
 #include "core/base/str.h"
 #include "core/layout/type_scale.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 // The nameplate is set in the display face, in caps, letterspaced to fill the
-// measure — which is how a broadsheet nameplate works and why RSSpaper does
+// measure — which is how a broadsheet nameplate works and why Diarium does
 // not need a dedicated 100 px masthead font eating 200 KB of flash.
 constexpr int kNameplateTop = 14;
 constexpr int kNameplateRuleGap = 8;
@@ -117,4 +117,4 @@ void PageRenderer::render(const Page& page, Framebuffer* fb) const {
   render_folio(page, fb);
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

@@ -2,7 +2,7 @@
 
 #include "core/base/str.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 // Which face a style run maps to, within the block's base face. Bold and
@@ -296,4 +296,4 @@ std::vector<BrokenLine> break_block(const Block& block, const RoleStyle& style,
   return break_atoms(atoms, measure, style.align, fonts, hyphenator);
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

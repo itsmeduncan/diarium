@@ -1,6 +1,6 @@
 #include "core/net/http_body.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 // A chunk header is at most a hex length plus extensions; anything longer is
@@ -108,4 +108,4 @@ size_t HttpBodySource::read(char* dst, size_t n) {
   return got;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

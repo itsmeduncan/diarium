@@ -35,18 +35,18 @@ jobs:
         run: ./tools/check-portability.sh
 
       - name: Parse the fixture corpus
-        run: ./bin/rsspaper-sim parse test/fixtures/feeds/*.xml
+        run: ./bin/diarium-sim parse test/fixtures/feeds/*.xml
 
       - name: Compose an edition end to end
         run: |
           make fonts
-          ./bin/rsspaper-sim compose --fresh --out "$RUNNER_TEMP/edition"
+          ./bin/diarium-sim compose --fresh --out "$RUNNER_TEMP/edition"
 
       # Reads the edition compose just saved, rather than composing again —
       # which is the whole battery argument, so it should not rot silently.
       - name: Drive the reader over the saved edition
         run: |
-          printf 'n\n1\nn\nb\ns\n2\nq\n' | ./bin/rsspaper-sim read \
+          printf 'n\n1\nn\nb\ns\n2\nq\n' | ./bin/diarium-sim read \
             --edition "$RUNNER_TEMP/edition/edition.rspe" \
             --out "$RUNNER_TEMP/read" | tee "$RUNNER_TEMP/read.log"
           grep -q 'no re-parse, no re-layout' "$RUNNER_TEMP/read.log"

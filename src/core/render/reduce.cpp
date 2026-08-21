@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 uint8_t quantize3(uint8_t v) {
@@ -56,4 +56,4 @@ void reduce_to_mono1(Framebuffer* fb) {
   }
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

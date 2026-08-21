@@ -7,7 +7,7 @@
 #include "core/base/str.h"
 #include "core/io/file_byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 namespace {
 
@@ -83,4 +83,4 @@ std::unique_ptr<ByteSource> SimHttpClient::get(const HttpRequest& request,
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

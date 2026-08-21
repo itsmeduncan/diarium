@@ -7,7 +7,7 @@
 #include "core/base/str.h"
 #include "core/layout/type_scale.h"
 
-namespace rsspaper {
+namespace diarium {
 
 Reader::Reader(const Edition& edition, const FontPack& fonts, Hal hal,
                ReaderPolicy policy)
@@ -570,4 +570,4 @@ void Reader::render_finished() {
   }
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

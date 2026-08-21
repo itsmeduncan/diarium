@@ -18,7 +18,7 @@
 
 #include "core/html/block.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct ReadabilityLimits {
   // Blocks shorter than this are furniture until proven otherwise. A nav item
@@ -35,4 +35,4 @@ struct ReadabilityLimits {
 std::vector<Block> extract_article(const std::vector<Block>& page,
                                    ReadabilityLimits limits = ReadabilityLimits());
 
-}  // namespace rsspaper
+}  // namespace diarium

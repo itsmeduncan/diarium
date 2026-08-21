@@ -2,7 +2,7 @@
 
 #include <vector>
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 void put_u8(std::string& out, uint8_t v) {
@@ -326,4 +326,4 @@ bool deserialize_edition(const std::string& blob, Edition* out,
   return true;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

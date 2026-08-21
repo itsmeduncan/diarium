@@ -8,7 +8,7 @@
 #include "core/layout/type_scale.h"
 #include "core/render/page_renderer.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 Block text_block(const std::string& text) {
@@ -523,4 +523,4 @@ std::vector<size_t> Edition::reading_order() const {
   return order;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

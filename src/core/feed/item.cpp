@@ -2,7 +2,7 @@
 
 #include "core/base/str.h"
 
-namespace rsspaper {
+namespace diarium {
 
 const char* truncation_reason_name(TruncationReason r) {
   switch (r) {
@@ -22,4 +22,4 @@ uint64_t Item::dedup_key() const {
   return fnv1a("t:" + title + "|" + std::to_string(published));
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

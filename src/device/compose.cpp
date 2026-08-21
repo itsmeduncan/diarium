@@ -11,7 +11,7 @@
 #include "core/html/html_to_blocks.h"
 #include "core/html/readability.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 namespace {
 
@@ -234,4 +234,4 @@ Edition compose_from_card(const FeedList& config, const FontPack& fonts,
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

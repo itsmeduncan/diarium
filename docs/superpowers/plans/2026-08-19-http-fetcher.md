@@ -43,7 +43,7 @@ The parser is incremental because the head arrives in whatever chunks TLS hands 
 
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 HttpHeadParser parse_all(const std::string& raw) {
@@ -133,7 +133,7 @@ TEST_CASE("an oversized head is refused rather than buffered forever") {
 
 - [ ] **Step 2: Run it and watch it fail**
 
-Run: `make tests && ./bin/rsspaper-tests --test-case="*status line*"`
+Run: `make tests && ./bin/diarium-tests --test-case="*status line*"`
 Expected: FAIL — `core/net/http_response.h` does not exist.
 
 - [ ] **Step 3: Write the header**
@@ -149,7 +149,7 @@ Expected: FAIL — `core/net/http_response.h` does not exist.
 #include <cstddef>
 #include <string>
 
-namespace rsspaper {
+namespace diarium {
 
 struct HttpHead {
   int status = 0;
@@ -195,7 +195,7 @@ class HttpHeadParser {
   bool overflowed_ = false;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 4: Write the implementation**
@@ -205,7 +205,7 @@ class HttpHeadParser {
 
 #include <cstdlib>
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 char lower(char c) { return (c >= 'A' && c <= 'Z') ? c - 'A' + 'a' : c; }
@@ -294,7 +294,7 @@ bool HttpHeadParser::feed(const char* data, size_t n) {
   return true;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 5: Run the tests**
@@ -334,7 +334,7 @@ Chunked framing is portable and is where real servers break parsers, so it is te
 #include "core/net/http_response.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 
@@ -401,7 +401,7 @@ TEST_CASE("an unstated length reads until the stream ends") {
 
 - [ ] **Step 2: Run it and watch it fail**
 
-Run: `make tests && ./bin/rsspaper-tests --test-case="*chunked*"`
+Run: `make tests && ./bin/diarium-tests --test-case="*chunked*"`
 Expected: FAIL — `core/net/http_body.h` does not exist.
 
 - [ ] **Step 3: Write the header**
@@ -417,7 +417,7 @@ Expected: FAIL — `core/net/http_body.h` does not exist.
 #include "core/io/byte_source.h"
 #include "core/net/http_response.h"
 
-namespace rsspaper {
+namespace diarium {
 
 class HttpBodySource final : public ByteSource {
  public:
@@ -442,7 +442,7 @@ class HttpBodySource final : public ByteSource {
   bool finished_ = false;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 4: Write the implementation**
@@ -450,7 +450,7 @@ class HttpBodySource final : public ByteSource {
 ```cpp
 #include "core/net/http_body.h"
 
-namespace rsspaper {
+namespace diarium {
 
 HttpBodySource::HttpBodySource(ByteSource& inner, const HttpHead& head,
                                std::string prefetched)
@@ -539,7 +539,7 @@ size_t HttpBodySource::read(char* dst, size_t n) {
   return got;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 5: Run the tests**
@@ -579,7 +579,7 @@ This is what makes most mornings cheap: most feeds have not changed, and a 304 c
 #include "doctest.h"
 #include "hal/hal.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 
@@ -675,7 +675,7 @@ TEST_CASE("the cache is bounded") {
 
 - [ ] **Step 2: Run it and watch it fail**
 
-Run: `make tests && ./bin/rsspaper-tests --test-case="*validators*"`
+Run: `make tests && ./bin/diarium-tests --test-case="*validators*"`
 Expected: FAIL — `core/net/feed_cache.h` does not exist.
 
 - [ ] **Step 3: Write the header**
@@ -692,7 +692,7 @@ Expected: FAIL — `core/net/feed_cache.h` does not exist.
 
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct FeedValidators {
   std::string etag;
@@ -726,7 +726,7 @@ class FeedCache {
   std::vector<Entry> entries_;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 4: Write the implementation**
@@ -734,7 +734,7 @@ class FeedCache {
 ```cpp
 #include "core/net/feed_cache.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 constexpr char kMagic[4] = {'R', 'S', 'C', '1'};
@@ -822,7 +822,7 @@ void FeedCache::put(const std::string& url, const FeedValidators& v) {
   entries_.push_back(Entry{url, v});
 }
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 5: Run the tests**
@@ -888,7 +888,7 @@ TEST_CASE("an open network needs no password") {
 
 - [ ] **Step 2: Run it and watch it fail**
 
-Run: `make tests && ./bin/rsspaper-tests --test-case="*wifi*"`
+Run: `make tests && ./bin/diarium-tests --test-case="*wifi*"`
 Expected: FAIL — no member named `wifi`.
 
 - [ ] **Step 3: Add the struct**
@@ -981,7 +981,7 @@ TLS is `setInsecure()` — encrypted, unverified — per the recorded decision. 
 
 #include "core/config/feeds_config.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceWifi {
@@ -992,7 +992,7 @@ class DeviceWifi {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 ```cpp
@@ -1001,7 +1001,7 @@ class DeviceWifi {
 #include <Arduino.h>
 #include <WiFi.h>
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 bool DeviceWifi::connect(const WifiConfig& config, uint32_t timeout_ms) {
@@ -1026,7 +1026,7 @@ void DeviceWifi::disconnect() {
 bool DeviceWifi::connected() const { return WiFi.status() == WL_CONNECTED; }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 2: Write the client**

@@ -11,7 +11,7 @@
 #include "core/layout/page.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct Section {
   std::string name;
@@ -29,7 +29,7 @@ struct FeedProblem {
 
 struct ComposeOptions {
   Epoch now = kNoDate;
-  std::string title = "RSSpaper";
+  std::string title = "Diarium";
   // Optional ceiling on the whole edition. Zero means no ceiling: every story
   // that survives the per-feed caps and the age window is published, which is
   // what you want when you are a week behind the news. Set it if you would
@@ -135,4 +135,4 @@ struct Edition {
 Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
                         const ComposeOptions& opts);
 
-}  // namespace rsspaper
+}  // namespace diarium

@@ -1,4 +1,4 @@
-# RSSpaper edition configuration.
+# Diarium edition configuration.
 #
 # This is the whole of the user-facing configuration. It lives on the microSD
 # card and is read at wake. Section order here is section order in the paper.
@@ -19,7 +19,7 @@ password = "YOUR-PASSWORD"
 
 [edition]
 # The nameplate across the top of page one.
-title = "RSSpaper"
+title = "Diarium"
 # Local time to wake, compose and go back to sleep. 24-hour.
 wake_at = "05:30"
 # Minutes east of UTC. The device has no network to ask and no keyboard to be

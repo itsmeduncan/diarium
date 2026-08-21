@@ -2,7 +2,7 @@
 
 #include "core/base/str.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 // Compact image placeholder. A framed box would be the obvious choice, but
@@ -283,4 +283,4 @@ size_t Paginator::paginate(const std::vector<FlowElement>& flow,
   return out->size() - before;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

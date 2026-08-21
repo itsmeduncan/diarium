@@ -12,7 +12,7 @@
 #include "core/render/framebuffer.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // Draws over whatever was there. Degrades to a rule and a mark when `fonts`
 // has no faces, which is exactly the case when the font pack is what is
@@ -26,4 +26,4 @@ void render_notice(const FontPack& fonts, const char* headline,
 void render_sleep_page(const FontPack& fonts, const std::string& title,
                        const std::string& date_line, Framebuffer* fb);
 
-}  // namespace rsspaper
+}  // namespace diarium

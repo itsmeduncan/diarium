@@ -8,7 +8,7 @@
 
 #include "core/render/framebuffer.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // The panel's full-refresh mode: 8 levels, no dithering needed.
 void reduce_to_grey3(Framebuffer* fb);
@@ -23,4 +23,4 @@ void reduce_to_grey3(Framebuffer* fb);
 // buffer would be 3 MB — more than the device has to spare.
 void reduce_to_mono1(Framebuffer* fb);
 
-}  // namespace rsspaper
+}  // namespace diarium

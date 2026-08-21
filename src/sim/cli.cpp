@@ -1,6 +1,6 @@
 #include "sim/commands.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 namespace {
 
@@ -44,4 +44,4 @@ std::vector<std::string> positionals(const std::vector<std::string>& args) {
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

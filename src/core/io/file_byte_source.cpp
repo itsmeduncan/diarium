@@ -1,6 +1,6 @@
 #include "core/io/file_byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 
 bool read_file(const std::string& path, std::string* out) {
   std::FILE* fp = std::fopen(path.c_str(), "rb");
@@ -23,4 +23,4 @@ bool write_file(const std::string& path, const std::string& data) {
   return ok;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

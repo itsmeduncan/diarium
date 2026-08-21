@@ -4,7 +4,7 @@
 #include "core/layout/page.h"
 #include "core/text/faces.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 std::string upper(const std::string& s) {
@@ -135,4 +135,4 @@ void render_contents(const FontPack& fonts, const Edition& edition,
   }
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

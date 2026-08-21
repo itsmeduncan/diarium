@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-namespace rsspaper {
+namespace diarium {
 namespace fontgen {
 namespace {
 
@@ -287,4 +287,4 @@ int GposKerning::lookup(uint16_t left, uint16_t right) const {
 }
 
 }  // namespace fontgen
-}  // namespace rsspaper
+}  // namespace diarium

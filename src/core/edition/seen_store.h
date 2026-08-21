@@ -12,7 +12,7 @@
 
 #include "core/base/datetime.h"
 
-namespace rsspaper {
+namespace diarium {
 
 class SeenStore {
  public:
@@ -53,4 +53,4 @@ class SeenStore {
 
 std::string serialize_seen_store(const SeenStore& store);
 
-}  // namespace rsspaper
+}  // namespace diarium

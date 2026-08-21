@@ -27,7 +27,7 @@
 
 **Files:**
 - Create: `src/device/platformio.ini`
-- Create: `src/device/partitions_rsspaper.csv`
+- Create: `src/device/partitions_diarium.csv`
 - Create: `src/device/main.cpp`
 - Modify: `Makefile` (add a `device` target; do not touch the glob variables)
 - Modify: `.gitignore` (add `src/device/.pio/`)
@@ -38,7 +38,7 @@
 
 - [ ] **Step 1: Create the partition table**
 
-`src/device/partitions_rsspaper.csv` — 4 MB flash, no OTA, data lives on the card:
+`src/device/partitions_diarium.csv` — 4 MB flash, no OTA, data lives on the card:
 
 ```
 # Name,     Type, SubType,  Offset,   Size
@@ -64,7 +64,7 @@ src_dir = .
 platform = espressif32
 board = esp32dev
 framework = arduino
-board_build.partitions = partitions_rsspaper.csv
+board_build.partitions = partitions_diarium.csv
 build_flags =
     -DARDUINO_INKPLATE6FLICK
     -DBOARD_HAS_PSRAM
@@ -93,7 +93,7 @@ void setup() {
   Serial.begin(115200);
   delay(300);
   panel.begin();
-  Serial.printf("rsspaper: panel %dx%d\n", panel.width(), panel.height());
+  Serial.printf("diarium: panel %dx%d\n", panel.width(), panel.height());
 }
 
 void loop() {}
@@ -150,7 +150,7 @@ git commit -m "Add the device build target"
 #include "Inkplate.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 // A card that will not mount is a normal state, not an exception: the first
@@ -177,7 +177,7 @@ class DeviceStorage final : public IStorage {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 2: Write the implementation**
@@ -185,7 +185,7 @@ class DeviceStorage final : public IStorage {
 ```cpp
 #include "device/device_storage.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 bool DeviceStorage::mount() {
@@ -234,7 +234,7 @@ bool DeviceStorage::remove(const std::string& path) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 3: Exercise it from `main.cpp`**
@@ -303,7 +303,7 @@ git commit -m "Implement IStorage over the microSD card"
 #include "core/render/framebuffer.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceDisplay final : public IDisplay {
@@ -331,7 +331,7 @@ class DeviceDisplay final : public IDisplay {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 2: Write the implementation**
@@ -341,7 +341,7 @@ class DeviceDisplay final : public IDisplay {
 ```cpp
 #include "device/device_display.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 void DeviceDisplay::blit() {
@@ -382,7 +382,7 @@ void DeviceDisplay::set_frontlight(int level) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 3: Exercise it from `main.cpp`**
@@ -465,7 +465,7 @@ git commit -m "Implement IDisplay with a direct panel blit"
 #include "Inkplate.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceInput final : public IInput {
@@ -481,13 +481,13 @@ class DeviceInput final : public IInput {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 ```cpp
 #include "device/device_input.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 size_t DeviceInput::poll(TouchPoint* out, size_t max) {
@@ -504,7 +504,7 @@ size_t DeviceInput::poll(TouchPoint* out, size_t max) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 2: Write `device_clock.h` / `.cpp`**
@@ -516,7 +516,7 @@ size_t DeviceInput::poll(TouchPoint* out, size_t max) {
 #include "core/base/datetime.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceClock final : public IClock {
@@ -536,13 +536,13 @@ class DeviceClock final : public IClock {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 ```cpp
 #include "device/device_clock.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 Epoch DeviceClock::now() const {
@@ -558,7 +558,7 @@ void DeviceClock::set_wake_alarm(Epoch when) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 3: Write `device_power.h` / `.cpp`**
@@ -571,7 +571,7 @@ void DeviceClock::set_wake_alarm(Epoch when) {
 #include "device/device_storage.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DevicePower final : public IPower {
@@ -592,7 +592,7 @@ class DevicePower final : public IPower {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 ```cpp
@@ -600,7 +600,7 @@ class DevicePower final : public IPower {
 
 #include <esp_sleep.h>
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 int DevicePower::battery_millivolts() const {
@@ -621,7 +621,7 @@ void DevicePower::deep_sleep_until(Epoch when) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 4: Write `device_http.h`**
@@ -635,7 +635,7 @@ void DevicePower::deep_sleep_until(Epoch when) {
 
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceHttpClient final : public IHttpClient {
@@ -652,7 +652,7 @@ class DeviceHttpClient final : public IHttpClient {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 5: Exercise from `main.cpp`**
@@ -714,7 +714,7 @@ This is the only task with real unit tests — the HAL cannot be tested off-devi
 
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 TEST_CASE("session stays awake immediately after a touch") {
   Session s{SessionThresholds{}};
@@ -753,7 +753,7 @@ TEST_CASE("millis rollover does not strand the reader asleep") {
 
 - [ ] **Step 2: Run it and watch it fail**
 
-Run: `make tests && ./bin/rsspaper-tests --test-case="*session*"`
+Run: `make tests && ./bin/diarium-tests --test-case="*session*"`
 Expected: FAIL — `core/ui/session.h` does not exist.
 
 - [ ] **Step 3: Write the implementation**
@@ -770,7 +770,7 @@ Expected: FAIL — `core/ui/session.h` does not exist.
 
 #include <cstdint>
 
-namespace rsspaper {
+namespace diarium {
 
 struct SessionThresholds {
   // Rebuilding state from the card costs ~2.25 s, a page turn with state
@@ -794,7 +794,7 @@ class Session {
   uint32_t last_ = 0;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 `src/core/ui/session.cpp`:
@@ -802,7 +802,7 @@ class Session {
 ```cpp
 #include "core/ui/session.h"
 
-namespace rsspaper {
+namespace diarium {
 
 SessionIntent Session::intent(uint32_t now_ms) const {
   // Unsigned subtraction wraps, which is exactly right: millis() rolls over
@@ -813,12 +813,12 @@ SessionIntent Session::intent(uint32_t now_ms) const {
   return SessionIntent::Stay;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 4: Run the tests**
 
-Run: `make tests && ./bin/rsspaper-tests --test-case="*session*"`
+Run: `make tests && ./bin/diarium-tests --test-case="*session*"`
 Expected: PASS, 5 test cases.
 
 - [ ] **Step 5: Run the whole suite and the portability gate**
@@ -861,7 +861,7 @@ git commit -m "Add portable idle tiering for the reading session"
 #include "device/device_storage.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 struct DeviceHal {
@@ -891,7 +891,7 @@ struct DeviceHal {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 2: Write the read lifecycle in `main.cpp`**
@@ -914,7 +914,7 @@ struct DeviceHal {
 #include "core/ui/session.h"
 #include "device/device_hal.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 
@@ -1033,7 +1033,7 @@ Closes #15 and delivers spec decision D5.
 #include "core/text/font_pack.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 TEST_CASE("a notice marks the page without a font pack") {
   FontPack empty;
@@ -1051,7 +1051,7 @@ TEST_CASE("a notice marks the page without a font pack") {
 
 - [ ] **Step 2: Run it and watch it fail**
 
-Run: `make tests && ./bin/rsspaper-tests --test-case="*notice*"`
+Run: `make tests && ./bin/diarium-tests --test-case="*notice*"`
 Expected: FAIL — `core/ui/notice.h` does not exist.
 
 - [ ] **Step 3: Write the implementation**
@@ -1067,12 +1067,12 @@ Expected: FAIL — `core/ui/notice.h` does not exist.
 #include "core/render/framebuffer.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 
 void render_notice(const FontPack& fonts, const char* headline,
                    const char* body, Framebuffer* fb);
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 `src/core/ui/notice.cpp`:
@@ -1083,7 +1083,7 @@ void render_notice(const FontPack& fonts, const char* headline,
 #include "core/layout/page.h"
 #include "core/text/faces.h"
 
-namespace rsspaper {
+namespace diarium {
 
 void render_notice(const FontPack& fonts, const char* headline,
                    const char* body, Framebuffer* fb) {
@@ -1102,7 +1102,7 @@ void render_notice(const FontPack& fonts, const char* headline,
   }
 }
 
-}  // namespace rsspaper
+}  // namespace diarium
 ```
 
 - [ ] **Step 4: Run the tests**
@@ -1159,7 +1159,7 @@ TEST_CASE("edition carries a utc offset in minutes") {
 }
 ```
 
-Run: `make tests && ./bin/rsspaper-tests --test-case="*utc offset*"` — expect FAIL.
+Run: `make tests && ./bin/diarium-tests --test-case="*utc offset*"` — expect FAIL.
 
 Add to `EditionConfig` in `src/core/config/feeds_config.h`, beside `wake_at`:
 

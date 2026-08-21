@@ -8,7 +8,7 @@
 #include "core/text/font_pack.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 
@@ -262,7 +262,7 @@ TEST_CASE("the version gate accepts the formats it claims to") {
   // an actual v2 file, which is the only place that fact lives.
   Edition ed;
   ed.date = 1786864000;
-  ed.title = "RSSpaper";
+  ed.title = "Diarium";
   ed.pages.push_back(Page());
   ed.browse_page_count = 1;
   const std::string good = serialize_edition(ed);

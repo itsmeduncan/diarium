@@ -8,10 +8,10 @@
 #include "core/render/framebuffer.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct MastheadInfo {
-  std::string title = "RSSPAPER";
+  std::string title = "DIARIUM";
   std::string date_line;   // "Saturday, 15 August 2026"
   std::string strap;       // "Composed on device · 11 feeds"
 };
@@ -34,4 +34,4 @@ class PageRenderer {
   const FontPack& fonts_;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

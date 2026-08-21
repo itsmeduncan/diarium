@@ -14,7 +14,7 @@
 #include "core/edition/edition.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 
 // Creates `path` if it isn't there. POSIX mkdir rather than <filesystem>,
@@ -55,4 +55,4 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
                               FixtureComposeReport* report);
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

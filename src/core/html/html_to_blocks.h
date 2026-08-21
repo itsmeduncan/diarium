@@ -12,7 +12,7 @@
 
 #include "core/html/block.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct HtmlLimits {
   size_t max_blocks = 600;
@@ -135,4 +135,4 @@ std::vector<Block> html_to_blocks(const std::string& html,
 // Plain text (a summary with no markup) split on blank lines into paragraphs.
 std::vector<Block> text_to_blocks(const std::string& text);
 
-}  // namespace rsspaper
+}  // namespace diarium

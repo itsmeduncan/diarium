@@ -5,7 +5,7 @@
 #include "core/base/str.h"
 #include "core/io/file_byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 uint16_t rd_u16(const uint8_t* p) {
@@ -230,4 +230,4 @@ const Face& FontPack::face(FaceId id) const {
   return f;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

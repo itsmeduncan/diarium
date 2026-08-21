@@ -15,7 +15,7 @@
 #include "core/layout/page.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // 0 is black, 255 is the bare panel. Named because "white" on e-ink is a
 // light grey and the distinction matters when choosing rule weights.
@@ -59,4 +59,4 @@ class Framebuffer {
   std::vector<uint8_t> px_;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

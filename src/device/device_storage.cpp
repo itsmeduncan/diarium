@@ -1,6 +1,6 @@
 #include "device/device_storage.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 bool DeviceStorage::mount() {
@@ -52,4 +52,4 @@ bool DeviceStorage::remove(const std::string& path) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

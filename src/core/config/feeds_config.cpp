@@ -5,7 +5,7 @@
 #include "core/base/str.h"
 #include "core/io/file_byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 // Splits `key = value`, returning false for anything that isn't an assignment.
@@ -255,4 +255,4 @@ bool load_feeds_toml(const std::string& path, FeedList* out,
   return parse_feeds_toml(text, out, error);
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 
 // Shared flag lookup: `--name value`, with a default when absent.
@@ -21,4 +21,4 @@ int cmd_opml(const std::vector<std::string>& args);
 int cmd_screens(const std::vector<std::string>& args);
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

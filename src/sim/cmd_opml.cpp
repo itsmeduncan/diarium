@@ -1,4 +1,4 @@
-// `rsspaper-sim opml` — turn an exported subscription list into feeds.toml.
+// `diarium-sim opml` — turn an exported subscription list into feeds.toml.
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -7,7 +7,7 @@
 #include "core/io/file_byte_source.h"
 #include "sim/commands.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 
 int cmd_opml(const std::vector<std::string>& args) {
@@ -15,7 +15,7 @@ int cmd_opml(const std::vector<std::string>& args) {
   if (files.empty()) {
     std::fprintf(stderr,
                  "opml: give me an .opml file\n"
-                 "  rsspaper-sim opml subs.opml [--out config/feeds.toml]\n");
+                 "  diarium-sim opml subs.opml [--out config/feeds.toml]\n");
     return 2;
   }
 
@@ -57,4 +57,4 @@ int cmd_opml(const std::vector<std::string>& args) {
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

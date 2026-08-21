@@ -5,7 +5,7 @@ code in this repository.
 
 ## What this is
 
-RSSpaper is an on-device e-ink RSS reader that composes a bounded newspaper
+Diarium is an on-device e-ink RSS reader that composes a bounded newspaper
 edition. No server, no accounts, no cloud, no AI curation. Read `README.md` for
 the product thesis and `CONTRIBUTING.md` for what is deliberately out of scope
 — features that contradict the thesis are rejected even when they're good
@@ -17,7 +17,7 @@ panel at ~212 PPI). The desktop simulator runs the identical pipeline.
 ## Commands
 
 ```sh
-make sim                  # bin/rsspaper-sim
+make sim                  # bin/diarium-sim
 make tests && make check  # build and run the unit tests
 make fonts                # build/literata.rfp from assets/fonts/*.ttf
 make edition              # compose from fixtures into out/ as PNGs
@@ -40,8 +40,8 @@ ctest --test-dir build --output-on-failure
 Run a single test case (doctest):
 
 ```sh
-./bin/rsspaper-tests --test-case="*truncation*"
-./bin/rsspaper-tests --list-test-cases
+./bin/diarium-tests --test-case="*truncation*"
+./bin/diarium-tests --list-test-cases
 ```
 
 An edition is composed once and read many times; `compose` saves it and `read`
@@ -52,8 +52,8 @@ flip through.
 Inspect the parser's view of a feed — the fastest way to diagnose a feed bug:
 
 ```sh
-./bin/rsspaper-sim parse --verbose --max 5 test/fixtures/feeds/theverge.atom.xml
-./bin/rsspaper-sim opml test/fixtures/opml/subscriptions.opml
+./bin/diarium-sim parse --verbose --max 5 test/fixtures/feeds/theverge.atom.xml
+./bin/diarium-sim opml test/fixtures/opml/subscriptions.opml
 ```
 
 Tests read `test/fixtures/` by relative path, so **run them from the repository

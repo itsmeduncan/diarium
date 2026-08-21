@@ -1,4 +1,4 @@
-// `rsspaper-sim parse` — run the feed parser over files and report what came
+// `diarium-sim parse` — run the feed parser over files and report what came
 // out. This is the tool for answering "does this feed survive our parser, and
 // how much of the article does the publisher actually give us?"
 #include <cstdio>
@@ -11,7 +11,7 @@
 #include "core/io/file_byte_source.h"
 #include "sim/commands.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 namespace {
 
@@ -101,4 +101,4 @@ int cmd_parse(const std::vector<std::string>& args) {
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

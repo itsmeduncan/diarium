@@ -12,7 +12,7 @@
 #include "core/layout/page.h"
 #include "core/text/faces.h"
 
-namespace rsspaper {
+namespace diarium {
 
 enum class TextRole : uint8_t {
   Nameplate,    // the masthead on page one
@@ -60,4 +60,4 @@ TextRole role_for_block(const Block& block);
 void set_body_alignment(Align align);
 Align body_alignment();
 
-}  // namespace rsspaper
+}  // namespace diarium

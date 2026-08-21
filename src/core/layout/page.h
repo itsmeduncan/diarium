@@ -12,7 +12,7 @@
 
 #include "core/text/faces.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // The panel. Fixed here because layout decisions (measure, leading, column
 // count) were made for this geometry; a different panel wants its own review,
@@ -104,4 +104,4 @@ struct Frame {
   int bottom() const { return y + h; }
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

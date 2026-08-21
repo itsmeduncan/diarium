@@ -12,7 +12,7 @@
 #include "core/html/block.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 

@@ -11,7 +11,7 @@
 #include "core/render/framebuffer.h"
 #include "core/render/reduce.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 
 enum class Depth {
@@ -28,4 +28,4 @@ bool write_png(const Framebuffer& fb, Depth depth, const std::string& path);
 // what the panel will actually show.
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

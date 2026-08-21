@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <string>
 
-namespace rsspaper {
+namespace diarium {
 
 struct HttpHead {
   int status = 0;                 // 0 means the head was never understood
@@ -58,4 +58,4 @@ class HttpHeadParser {
   bool overflowed_ = false;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

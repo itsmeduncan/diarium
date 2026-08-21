@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace rsspaper {
+namespace diarium {
 
 enum class BlockType : uint8_t {
   Paragraph,
@@ -64,4 +64,4 @@ class BlockCollector final : public BlockSink {
   std::vector<Block> blocks;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

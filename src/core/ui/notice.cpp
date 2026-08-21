@@ -3,7 +3,7 @@
 #include "core/layout/page.h"
 #include "core/text/faces.h"
 
-namespace rsspaper {
+namespace diarium {
 
 void render_notice(const FontPack& fonts, const char* headline,
                    const char* body, Framebuffer* fb) {
@@ -106,4 +106,4 @@ void render_sleep_page(const FontPack& fonts, const std::string& title,
   }
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

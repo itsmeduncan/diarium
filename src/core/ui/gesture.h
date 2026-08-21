@@ -13,7 +13,7 @@
 
 #include <cstdint>
 
-namespace rsspaper {
+namespace diarium {
 
 enum class Gesture : uint8_t {
   None,
@@ -78,4 +78,4 @@ class GestureRecognizer {
 
 const char* gesture_name(Gesture g);
 
-}  // namespace rsspaper
+}  // namespace diarium

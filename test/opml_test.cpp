@@ -6,7 +6,7 @@
 #include "core/io/byte_source.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 
@@ -126,7 +126,7 @@ TEST_CASE("OPML: a generic head title is not adopted as the masthead") {
     <body><outline type="rss" xmlUrl="https://a.example/feed"/></body>
   </opml>)", &report);
   CHECK(report.title == "Subscriptions");
-  CHECK(generic.edition.title == "RSSpaper");  // not "Subscriptions"
+  CHECK(generic.edition.title == "Diarium");  // not "Subscriptions"
 
   const FeedList named = import(R"(<opml>
     <head><title>Duncan's morning paper</title></head>

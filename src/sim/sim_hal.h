@@ -14,7 +14,7 @@
 #include "hal/hal.h"
 #include "sim/png_writer.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 
 // Writes each flush to a numbered PNG and records what refresh mode was asked
@@ -131,4 +131,4 @@ class SimHttpClient final : public IHttpClient {
 };
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

@@ -3,7 +3,7 @@
 #include "core/base/str.h"
 #include "core/xml/xml_pull.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 enum class Field : uint8_t {
@@ -438,4 +438,4 @@ FeedParseStats parse_feed(ByteSource& src, ItemSink& sink,
   return stats;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium
