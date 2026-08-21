@@ -76,12 +76,12 @@ An edition has two kinds of page. Pages `[0, browse_page_count)` are the ledes;
 everything after is story text (`StoryRef`, `Edition::story_at`). Keep that
 split — a linear edition of the same content ran to 175 pages.
 
-Reading is a single pass rather than a tree. You land on a contents page —
-drawn by `core/ui/contents.h`, not composed, because it is a view of what is
+Reading is a single pass rather than a tree. You land on a home page —
+drawn by `core/ui/home.h`, not composed, because it is a view of what is
 left rather than a fact about the edition — and swipe onward through every
 unread story, oldest first (`Edition::reading_order`), until there are none.
 Each is marked read on arrival; what you did not reach is still in tomorrow's
-paper, because the composer dedups against what was *read* rather than what it
+paper, because the composer dedups against what was _read_ rather than what it
 printed.
 
 **`src/core/` is portable C++17 and must never include a platform header.**

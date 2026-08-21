@@ -63,13 +63,16 @@ void render_home(const FontPack& fonts, const Edition& edition,
   }
   y += 26;
   fb->fill_rect(left, y, width, 5, kInk);
-  y += 12;
+  y += 20;
   if (meta.valid()) {
     const std::string date = format_masthead_date(edition.date);
     const int x = (page_width() * kSubpixel - meta.measure(date)) / 2;
-    fb->draw_text(meta, date, x, y, kInk);
+    // Baseline, not the text's top: draw_text positions glyphs upward from
+    // where you tell it, so without the face's ascent the ascenders land on
+    // the rule above rather than the row below it.
+    fb->draw_text(meta, date, x, y + meta.ascent(), kInk);
   }
-  y += 10;
+  y += meta.valid() ? meta.ascent() + meta.descent() + 8 : 10;
   fb->fill_rect(left, y, width, 1, 190);
 
   const HomeSummary summary = summarize_home(edition, order, unread);
