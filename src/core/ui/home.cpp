@@ -38,7 +38,7 @@ HomeSummary summarize_home(const Edition& edition,
 void render_home(const FontPack& fonts, const Edition& edition,
                  const std::vector<size_t>& order,
                  const std::vector<bool>& unread, const std::string& strap,
-                 Framebuffer* fb) {
+                 Framebuffer* fb, bool confirm_clear) {
   fb->fill(kPaper);
 
   const int left = kSideMargin;
@@ -107,7 +107,11 @@ void render_home(const FontPack& fonts, const Edition& edition,
     fb->draw_text(meta, strap, x, page_height() - 52, kInk);
   }
   if (meta.valid()) {
-    const std::string hint = upper("swipe right to begin");
+    const std::string hint =
+        confirm_clear
+            ? upper("clear all " + std::to_string(summary.unread_total) +
+                     " unread? tap again")
+            : upper("swipe right to begin");
     const int tracking = 4 * kSubpixel;
     const int measured =
         meta.measure(hint) + tracking * static_cast<int>(hint.size());

@@ -775,3 +775,47 @@ TEST_CASE("reading: the way home") {
     CHECK(r.mode() == ReaderMode::Article);
   }
 }
+
+// Clearing the whole backlog used to live in the deleted Sections overlay;
+// it is reachable from home now, as the same two-tap.
+TEST_CASE("reading: clearing the backlog from home") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  GestureEvent tap;
+  tap.kind = Gesture::Tap;
+  GestureEvent right;
+  right.kind = Gesture::SwipeRight;
+
+  SUBCASE("a tap on home arms the clear, but doesn't fire it") {
+    Reader r = fresh_reader(*fonts);
+    REQUIRE(r.handle(tap));
+    CHECK(r.mode() == ReaderMode::Home);
+
+    // Still armed rather than fired: reading picks up at the oldest article,
+    // not the empty end of the pass a clear would have left behind.
+    REQUIRE(r.handle(right));
+    CHECK(r.mode() == ReaderMode::Article);
+  }
+
+  SUBCASE("a second tap fires it, and reading stays on home") {
+    Reader r = fresh_reader(*fonts);
+    REQUIRE(r.handle(tap));   // arms
+    REQUIRE(r.handle(tap));   // fires
+    CHECK(r.mode() == ReaderMode::Home);  // not forced to Finished
+
+    // Nothing left unread: beginning the pass now runs straight off the end.
+    REQUIRE(r.handle(right));
+    CHECK(r.mode() == ReaderMode::Finished);
+  }
+
+  SUBCASE("a swipe cancels the arm instead of clearing") {
+    Reader r = fresh_reader(*fonts);
+    REQUIRE(r.handle(tap));  // arms
+    REQUIRE(r.handle(right));  // cancels the arm and begins reading
+
+    // The backlog is intact: this is the same oldest-first opening as an
+    // ordinary swipe from home, not the empty pass a clear would leave.
+    CHECK(r.mode() == ReaderMode::Article);
+  }
+}

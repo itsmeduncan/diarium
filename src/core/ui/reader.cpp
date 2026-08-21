@@ -130,9 +130,16 @@ bool Reader::handle(const GestureEvent& event) {
     return false;
   }
 
-  // Home: rightwards is into the news. Nothing else does anything here.
+  // Home: rightwards is into the news. A tap arms clearing the whole
+  // backlog and a second tap fires it — see `mark_everything_read()`. Any
+  // swipe cancels a pending arm first, so turning away from it and coming
+  // back does not leave a mis-tap away from clearing everything.
+  if (event.kind == Gesture::Tap) return mark_everything_read();
+  const bool was_armed = confirm_mark_all_;
+  confirm_mark_all_ = false;
   if (event.kind == Gesture::SwipeRight) return begin_reading();
-  return false;
+  if (was_armed) needs_render_ = true;
+  return was_armed;
 }
 
 bool Reader::tick() {
@@ -164,7 +171,7 @@ void Reader::render() {
       unread.push_back(!read_.has(edition_.stories[order_[i]].key));
     }
     render_home(fonts_, edition_, order_, unread, "composed on device",
-                &hal_.display->framebuffer());
+                &hal_.display->framebuffer(), confirm_mark_all_);
   } else {
     if (page_ >= edition_.pages.size()) return;
     renderer_.render(edition_.pages[page_], &hal_.display->framebuffer());
@@ -293,6 +300,10 @@ bool Reader::scroll_up() {
 }
 
 // Two taps, not one: the first arms it and says so, the second does it.
+// Driven from home, which is where the count being cleared is visible —
+// this does not move the reader on its own; it stays wherever it was
+// called from, and home simply recomputes to zero unread on the next
+// render.
 bool Reader::mark_everything_read() {
   if (!confirm_mark_all_) {
     confirm_mark_all_ = true;
@@ -306,7 +317,6 @@ bool Reader::mark_everything_read() {
     hal_.storage->write(read_path_, serialize_seen_store(read_));
   }
 
-  mode_ = ReaderMode::Finished;
   needs_render_ = true;
   pending_context_change_ = true;
   return true;
