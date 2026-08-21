@@ -67,7 +67,7 @@ void write_page(ByteSink& out, const Page& p) {
   }
 }
 
-bool read_page(Reader& r, Page* out) {
+bool read_page(ByteReader& r, Page* out) {
   Page p;
   p.is_front_page = r.u8() != 0;
   p.folio_left = r.str();
@@ -167,7 +167,7 @@ bool deserialize_edition(const std::string& blob, Edition* out,
     return false;
   };
 
-  Reader r(blob);
+  ByteReader r(blob);
   if (r.u32() != kEditionMagic) return fail("not a saved edition");
   const uint16_t version = r.u16();
   if (version < kMinEditionVersion || version > kEditionVersion) {

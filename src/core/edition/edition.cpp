@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "core/base/str.h"
+#include "core/edition/edition_stream.h"
 #include "core/layout/hyphenator.h"
 #include "core/layout/paginator.h"
 #include "core/layout/type_scale.h"
@@ -44,16 +45,13 @@ bool newer(const Item& a, const Item& b) {
   return a.published > b.published;
 }
 
-}  // namespace
-
-Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
-                        const ComposeOptions& opts) {
-  Edition ed;
-  ed.date = opts.now;
-  ed.title = opts.title;
-  set_body_alignment(opts.body_alignment);
-
-  // --- select ---------------------------------------------------------------
+// Drops stale stories, sorts each section newest-first, then applies the
+// max_items budget across item metadata alone — none of it needs a story's
+// pages laid out. Shared by compose_edition and compose_streaming, so there
+// is exactly one selection path regardless of how the result gets written.
+std::vector<Section> select_sections(std::vector<Section> sections,
+                                     const ComposeOptions& opts,
+                                     ComposeStats* stats) {
   const Epoch cutoff =
       opts.now == kNoDate
           ? kNoDate
@@ -66,10 +64,10 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   for (Section& s : sections) {
     std::vector<Item> fresh;
     for (Item& it : s.items) {
-      ++ed.stats.items_in;
+      ++stats->items_in;
       if (cutoff != kNoDate && it.published != kNoDate &&
           it.published < cutoff) {
-        ++ed.stats.dropped_stale;
+        ++stats->dropped_stale;
         continue;
       }
       fresh.push_back(std::move(it));
@@ -110,13 +108,86 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
 
     for (size_t i = 0; i < sections.size(); ++i) {
       if (sections[i].items.size() > take[i]) {
-        ed.stats.dropped_over_budget += sections[i].items.size() - take[i];
+        stats->dropped_over_budget += sections[i].items.size() - take[i];
         sections[i].items.resize(take[i]);
       }
     }
   }
 
-  // --- story pages: the full text, and each story's place in the paper -----
+  return sections;
+}
+
+// Builds one story's flow and paginates it into `out_pages`, appending
+// rather than replacing — the caller decides whether that is the whole
+// edition's page list (compose_edition) or a scratch vector scoped to one
+// story (compose_streaming). `page_offset` becomes StoryRef::first_page,
+// which is only meaningful in the former case; compose_streaming passes 0
+// since a streamed story's pages are never addressed by a global index.
+//
+// Also sets each new page's furniture (is_front_page, folio) from the local
+// position within *this* story, so neither caller needs a second pass over
+// pages it may not still have all of at once.
+StoryRef paginate_story(const Item& it, const std::string& section_name,
+                        const Paginator& paginator, const PageTemplate& tmpl,
+                        size_t page_offset, std::vector<Page>* out_pages) {
+  std::vector<FlowElement> story;
+  story.push_back(element(TextRole::ArticleHead, it.title));
+  const std::string by = byline_for(it);
+  if (!by.empty()) story.push_back(element(TextRole::Byline, by));
+
+  bool opened = false;
+  for (const Block& b : it.blocks) {
+    FlowElement e;
+    e.role = role_for_block(b);
+    e.block = b;
+    if (!opened && e.role == TextRole::Body) {
+      e.opens_story = true;
+      opened = true;
+    }
+    story.push_back(std::move(e));
+  }
+  if (it.looks_truncated()) {
+    story.push_back(
+        element(TextRole::Caption, "The publisher's feed ends here."));
+  }
+
+  StoryRef ref;
+  ref.key = it.dedup_key();
+  ref.title = it.title;
+  ref.section = section_name;
+  ref.source = it.source_name;
+  ref.truncated = it.looks_truncated();
+  ref.published = it.published;
+  ref.first_page = page_offset;
+
+  const size_t added_start = out_pages->size();
+  ref.page_count = paginator.paginate(story, tmpl, out_pages);
+
+  // The folio says where you are in *this* story, not in whatever else
+  // out_pages holds — there is no front-of-paper any more.
+  for (size_t k = 0; k < ref.page_count; ++k) {
+    Page& p = (*out_pages)[added_start + k];
+    p.is_front_page = false;
+    p.folio_left = section_name;
+    p.folio_right =
+        std::to_string(k + 1) + " / " + std::to_string(ref.page_count);
+  }
+
+  return ref;
+}
+
+}  // namespace
+
+Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
+                        const ComposeOptions& opts) {
+  Edition ed;
+  ed.date = opts.now;
+  ed.title = opts.title;
+  set_body_alignment(opts.body_alignment);
+
+  const std::vector<Section> selected =
+      select_sections(std::move(sections), opts, &ed.stats);
+
   const Hyphenator& hyphenator =
       opts.hyphenate ? english_hyphenator() : null_hyphenator();
   const Paginator paginator(fonts, hyphenator);
@@ -129,7 +200,7 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   // page budget is reached, the remaining stories are dropped (and counted)
   // instead. The desktop leaves max_pages at zero and is never bounded here.
   bool budget_reached = false;
-  for (const Section& s : sections) {
+  for (const Section& s : selected) {
     if (budget_reached) {
       ed.stats.dropped_over_budget += s.items.size();
       continue;
@@ -140,63 +211,73 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
         budget_reached = true;
         break;
       }
-      const Item& it = s.items[ii];
-      std::vector<FlowElement> story;
-      story.push_back(element(TextRole::ArticleHead, it.title));
-      const std::string by = byline_for(it);
-      if (!by.empty()) story.push_back(element(TextRole::Byline, by));
-
-      bool opened = false;
-      for (const Block& b : it.blocks) {
-        FlowElement e;
-        e.role = role_for_block(b);
-        e.block = b;
-        if (!opened && e.role == TextRole::Body) {
-          e.opens_story = true;
-          opened = true;
-        }
-        story.push_back(std::move(e));
-      }
-      if (it.looks_truncated()) {
-        story.push_back(element(TextRole::Caption,
-                                "The publisher's feed ends here."));
-      }
-
-      StoryRef ref;
-      ref.key = it.dedup_key();
-      ref.title = it.title;
-      ref.section = s.name;
-      ref.source = it.source_name;
-      ref.truncated = it.looks_truncated();
-      ref.published = it.published;
-      ref.first_page = ed.pages.size();
-      ref.page_count = paginator.paginate(story, story_tmpl, &ed.pages);
-      ed.stories.push_back(std::move(ref));
-
+      StoryRef ref = paginate_story(s.items[ii], s.name, paginator,
+                                    story_tmpl, ed.pages.size(), &ed.pages);
       ++ed.stats.items_published;
-      if (it.looks_truncated()) ++ed.stats.truncated_published;
-    }
-  }
-
-  // --- furniture ------------------------------------------------------------
-  for (size_t i = 0; i < ed.pages.size(); ++i) {
-    Page& p = ed.pages[i];
-    p.is_front_page = false;  // there is no front-of-paper any more
-
-    // The folio says where you are in *that* story, not in the edition: the
-    // edition's page count is not what you're reading.
-    for (const StoryRef& st : ed.stories) {
-      if (st.page_count > 0 && i >= st.first_page &&
-          i < st.first_page + st.page_count) {
-        p.folio_left = st.section;
-        p.folio_right = std::to_string(i - st.first_page + 1) + " / " +
-                        std::to_string(st.page_count);
-        break;
-      }
+      if (s.items[ii].looks_truncated()) ++ed.stats.truncated_published;
+      ed.stories.push_back(std::move(ref));
     }
   }
 
   return ed;
+}
+
+bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
+                       const ComposeOptions& opts, ByteSink& sink,
+                       ComposeStats* stats) {
+  set_body_alignment(opts.body_alignment);
+
+  ComposeStats selection_stats;
+  const std::vector<Section> selected =
+      select_sections(std::move(sections), opts, &selection_stats);
+
+  // The header is committed here, right after selection and before any
+  // story is laid out — nothing in a streaming writer holds enough to know
+  // the final published/dropped counts any earlier than that. See the
+  // `stats` doc on the declaration.
+  StreamingEditionWriter writer(sink, opts.now, opts.title, selection_stats);
+
+  const Hyphenator& hyphenator =
+      opts.hyphenate ? english_hyphenator() : null_hyphenator();
+  const Paginator paginator(fonts, hyphenator);
+  PageTemplate story_tmpl;
+  story_tmpl.columns = 1;
+
+  ComposeStats actual = selection_stats;
+  actual.items_published = 0;
+  actual.truncated_published = 0;
+
+  size_t total_pages = 0;
+  bool budget_reached = false;
+  for (const Section& s : selected) {
+    if (budget_reached) {
+      actual.dropped_over_budget += s.items.size();
+      continue;
+    }
+    for (size_t ii = 0; ii < s.items.size(); ++ii) {
+      if (opts.max_pages > 0 && total_pages >= opts.max_pages) {
+        actual.dropped_over_budget += s.items.size() - ii;
+        budget_reached = true;
+        break;
+      }
+      std::vector<Page> pages;
+      // page_offset 0: a streamed story's pages are addressed only within
+      // its own byte range (see StreamingEditionReader::load_story_pages),
+      // never through a global index — there is no global page list here.
+      StoryRef ref = paginate_story(s.items[ii], s.name, paginator,
+                                    story_tmpl, 0, &pages);
+      total_pages += pages.size();
+      writer.add_story(ref, pages);
+      // `pages` frees here, at the end of the loop body, before the next
+      // story is laid out — nothing bigger than one story is ever resident.
+
+      ++actual.items_published;
+      if (s.items[ii].looks_truncated()) ++actual.truncated_published;
+    }
+  }
+
+  if (stats != nullptr) *stats = actual;
+  return writer.finish();
 }
 
 std::vector<size_t> Edition::reading_order() const {

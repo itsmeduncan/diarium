@@ -9,6 +9,7 @@
 
 #include "core/base/datetime.h"
 #include "core/feed/item.h"
+#include "core/io/byte_sink.h"
 #include "core/layout/page.h"
 #include "core/text/font_pack.h"
 
@@ -113,5 +114,24 @@ struct Edition {
 // that order is the paper's running order.
 Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
                         const ComposeOptions& opts);
+
+// The same select/paginate pipeline as compose_edition, but writing one
+// story at a time to `sink` (via a StreamingEditionWriter — see
+// core/edition/edition_stream.h) instead of building a resident Edition.
+// Nothing bigger than one story's pages is ever held at once, which is what
+// lets an edition of hundreds of stories compose on a device with 8 MB of
+// PSRAM. Returns false if the sink failed.
+//
+// `stats`, if given, is filled with the actual published/dropped counts once
+// every selected story has been written. It can differ from what ends up in
+// the v5 file's own header: that header is committed by the writer's
+// constructor right after selection, before any story is laid out, because
+// nothing here holds enough to know the final numbers any earlier than that
+// — the max_pages backstop below can still trim trailing stories afterwards.
+// A caller that wants the true count reads `*stats`, not the file it just
+// wrote.
+bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
+                       const ComposeOptions& opts, ByteSink& sink,
+                       ComposeStats* stats = nullptr);
 
 }  // namespace diarium

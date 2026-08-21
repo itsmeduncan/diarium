@@ -12,6 +12,7 @@
 #include "core/base/datetime.h"
 #include "core/config/feeds_config.h"
 #include "core/edition/edition.h"
+#include "core/io/byte_sink.h"
 #include "core/text/font_pack.h"
 
 namespace diarium {
@@ -53,6 +54,18 @@ struct FixtureComposeReport {
 Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
                               const FixtureComposeOptions& opts,
                               FixtureComposeReport* report);
+
+// The same feed assembly as compose_from_fixtures, but streaming the result
+// to `sink` a story at a time (compose_streaming) instead of building a
+// resident Edition — what `diarium-sim compose` writes to disk, so the v5
+// path is exercised on the desktop and not only in tests. Returns false if
+// the sink failed.
+bool compose_streaming_from_fixtures(const FeedList& config,
+                                     const FontPack& fonts,
+                                     const FixtureComposeOptions& opts,
+                                     ByteSink& sink,
+                                     FixtureComposeReport* report,
+                                     ComposeStats* stats);
 
 }  // namespace sim
 }  // namespace diarium

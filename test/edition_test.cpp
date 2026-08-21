@@ -4,6 +4,8 @@
 #include <vector>
 
 #include "core/edition/edition.h"
+#include "core/edition/edition_stream.h"
+#include "core/io/byte_sink.h"
 #include "core/text/font_pack.h"
 #include "doctest.h"
 
@@ -267,6 +269,91 @@ TEST_CASE("the budget keeps the newest stories, not the first in the feed") {
   CHECK(ed.stories[0].title == "Day 6");
   CHECK(ed.stories[1].title == "Day 5");
   CHECK(ed.stories[2].title == "Day 4");
+}
+
+// Stage B: the same select/paginate pipeline, but writing one story at a
+// time to a sink instead of building a resident Edition.
+TEST_CASE("compose_streaming writes the same stories compose_edition would, one at a time") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+
+  const Edition whole = compose_edition(two_sections(), *fonts, opts);
+  REQUIRE(!whole.stories.empty());
+
+  std::string out;
+  StringSink sink(&out);
+  ComposeStats stream_stats;
+  REQUIRE(compose_streaming(two_sections(), *fonts, opts, sink, &stream_stats));
+
+  CHECK(stream_stats.items_published == whole.stats.items_published);
+  CHECK(stream_stats.items_published == whole.stories.size());
+  CHECK(stream_stats.dropped_stale == whole.stats.dropped_stale);
+  CHECK(stream_stats.truncated_published == whole.stats.truncated_published);
+  CHECK(stream_stats.dropped_over_budget == whole.stats.dropped_over_budget);
+
+  StreamingEditionReader r;
+  std::string error;
+  REQUIRE_MESSAGE(r.open(out, &error), error);
+
+  CHECK(r.date() == whole.date);
+  CHECK(r.title() == whole.title);
+  REQUIRE(r.index().size() == whole.stories.size());
+
+  for (size_t i = 0; i < whole.stories.size(); ++i) {
+    CAPTURE(i);
+    CHECK(r.index()[i].ref.title == whole.stories[i].title);
+    CHECK(r.index()[i].ref.section == whole.stories[i].section);
+    CHECK(r.index()[i].ref.source == whole.stories[i].source);
+    CHECK(r.index()[i].ref.page_count == whole.stories[i].page_count);
+    CHECK(r.index()[i].ref.published == whole.stories[i].published);
+  }
+
+  // Same first story's page text — the point of the "one at a time" claim.
+  const std::vector<Page> loaded = r.load_story_pages(0);
+  const StoryRef& first = whole.stories[0];
+  REQUIRE(loaded.size() == first.page_count);
+  for (size_t p = 0; p < loaded.size(); ++p) {
+    CAPTURE(p);
+    const Page& want = whole.pages[first.first_page + p];
+    REQUIRE(loaded[p].lines.size() == want.lines.size());
+    for (size_t l = 0; l < want.lines.size(); ++l) {
+      REQUIRE(loaded[p].lines[l].runs.size() == want.lines[l].runs.size());
+      for (size_t k = 0; k < want.lines[l].runs.size(); ++k) {
+        CHECK(loaded[p].lines[l].runs[k].text == want.lines[l].runs[k].text);
+      }
+    }
+    CHECK(loaded[p].folio_left == want.folio_left);
+    CHECK(loaded[p].folio_right == want.folio_right);
+  }
+}
+
+TEST_CASE("compose_streaming's page budget still bounds the streamed count") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  ComposeOptions opts;
+  opts.max_pages = 8;
+
+  std::string out;
+  StringSink sink(&out);
+  ComposeStats stats;
+  REQUIRE(compose_streaming(two_sections(), *fonts, opts, sink, &stats));
+  CHECK(stats.dropped_over_budget > 0);
+
+  StreamingEditionReader r;
+  std::string error;
+  REQUIRE_MESSAGE(r.open(out, &error), error);
+  // *stats is corrected for the backstop, so it — not the header a caller
+  // never reads directly — is what must match what actually landed on disk.
+  CHECK(r.index().size() == stats.items_published);
+
+  size_t total_pages = 0;
+  for (const StreamIndexEntry& e : r.index()) total_pages += e.ref.page_count;
+  CHECK(total_pages <= opts.max_pages + 12);
 }
 
 TEST_CASE("no ceiling means every story is published") {

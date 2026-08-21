@@ -69,7 +69,7 @@ bool StreamingEditionReader::open(const std::string& file, std::string* error) {
   if (file.size() < kFooterSize) return fail("stream edition is truncated");
 
   const std::string footer_bytes = file.substr(file.size() - kFooterSize);
-  Reader footer(footer_bytes);
+  ByteReader footer(footer_bytes);
   const uint32_t index_offset = footer.u32();
   const uint32_t footer_magic = footer.u32();
   if (!footer.ok() || footer_magic != kEditionMagic) {
@@ -79,7 +79,7 @@ bool StreamingEditionReader::open(const std::string& file, std::string* error) {
     return fail("stream edition index is corrupt");
   }
 
-  Reader header(file);
+  ByteReader header(file);
   if (header.u32() != kEditionMagic) return fail("not a saved stream edition");
   const uint16_t version = header.u16();
   if (version != kStreamEditionVersion) {
@@ -101,7 +101,7 @@ bool StreamingEditionReader::open(const std::string& file, std::string* error) {
   if (!header.ok()) return fail("stream edition header is corrupt");
 
   const std::string index_bytes = file.substr(index_offset);
-  Reader index_reader(index_bytes);
+  ByteReader index_reader(index_bytes);
   const uint32_t story_count = index_reader.u32();
   if (!index_reader.plausible_count(story_count, 41)) {
     return fail("stream edition index is corrupt");
@@ -152,7 +152,7 @@ std::vector<Page> StreamingEditionReader::load_story_pages(size_t i) const {
   }
 
   const std::string story_bytes = file_.substr(e.byte_offset, e.byte_length);
-  Reader r(story_bytes);
+  ByteReader r(story_bytes);
   pages.reserve(e.ref.page_count);
   for (uint32_t k = 0; k < e.ref.page_count && r.ok(); ++k) {
     Page p;

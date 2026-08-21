@@ -123,11 +123,17 @@ bool ensure_dir(const std::string& path) {
 }
 
 
-Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
-                              const FixtureComposeOptions& opts,
-                              FixtureComposeReport* report) {
-  FixtureComposeReport local;
+namespace {
 
+// Everything compose_from_fixtures and compose_streaming_from_fixtures share:
+// resolving each configured feed to a fixture, parsing it, and sorting items
+// into sections — all of it item metadata, none of it needing a FontPack or
+// caring whether the result gets laid out into a resident Edition or
+// streamed to a sink one story at a time. `report` must not be null.
+std::vector<Section> assemble_fixture_sections(const FeedList& config,
+                                               const FixtureComposeOptions& opts,
+                                               ComposeOptions* compose_opts,
+                                               FixtureComposeReport* report) {
   const std::vector<std::string> fixtures = list_fixtures(opts.fixtures_dir);
   const std::vector<std::string> order = config.section_order();
   std::vector<Section> sections;
@@ -137,19 +143,19 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
   for (const FeedEntry& feed : config.feeds) {
     const std::string file = fixture_for(feed.url, fixtures);
     if (file.empty()) {
-      ++local.unresolved_feeds;
-      local.problems.push_back("no fixture for " + feed.url);
-      local.feed_problems.push_back(FeedProblem{feed.url, "no fixture"});
+      ++report->unresolved_feeds;
+      report->problems.push_back("no fixture for " + feed.url);
+      report->feed_problems.push_back(FeedProblem{feed.url, "no fixture"});
       continue;
     }
     FileByteSource src(opts.fixtures_dir + "/" + file);
     if (!src.ok()) {
-      ++local.unresolved_feeds;
-      local.problems.push_back("cannot open " + file);
-      local.feed_problems.push_back(FeedProblem{feed.url, "could not be read"});
+      ++report->unresolved_feeds;
+      report->problems.push_back("cannot open " + file);
+      report->feed_problems.push_back(FeedProblem{feed.url, "could not be read"});
       continue;
     }
-    ++local.feeds_read;
+    ++report->feeds_read;
 
     Collect sink;
     FeedParseOptions parse_opts;
@@ -172,7 +178,7 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
 
   Epoch now = opts.date_override != kNoDate ? opts.date_override : newest;
   if (now == kNoDate) now = 0;
-  local.date = now;
+  report->date = now;
 
   if (!opts.fresh && !opts.seen_path.empty()) {
     SeenStore seen;
@@ -181,7 +187,7 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
       std::vector<Item> kept;
       for (Item& it : s.items) {
         if (!seen.mark(it.dedup_key(), now)) {
-          ++local.dropped_seen;
+          ++report->dropped_seen;
           continue;
         }
         kept.push_back(std::move(it));
@@ -191,19 +197,48 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
     seen.save(opts.seen_path);
   }
 
+  compose_opts->now = now;
+  compose_opts->title = config.edition.title;
+  compose_opts->max_items = config.edition.max_items;
+  compose_opts->max_age_days = config.edition.max_age_days;
+  compose_opts->body_alignment = config.edition.body_alignment;
+  compose_opts->hyphenate = config.edition.hyphenate;
+  compose_opts->feeds_configured = config.feeds.size();
+  compose_opts->feed_problems = report->feed_problems;
+
+  return sections;
+}
+
+}  // namespace
+
+Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
+                              const FixtureComposeOptions& opts,
+                              FixtureComposeReport* report) {
+  FixtureComposeReport local;
   ComposeOptions compose_opts;
-  compose_opts.now = now;
-  compose_opts.title = config.edition.title;
-  compose_opts.max_items = config.edition.max_items;
-  compose_opts.max_age_days = config.edition.max_age_days;
-  compose_opts.body_alignment = config.edition.body_alignment;
-  compose_opts.hyphenate = config.edition.hyphenate;
-  compose_opts.feeds_configured = config.feeds.size();
-  compose_opts.feed_problems = local.feed_problems;
+  std::vector<Section> sections =
+      assemble_fixture_sections(config, opts, &compose_opts, &local);
 
   Edition ed = compose_edition(std::move(sections), fonts, compose_opts);
   if (report != nullptr) *report = local;
   return ed;
+}
+
+bool compose_streaming_from_fixtures(const FeedList& config,
+                                     const FontPack& fonts,
+                                     const FixtureComposeOptions& opts,
+                                     ByteSink& sink,
+                                     FixtureComposeReport* report,
+                                     ComposeStats* stats) {
+  FixtureComposeReport local;
+  ComposeOptions compose_opts;
+  std::vector<Section> sections =
+      assemble_fixture_sections(config, opts, &compose_opts, &local);
+
+  const bool ok =
+      compose_streaming(std::move(sections), fonts, compose_opts, sink, stats);
+  if (report != nullptr) *report = local;
+  return ok;
 }
 
 }  // namespace sim

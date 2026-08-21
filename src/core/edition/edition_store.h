@@ -65,9 +65,9 @@ bool deserialize_edition(const std::string& blob, Edition* edition,
 // (`ok()`) rather than at every call site. Public so the streaming v5 reader
 // (edition_stream.h) can decode its header/index/pages with the same cursor
 // deserialize_edition uses, rather than a second implementation.
-class Reader {
+class ByteReader {
  public:
-  explicit Reader(const std::string& data) : d_(data) {}
+  explicit ByteReader(const std::string& data) : d_(data) {}
 
   bool ok() const { return ok_; }
   size_t remaining() const { return ok_ ? d_.size() - at_ : 0; }
@@ -144,6 +144,6 @@ class Reader {
 // `page` possibly partially filled) if the reader ran out of bytes or found
 // an implausible count — the caller checks `reader.ok()` once at the end
 // rather than after every page.
-bool read_page(Reader& reader, Page* page);
+bool read_page(ByteReader& reader, Page* page);
 
 }  // namespace diarium
