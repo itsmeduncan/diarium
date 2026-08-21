@@ -353,18 +353,138 @@ TEST_CASE("compose_streaming's page budget still bounds the streamed count") {
   StreamingEditionReader r;
   std::string error;
   REQUIRE_MESSAGE(r.open(out, &error), error);
-  // The backstop trims trailing stories after selection but before the
-  // header is written; a dry layout pass finds where first, so both the
-  // out-param and the file's own header — read back here via `r.stats()`,
-  // not the out-param — report what actually landed in the index.
+  // The out-param is the authoritative, post-budget count: it must match
+  // what actually landed in the index exactly.
   CHECK(r.index().size() == stats.items_published);
-  CHECK(r.stats().items_published == stats.items_published);
-  CHECK(r.stats().truncated_published == stats.truncated_published);
-  CHECK(r.stats().dropped_over_budget == stats.dropped_over_budget);
+  // The file's own header is written before the budget is applied — before
+  // any story (or its article) is fetched or laid out at all — so it can
+  // only overstate, by at most the number of stories the backstop trims.
+  // Nothing downstream reads it for an exact count; `*stats` is what a
+  // caller uses for that.
+  CHECK(r.stats().items_published >= stats.items_published);
 
   size_t total_pages = 0;
   for (const StreamIndexEntry& e : r.index()) total_pages += e.ref.page_count;
   CHECK(total_pages <= opts.max_pages + 12);
+}
+
+namespace {
+
+// Stands in for device/compose.cpp's CardArticleSource: answers html_for
+// for exactly one key (the truncated item under test), and counts calls so
+// a test can check it was asked for the right story and no more than once.
+class CountingArticleSource final : public ArticleSource {
+ public:
+  CountingArticleSource(uint64_t key, std::string html)
+      : key_(key), html_(std::move(html)) {}
+
+  std::string html_for(const Item& item) const override {
+    ++calls_;
+    return item.dedup_key() == key_ ? html_ : "";
+  }
+
+  size_t calls() const { return calls_; }
+
+ private:
+  uint64_t key_;
+  std::string html_;
+  mutable size_t calls_ = 0;
+};
+
+// A space after every run: PositionedRun::text doesn't carry the
+// inter-word space the layout placed between runs, so joining without one
+// would glue "fire" and "service" into one unfindable word.
+std::string joined_text(const std::vector<Page>& pages) {
+  std::string out;
+  for (const Page& p : pages) {
+    for (const Line& l : p.lines) {
+      for (const PositionedRun& run : l.runs) out += run.text + " ";
+    }
+  }
+  return out;
+}
+
+}  // namespace
+
+TEST_CASE("compose_streaming fetches a truncated story's article lazily") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  Item truncated;
+  truncated.title = "A story cut short";
+  truncated.author = "A Reporter";
+  truncated.source_name = "The Source";
+  truncated.guid = "truncated-1";
+  truncated.published = 1786864000 - 86400;
+  truncated.truncation = TruncationReason::EllipsisTail;
+  Block excerpt;
+  excerpt.type = BlockType::Paragraph;
+  excerpt.text = "Fires broke out across the county overnight, officials said...";
+  truncated.blocks = {excerpt};
+
+  Item whole_story;
+  whole_story.title = "A story told in full";
+  whole_story.author = "A Reporter";
+  whole_story.source_name = "The Source";
+  whole_story.guid = "whole-1";
+  whole_story.published = 1786864000 - 172800;
+  Block para;
+  para.type = BlockType::Paragraph;
+  para.text =
+      "Body paragraph of a story that was never truncated, written at "
+      "length so it occupies real space on whatever page it lands on.";
+  whole_story.blocks = {para};
+
+  const std::string article_html =
+      "<html><body>"
+      "<nav><a href=\"/\">Home</a> <a href=\"/news\">News</a></nav>"
+      "<article>"
+      "<p>The fire service said the scale of the incidents was without "
+      "recent precedent, with crews drawn from three neighbouring counties "
+      "working through the night to contain what had begun as separate "
+      "fires.</p>"
+      "<p>Investigators said the pattern of ignition, spread across several "
+      "miles within a narrow window, pointed toward a common cause rather "
+      "than coincidence, though no determination had been made by the time "
+      "crews stood down at dawn.</p>"
+      "</article>"
+      "<footer>Copyright 2026</footer>"
+      "</body></html>";
+  CountingArticleSource articles(truncated.dedup_key(), article_html);
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  // Hyphenation can split a word across a line break with a hyphen and no
+  // space, which would make a plain substring search unreliable for
+  // reasons that have nothing to do with what this test checks.
+  opts.hyphenate = false;
+
+  std::string out;
+  StringSink sink(&out);
+  ComposeStats stats;
+  Section s{"Technology", {truncated, whole_story}};
+  REQUIRE(compose_streaming({s}, *fonts, opts, sink, &stats, &articles));
+
+  // Asked for exactly the one truncated, selected story — never the
+  // untruncated one, and never more than once for it.
+  CHECK(articles.calls() == 1);
+
+  StreamingEditionReader r;
+  std::string error;
+  REQUIRE_MESSAGE(r.open(out, &error), error);
+  REQUIRE(r.index().size() == 2);
+
+  const size_t idx = r.index()[0].ref.key == truncated.dedup_key() ? 0 : 1;
+  // No longer marked truncated: the fetched article replaced the excerpt,
+  // exactly as compose_from_card's whole-Edition equivalent already did.
+  CHECK_FALSE(r.index()[idx].ref.truncated);
+
+  const std::string text = joined_text(r.load_story_pages(idx));
+  CHECK(text.find("fire service") != std::string::npos);
+  CHECK(text.find("neighbouring counties") != std::string::npos);
+  CHECK(text.find("Fires broke out across the county overnight") ==
+       std::string::npos);
 }
 
 TEST_CASE("no ceiling means every story is published") {

@@ -59,6 +59,23 @@ struct ComposeOptions {
   std::vector<FeedProblem> feed_problems;
 };
 
+// A truncated item's own article, fetched on demand rather than handed over
+// resident: compose_streaming asks for a story's article only when it is
+// about to lay that story out, and only for a story the budget hasn't
+// already dropped, so nothing bigger than one story's article is ever held
+// at once — the point of streaming the compose at all is undone if every
+// truncated item's full text is already resident before the first story is
+// laid out. Portable — src/core/ never sees the HAL — so the device (a
+// small wrapper reading a cached article back off the card) and any future
+// caller both just implement this.
+struct ArticleSource {
+  virtual ~ArticleSource() = default;
+  // The raw article HTML for `item`, or "" if there is none (nothing was
+  // fetched, or the fetch failed). Empty means compose_streaming falls back
+  // to the feed's own excerpt, exactly as if no ArticleSource were given.
+  virtual std::string html_for(const Item& item) const = 0;
+};
+
 // What the edition dropped and why. Printed by the simulator and worth
 // surfacing on device too, because silently omitting stories is the kind of
 // thing a reader should be able to notice.
@@ -122,16 +139,32 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
 // lets an edition of hundreds of stories compose on a device with 8 MB of
 // PSRAM. Returns false if the sink failed.
 //
+// `articles`, if given, is asked for a truncated item's own article — via
+// html_for — only once that story is about to be laid out, and only for a
+// story the max_pages budget hasn't already dropped: the article is
+// converted (HtmlToBlocks, then extract_article) and paginated in place of
+// the feed's excerpt, then freed before the next story starts. Null, or an
+// empty result from html_for, keeps today's behavior: the feed's own
+// (possibly truncated) blocks are laid out as-is.
+//
 // `stats`, if given, is filled with the actual published/dropped counts once
-// every selected story has been written, and matches what the v5 file's own
-// header says: the writer's constructor commits that header right after
-// selection, before any story is laid out for real, so when there is a
-// max_pages ceiling this runs a write-nothing dry layout first to learn
-// exactly which stories the backstop will drop — the same layout the real
-// pass repeats while actually writing — so the header is not left reporting
-// the pre-budget selection count.
+// every selected story has been written — the true, post-budget numbers.
+// The v5 file's own header is written earlier than that: the writer's
+// constructor commits it right after selection, before any story (or its
+// article) has been fetched or laid out, using the selection-time counts —
+// every selected item, not the smaller number that survives max_pages. A
+// caller after the exact count reads `*stats`, not the header; the header
+// can only overstate, by at most the number of stories the budget trims,
+// which is never consumed downstream. (An earlier version of this function
+// found the exact post-budget count with a write-nothing dry layout pass
+// run before the header was written — sound when every story's content was
+// already resident, but incompatible with `articles`: a story can't be
+// dry-paginated without fetching its article, and fetching every selected
+// item's article just to count is exactly the resident-articles problem
+// this parameter exists to avoid.)
 bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
                        const ComposeOptions& opts, ByteSink& sink,
-                       ComposeStats* stats = nullptr);
+                       ComposeStats* stats = nullptr,
+                       const ArticleSource* articles = nullptr);
 
 }  // namespace diarium

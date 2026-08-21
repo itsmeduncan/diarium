@@ -47,17 +47,26 @@ struct ComposeReport {
 void fetch_all(const FeedList& config, IHttpClient* http, IStorage* storage,
                FeedCache* cache, DeviceClock* clock, ComposeReport* report);
 
-// Phase two: parse what is on the card and lay out the paper. Call it with
-// the radio already off.
+// Phase two: parse what is on the card and stream the paper straight back
+// to it, one story at a time. Call it with the radio already off.
 //
 // `already_read` is the filter: anything in it is left out, anything else is
 // carried into this edition whether or not it appeared in an earlier one. It
 // is deliberately the reader's read-state rather than a record of what was
 // printed, so a story nobody got to is still news tomorrow. It is not
 // modified — composing marks nothing read.
-Edition compose_from_card(const FeedList& config, const FontPack& fonts,
-                          IStorage* storage, const SeenStore* already_read,
-                          Epoch now, const ComposeReport& fetched);
+//
+// A truncated item's own article, if phase one fetched one, is read back
+// from the card and extracted (HtmlToBlocks, then extract_article) only
+// once that story is about to be laid out — never all of them resident at
+// once, which was the last place an edition of any real size held more
+// than one story in RAM at a time. `stats`, if given, is filled with the
+// actual published/dropped counts once composing finishes. Returns false
+// if the card would not open for writing or the write did not finish.
+bool compose_from_card(const FeedList& config, const FontPack& fonts,
+                       IStorage* storage, const SeenStore* already_read,
+                       Epoch now, const ComposeReport& fetched,
+                       ComposeStats* stats = nullptr);
 
 }  // namespace device
 }  // namespace diarium

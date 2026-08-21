@@ -8,8 +8,6 @@
 #include "core/base/datetime.h"
 #include "core/base/str.h"
 #include "core/feed/feed_parser.h"
-#include "core/html/html_to_blocks.h"
-#include "core/html/readability.h"
 
 namespace diarium {
 namespace device {
@@ -40,6 +38,28 @@ std::string cache_path_for(const std::string& url) {
 std::string article_path_for(uint64_t key) {
   return "/a" + to_hex64(key) + ".htm";
 }
+
+// Reads a truncated item's own article back from the card, on demand:
+// compose_streaming asks for one only when it is about to lay that story
+// out, so this is the only place a fetched article's HTML is ever resident
+// — one story's worth at a time, not every truncated item's before
+// composing even starts. Converting the HTML into blocks happens inside
+// compose_streaming itself (core/edition/edition.cpp), not here: this is
+// just the storage read, which is the one part of the job that has to live
+// on this side of the HAL boundary.
+class CardArticleSource final : public ArticleSource {
+ public:
+  explicit CardArticleSource(IStorage* storage) : storage_(storage) {}
+
+  std::string html_for(const Item& item) const override {
+    std::string html;
+    if (!storage_->read(article_path_for(item.dedup_key()), &html)) return "";
+    return html;
+  }
+
+ private:
+  IStorage* storage_;
+};
 
 // Streams the response onto the card, so a body far larger than RAM is fine
 // and so a 304 next time still has something to parse.
@@ -150,9 +170,10 @@ void fetch_all(const FeedList& config, IHttpClient* http, IStorage* storage,
   if (report != nullptr) *report = local;
 }
 
-Edition compose_from_card(const FeedList& config, const FontPack& fonts,
-                          IStorage* storage, const SeenStore* already_read,
-                          Epoch now, const ComposeReport& fetched) {
+bool compose_from_card(const FeedList& config, const FontPack& fonts,
+                       IStorage* storage, const SeenStore* already_read,
+                       Epoch now, const ComposeReport& fetched,
+                       ComposeStats* stats) {
   std::vector<Section> sections;
   for (const std::string& name : config.section_order()) {
     sections.push_back(Section{name, {}});
@@ -179,27 +200,14 @@ Edition compose_from_card(const FeedList& config, const FontPack& fonts,
     parse_opts.max_items = feed.max_items;
     parse_feed(src, sink, parse_opts);
 
+    // Metadata and the feed's own (possibly truncated) blocks only. A
+    // truncated item's full article, if phase one fetched it, stays on the
+    // card until compose_streaming asks CardArticleSource for it — one
+    // story at a time, and only for a story that survives selection and
+    // the page budget — rather than every truncated item's article being
+    // resident here before composing even starts.
     for (Item& it : sink.items) {
       it.section = feed.section;
-
-      // A publisher that truncates gave us two paragraphs and an ellipsis. If
-      // its page was fetched, the story replaces the excerpt.
-      if (it.looks_truncated()) {
-        std::string html;
-        if (storage->read(article_path_for(it.dedup_key()), &html)) {
-          BlockCollector page_blocks;
-          HtmlToBlocks conv(page_blocks);
-          conv.feed(html);
-          conv.finish();
-          std::vector<Block> article = extract_article(page_blocks.blocks);
-          // Empty means the page read as all furniture; keeping the feed's
-          // own excerpt is better than printing a navigation bar.
-          if (!article.empty()) {
-            it.blocks = std::move(article);
-            it.truncation = TruncationReason::None;
-          }
-        }
-      }
 
       if (it.published != kNoDate && (newest == kNoDate || it.published > newest)) {
         newest = it.published;
@@ -245,7 +253,11 @@ Edition compose_from_card(const FeedList& config, const FontPack& fonts,
   opts.feeds_configured = config.feeds.size();
   opts.feed_problems = problems;
 
-  return compose_edition(std::move(sections), fonts, opts);
+  CardArticleSource articles(storage);
+  std::unique_ptr<ByteSink> edition_sink = storage->open_write("/edition.rspe");
+  if (edition_sink == nullptr) return false;
+  return compose_streaming(std::move(sections), fonts, opts, *edition_sink,
+                           stats, &articles);
 }
 
 }  // namespace device

@@ -4,6 +4,8 @@
 
 #include "core/base/str.h"
 #include "core/edition/edition_stream.h"
+#include "core/html/html_to_blocks.h"
+#include "core/html/readability.h"
 #include "core/layout/hyphenator.h"
 #include "core/layout/paginator.h"
 #include "core/layout/type_scale.h"
@@ -224,12 +226,28 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
 
 bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
                        const ComposeOptions& opts, ByteSink& sink,
-                       ComposeStats* stats) {
+                       ComposeStats* stats, const ArticleSource* articles) {
   set_body_alignment(opts.body_alignment);
 
   ComposeStats selection_stats;
   const std::vector<Section> selected =
       select_sections(std::move(sections), opts, &selection_stats);
+
+  // The header, committed by the writer's constructor below, before any
+  // story — or its article — has been fetched or laid out for real: the
+  // cheapest honest number available this early is every selected item,
+  // not the smaller count that survives the max_pages backstop below. See
+  // the `stats` doc on the declaration for why this can't be exact without
+  // giving up the lazy article fetch this function exists for.
+  ComposeStats header_stats = selection_stats;
+  for (const Section& s : selected) {
+    header_stats.items_published += s.items.size();
+    for (const Item& it : s.items) {
+      if (it.looks_truncated()) ++header_stats.truncated_published;
+    }
+  }
+
+  StreamingEditionWriter writer(sink, opts.now, opts.title, header_stats);
 
   const Hyphenator& hyphenator =
       opts.hyphenate ? english_hyphenator() : null_hyphenator();
@@ -237,60 +255,14 @@ bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
   PageTemplate story_tmpl;
   story_tmpl.columns = 1;
 
-  // How many of the selected items will actually survive the max_pages
-  // backstop — decided before the header is written below, since the
-  // writer's constructor commits it immediately, before any story is laid
-  // out for real. Without a ceiling (every call site today except the
-  // device's) every selected item survives and this costs nothing beyond
-  // counting. With one, a dry run — the same paginate_story calls the real
-  // pass below makes, its pages discarded rather than written — finds
-  // exactly where the budget bites, so the header reports what actually
-  // lands in the index rather than the pre-budget selection count. The
-  // real pass then trusts this count rather than re-deriving its own
-  // cutoff, so the two cannot disagree.
-  size_t total_selected = 0;
-  size_t surviving = 0;
-  size_t surviving_truncated = 0;
-  for (const Section& s : selected) {
-    total_selected += s.items.size();
-    if (opts.max_pages == 0) {
-      for (const Item& it : s.items) {
-        ++surviving;
-        if (it.looks_truncated()) ++surviving_truncated;
-      }
-    }
-  }
-  if (opts.max_pages > 0) {
-    size_t dry_pages = 0;
-    bool dry_budget_reached = false;
-    for (const Section& s : selected) {
-      if (dry_budget_reached) continue;
-      for (const Item& it : s.items) {
-        if (dry_pages >= opts.max_pages) {
-          dry_budget_reached = true;
-          break;
-        }
-        std::vector<Page> scratch;
-        paginate_story(it, s.name, paginator, story_tmpl, 0, &scratch);
-        dry_pages += scratch.size();
-        ++surviving;
-        if (it.looks_truncated()) ++surviving_truncated;
-      }
-    }
-  }
-
-  ComposeStats header_stats = selection_stats;
-  header_stats.items_published = surviving;
-  header_stats.truncated_published = surviving_truncated;
-  header_stats.dropped_over_budget += total_selected - surviving;
-
-  StreamingEditionWriter writer(sink, opts.now, opts.title, header_stats);
-
   ComposeStats actual = selection_stats;
   actual.items_published = 0;
   actual.truncated_published = 0;
 
-  size_t written = 0;
+  // A memory-safety stop, not a preference — see compose_edition's twin of
+  // this loop. Dropped stories here never reach the article fetch below
+  // either: the budget is checked first.
+  size_t total_pages = 0;
   bool budget_reached = false;
   for (const Section& s : selected) {
     if (budget_reached) {
@@ -298,24 +270,53 @@ bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
       continue;
     }
     for (size_t ii = 0; ii < s.items.size(); ++ii) {
-      if (written >= surviving) {
+      if (opts.max_pages > 0 && total_pages >= opts.max_pages) {
         actual.dropped_over_budget += s.items.size() - ii;
         budget_reached = true;
         break;
       }
+
+      const Item& original = s.items[ii];
+      Item replaced;
+      const Item* to_paginate = &original;
+      // The article, fetched and extracted for this one story only, right
+      // before it is laid out — never more than one story's article
+      // resident, and never fetched at all for a story the budget above
+      // already dropped.
+      if (articles != nullptr && original.looks_truncated()) {
+        const std::string html = articles->html_for(original);
+        if (!html.empty()) {
+          BlockCollector page_blocks;
+          HtmlToBlocks conv(page_blocks);
+          conv.feed(html);
+          conv.finish();
+          std::vector<Block> article = extract_article(page_blocks.blocks);
+          // Empty means the page read as all furniture; the feed's own
+          // excerpt is better than printing a navigation bar.
+          if (!article.empty()) {
+            replaced = original;
+            replaced.blocks = std::move(article);
+            replaced.truncation = TruncationReason::None;
+            to_paginate = &replaced;
+          }
+        }
+      }
+
       std::vector<Page> pages;
       // page_offset 0: a streamed story's pages are addressed only within
       // its own byte range (see StreamingEditionReader::load_story_pages),
       // never through a global index — there is no global page list here.
-      StoryRef ref = paginate_story(s.items[ii], s.name, paginator,
+      StoryRef ref = paginate_story(*to_paginate, s.name, paginator,
                                     story_tmpl, 0, &pages);
+      total_pages += pages.size();
       writer.add_story(ref, pages);
-      // `pages` frees here, at the end of the loop body, before the next
-      // story is laid out — nothing bigger than one story is ever resident.
+      // `pages`, and `replaced`'s article blocks if any were fetched, free
+      // here, at the end of the loop body, before the next story is laid
+      // out — nothing bigger than one story's article and pages is ever
+      // resident.
 
-      ++written;
       ++actual.items_published;
-      if (s.items[ii].looks_truncated()) ++actual.truncated_published;
+      if (to_paginate->looks_truncated()) ++actual.truncated_published;
     }
   }
 
