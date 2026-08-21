@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <esp_sleep.h>
 
+#include <cstdio>
 #include <memory>
 #include <string>
 #include <vector>
@@ -313,6 +314,31 @@ void compose_wake(device::DeviceHal& d) {
   d.power.deep_sleep_until(kNoDate);
 }
 
+// The battery reading has to reach the card, not only the serial line. The
+// wakes worth measuring are the unattended ones, and a host that plugs in
+// tomorrow to read a voltage has also put the cell back on charge, so it gets
+// the charger's 4.2 V whatever the night actually cost. A day's draw is the
+// difference between two of these.
+void log_battery(device::DeviceHal& d, int mv) {
+  std::string log;
+  d.storage.read("/battery.log", &log);  // absent is fine: it starts empty
+
+  // Bounded, like every other buffer here. A line is ~30 bytes and this is
+  // appended a few times a day, but "a few" is an assumption, and an unbounded
+  // file sharing a card with the edition is not acceptable.
+  constexpr size_t kMaxBytes = 8192;
+  if (log.size() > kMaxBytes) {
+    const size_t cut = log.find('\n', log.size() - kMaxBytes);
+    log = cut == std::string::npos ? std::string() : log.substr(cut + 1);
+  }
+
+  char line[64];
+  snprintf(line, sizeof(line), "%lld %d\n",
+           static_cast<long long>(d.clock.now()), mv);
+  log += line;
+  d.storage.write("/battery.log", log);
+}
+
 }  // namespace
 
 void setup() {
@@ -327,6 +353,13 @@ void setup() {
   static device::DeviceHal d(&panel);  // claims the framebuffer first
   hal_impl = &d;
 
+  // On every boot, not only the ones with a host attached: the wakes between
+  // two mornings are exactly the ones nobody is watching. Read before the card
+  // is mounted, because a flat battery is a plausible reason for the card to
+  // fail and this should be on the serial line either way.
+  const int battery_mv = d.power.battery_millivolts();
+  Serial.printf("battery %d mV\n", battery_mv);
+
   if (!d.storage.mount()) {
     // No font pack is available either — the card is where it lives — so this
     // notice is the one that has to survive having no type at all.
@@ -337,6 +370,11 @@ void setup() {
                     : "Insert a card with feeds.toml and an edition on it.");
     return;
   }
+
+  // After the mount, before anything that can sleep: compose_wake() does not
+  // return, so a wake logged any later would not be logged at all.
+  log_battery(d, battery_mv);
+
   // Before anything else, in case the host has something to say.
   uint32_t t_mark = millis();
   const bool asked_to_compose = serial_console(d);
