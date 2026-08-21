@@ -35,10 +35,7 @@ void print_help() {
       "  n / space   the next unread article    (swipe right)\n"
       "  p           the previous article       (swipe left)\n"
       "  j / k       scroll down / up within an article  (swipe up/down)\n"
-      "  1-9         open the Nth story on this page   (tap a lede)\n"
-      "  b           back to where you were     (swipe up in the overlay)\n"
-      "  g           home: the contents page   (long press, bottom left)\n"
-      "  s           section list               (swipe down)\n"
+      "  g           home: the summary page     (long press, bottom left)\n"
       "  t X Y       tap an exact point, for checking hit regions\n"
       "  ?           this help\n"
       "  q           quit\n"
@@ -78,24 +75,6 @@ void synth_long_press(SimInput* input, Reader* reader, int x, int y) {
   if (e.kind != Gesture::None) reader->handle(e);
   input->advance(20);
   local.update(false, x, y, input->millis());
-}
-
-// The ledes on the current page, top to bottom, so a digit key can pick one.
-std::vector<const StoryRef*> ledes_on(const Edition& ed, size_t page) {
-  std::vector<const StoryRef*> out;
-  for (const StoryRef& s : ed.stories) {
-    if (s.lede_page == page) out.push_back(&s);
-  }
-  for (size_t i = 0; i + 1 < out.size(); ++i) {
-    for (size_t j = i + 1; j < out.size(); ++j) {
-      if (out[j]->lede_bounds.y < out[i]->lede_bounds.y) {
-        const StoryRef* t = out[i];
-        out[i] = out[j];
-        out[j] = t;
-      }
-    }
-  }
-  return out;
 }
 
 }  // namespace
@@ -176,21 +155,13 @@ int cmd_read(const std::vector<std::string>& args) {
   reader.render();
 
   std::printf("Diarium — %s\n", format_masthead_date(ed.date).c_str());
-  std::printf("%zu pages to flip through, %zu stories behind them\n",
-              ed.browse_page_count, ed.stories.size());
+  std::printf("%zu stories in this edition\n", ed.stories.size());
   print_help();
 
   char line[256];
   for (;;) {
-    const std::vector<const StoryRef*> ledes =
-        reader.mode() == ReaderMode::Browse ? ledes_on(ed, reader.current_page())
-                                            : std::vector<const StoryRef*>();
-
-    std::printf("[%s] %s%s\n> ", display.last_path().c_str(),
-                reader.position().c_str(),
-                ledes.empty() ? ""
-                              : ("  (" + std::to_string(ledes.size()) +
-                                 " stories here)").c_str());
+    std::printf("[%s] %s\n> ", display.last_path().c_str(),
+                reader.position().c_str());
     std::fflush(stdout);
 
     if (std::fgets(line, sizeof(line), stdin) == nullptr) break;
@@ -218,14 +189,9 @@ int cmd_read(const std::vector<std::string>& args) {
     } else if (cmd == "k") {
       synth_swipe(&input, &reader, 0, 200);
       changed = true;
-    } else if (cmd == "s") {
-      synth_swipe(&input, &reader, 0, 200);
-      changed = true;
     } else if (cmd == "g") {
       synth_long_press(&input, &reader, 40, page_height() - 40);
       changed = true;
-    } else if (cmd == "b") {
-      changed = reader.back();
     } else if (cmd[0] == 't') {
       int x = 0, y = 0;
       if (std::sscanf(cmd.c_str(), "t %d %d", &x, &y) == 2) {
@@ -233,18 +199,6 @@ int cmd_read(const std::vector<std::string>& args) {
         changed = true;
       } else {
         std::printf("  usage: t <x> <y>\n");
-      }
-    } else if (cmd[0] >= '1' && cmd[0] <= '9') {
-      const size_t which = static_cast<size_t>(cmd[0] - '1');
-      if (reader.mode() == ReaderMode::Sections) {
-        changed = reader.jump_to_section(which);
-      } else if (which < ledes.size()) {
-        const Rect& r = ledes[which]->lede_bounds;
-        std::printf("  opening \"%s\"\n", ledes[which]->title.c_str());
-        synth_tap(&input, &reader, r.x + r.w / 2, r.y + r.h / 2);
-        changed = true;
-      } else {
-        std::printf("  no story %zu on this page\n", which + 1);
       }
     } else {
       std::printf("  unknown key '%s' — press ? for help\n", cmd.c_str());
