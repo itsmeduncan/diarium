@@ -189,6 +189,24 @@ bool serial_console(device::DeviceHal& d) {
         }
       }
       deadline = millis() + 4000;
+    } else if (line.compare(0, 4, "CAT ") == 0) {
+      // Read a file back off the card. The battery log is the reason this
+      // exists: the point of writing it was to read it here, and until now
+      // there was no way to. Reply is `OK <n> bytes` then exactly n raw bytes.
+      const std::string path = line.substr(4);
+      std::string body;
+      if (!d.storage.read(path, &body)) {
+        Serial.println("ERR no such file on the card");
+      } else if (body.size() > 64u * 1024u) {
+        // The console streams over a 115200 line; a cached page would take
+        // minutes and swamp the host. The files worth reading back are small.
+        Serial.println("ERR too large to cat over the console");
+      } else {
+        Serial.printf("OK %u bytes\n", (unsigned)body.size());
+        Serial.write(reinterpret_cast<const uint8_t*>(body.data()),
+                     body.size());
+      }
+      deadline = millis() + 4000;
     } else if (!line.empty()) {
       Serial.println("ERR unknown command");
     }

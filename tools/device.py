@@ -7,6 +7,7 @@ without editing the firmware to force one.
 
     tools/device.py log [--no-reset]     stream the serial output
     tools/device.py ls                   what is on the card
+    tools/device.py get PATH [LOCAL]     read a file back off the card
     tools/device.py put FILE [AS]        copy a file onto the card
     tools/device.py rm PATH              remove a file from the card
     tools/device.py compose              fetch and compose now
@@ -21,6 +22,7 @@ The console it talks to is open for a moment after boot and speaks one line
 at a time:
 
     PUT <path> <bytes>   followed by exactly that many bytes
+    CAT <path>           OK <n> bytes, then exactly that many bytes back
     LS                   list the card
     RM <path>            remove one file
     COMPOSE              take the compose path on this boot
@@ -224,9 +226,51 @@ def cmd_put(args):
         s.close()
 
 
+def cmd_get(args):
+    """Read a file back off the card. `OK <n> bytes`, then exactly n bytes."""
+    if not args:
+        raise DeviceError("usage: device.py get PATH [LOCAL]")
+    remote = args[0] if args[0].startswith("/") else "/" + args[0]
+    s = open_port()
+    try:
+        wait_for_ready(s)
+        s.write(("CAT %s\n" % remote).encode())
+        s.flush()
+        status, before = read_reply(s)
+        for line in before:  # boot chatter goes to stderr, not the file
+            print(line, file=sys.stderr)
+        if not status.startswith("OK"):
+            s.write(b"GO\n")
+            raise DeviceError(status)
+        want = int(status.split()[1])
+        body = b""
+        end = time.time() + 30
+        while len(body) < want and time.time() < end:
+            chunk = s.read(want - len(body))
+            if chunk:
+                body += chunk
+        s.write(b"GO\n")
+        if len(body) != want:
+            raise DeviceError(
+                "Read %d of %d bytes; the device stopped early." %
+                (len(body), want))
+        if len(args) > 1:
+            with open(args[1], "wb") as f:
+                f.write(body)
+            print("wrote %d bytes to %s" % (len(body), args[1]),
+                  file=sys.stderr)
+        else:
+            sys.stdout.buffer.write(body)
+            sys.stdout.flush()
+        return 0
+    finally:
+        s.close()
+
+
 COMMANDS = {
     "log": cmd_log,
     "ls": cmd_ls,
+    "get": cmd_get,
     "put": cmd_put,
     "rm": cmd_rm,
     "compose": cmd_compose,

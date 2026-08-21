@@ -115,7 +115,7 @@ endef
 
 DEVICE := $(DEVICE_PY) tools/device.py
 
-.PHONY: device-flash device-log device-ls device-put device-rm device-compose
+.PHONY: device-flash device-log device-ls device-get device-put device-rm device-compose
 device-flash:
 	$(call need_pio)
 	cd src/device && pio run -t upload
@@ -127,6 +127,14 @@ device-log:
 device-ls:
 	$(call need_device_py)
 	$(DEVICE) ls
+
+# make device-get PATH_ON_CARD=/battery.log [LOCAL=out/battery.log]
+#
+# With LOCAL, the bytes are saved there; without it, they print to stdout.
+device-get:
+	$(call need_device_py)
+	@test -n "$(PATH_ON_CARD)" || { echo "usage: make device-get PATH_ON_CARD=/name [LOCAL=path]"; exit 2; }
+	$(DEVICE) get $(PATH_ON_CARD) $(LOCAL)
 
 # make device-put FILE=config/feeds.local.toml DEST=/feeds.toml
 #
@@ -161,6 +169,7 @@ help:
 	@echo "  make device-flash    build it and put it on the board"
 	@echo "  make device-log      watch what it says"
 	@echo "  make device-ls       what is on the card"
+	@echo "  make device-get PATH_ON_CARD=/name [LOCAL=path]"
 	@echo "  make device-put FILE=<path> [DEST=/name]"
 	@echo "  make device-rm PATH_ON_CARD=/name"
 	@echo "  make device-compose  fetch and compose now"
