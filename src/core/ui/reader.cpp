@@ -1,6 +1,6 @@
 #include "core/ui/reader.h"
 
-#include "core/ui/contents.h"
+#include "core/ui/home.h"
 
 #include <cstdlib>
 
@@ -336,8 +336,8 @@ void Reader::render() {
     for (size_t i = 0; i < order_.size(); ++i) {
       unread.push_back(!read_.has(edition_.stories[order_[i]].key));
     }
-    render_contents(fonts_, edition_, order_, unread, "composed on device",
-                    &hal_.display->framebuffer());
+    render_home(fonts_, edition_, order_, unread, "composed on device",
+               &hal_.display->framebuffer());
   } else {
     if (page_ >= edition_.pages.size()) return;
     renderer_.render(edition_.pages[page_], &hal_.display->framebuffer());
