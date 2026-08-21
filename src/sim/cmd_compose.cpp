@@ -66,32 +66,22 @@ int cmd_compose(const std::vector<std::string>& args) {
     std::fprintf(stderr, "compose: %s (skipping)\n", problem.c_str());
   }
   if (ed.stats.items_published == 0) {
-    // Still rendered: the colophon says there were no stories and why, which
-    // is what the device would show. A blank screen is indistinguishable from
-    // a broken one.
+    // An empty edition composes to zero pages — the home dashboard is what
+    // tells the reader the paper came up empty, not a composed page.
     std::fprintf(stderr,
                  "compose: no stories made the edition — try --fresh to ignore "
-                 "the seen-store, or raise max_age_days. Writing the colophon "
-                 "anyway.\n");
+                 "the seen-store, or raise max_age_days.\n");
   }
 
   const PageRenderer renderer(fonts);
-  MastheadInfo masthead;
-  masthead.title = config.edition.title;
-  masthead.date_line = format_masthead_date(report.date);
-  masthead.strap = std::to_string(ed.stats.items_published) + " stories · " +
-                   std::to_string(report.feeds_read) +
-                   " feeds · composed on device";
-
   const std::string depth_flag = flag(args, "--depth", "grey8");
   Depth depth = Depth::Grey8;
   if (depth_flag == "grey3") depth = Depth::Grey3;
   else if (depth_flag == "mono1") depth = Depth::Mono1;
 
-  // By default only the pages you flip through are written: the story text
-  // behind them is 150 PNGs nobody asked for.
-  const bool all_pages = has_flag(args, "--all-pages");
-  size_t last = all_pages ? ed.pages.size() : ed.browse_page_count;
+  // An edition is nothing but story text now, so "all pages" is just "every
+  // page" — --pages still caps how many get written, for a quick look.
+  size_t last = ed.pages.size();
   const size_t limit =
       static_cast<size_t>(std::atoi(flag(args, "--pages", "0").c_str()));
   if (limit > 0 && limit < last) last = limit;
@@ -99,7 +89,6 @@ int cmd_compose(const std::vector<std::string>& args) {
   for (size_t i = 0; i < last; ++i) {
     Framebuffer fb;
     renderer.render(ed.pages[i], &fb);
-    if (ed.pages[i].is_front_page) renderer.render_masthead(masthead, &fb);
 
     char name[64];
     std::snprintf(name, sizeof(name), "/page-%03zu.png", i + 1);
@@ -111,27 +100,16 @@ int cmd_compose(const std::vector<std::string>& args) {
   }
 
   std::printf("Edition of %s\n", format_masthead_date(report.date).c_str());
+  std::printf("  %zu stories, %zu pages of story text\n",
+              ed.stats.items_published, ed.pages.size());
   std::printf(
-      "  %zu pages to flip through, %zu stories, %zu pages of story text "
-      "behind them\n",
-      ed.browse_page_count, ed.stats.items_published,
-      ed.pages.size() - ed.browse_page_count);
-  std::printf("  sections: ");
-  for (size_t i = 0; i < ed.section_marks.size(); ++i) {
-    std::printf("%s%s p%zu", i ? ", " : "", ed.section_marks[i].name.c_str(),
-                ed.section_marks[i].first_page + 1);
-  }
-  std::printf("\n");
-  std::printf(
-      "  dropped: %zu already seen, %zu stale, %zu over budget, %zu teasers "
-      "off the front page\n",
+      "  dropped: %zu already seen, %zu stale, %zu over budget\n",
       report.dropped_seen, ed.stats.dropped_stale,
-      ed.stats.dropped_over_budget, ed.stats.front_page_overflow);
+      ed.stats.dropped_over_budget);
   std::printf(
       "  %zu of %zu published stories are truncated by their publisher\n",
       ed.stats.truncated_published, ed.stats.items_published);
-  std::printf("  wrote %zu %s to %s/ (%s)\n", last,
-              all_pages ? "pages" : "browse pages", out_dir.c_str(),
+  std::printf("  wrote %zu pages to %s/ (%s)\n", last, out_dir.c_str(),
               depth_flag.c_str());
 
   // Save the composed edition. On the device this is what makes reading cheap:
@@ -149,11 +127,9 @@ int cmd_compose(const std::vector<std::string>& args) {
   }
 
   if (has_flag(args, "--index")) {
-    std::printf("\n  lede page  tap region        story pages  title\n");
+    std::printf("\n  story pages  title\n");
     for (const StoryRef& s : ed.stories) {
-      std::printf("  %9zu  %4d,%-4d %4dx%-4d  %4zu-%-4zu   %.44s%s\n",
-                  s.lede_page + 1, s.lede_bounds.x, s.lede_bounds.y,
-                  s.lede_bounds.w, s.lede_bounds.h, s.first_page + 1,
+      std::printf("  %4zu-%-4zu   %.44s%s\n", s.first_page + 1,
                   s.first_page + s.page_count, s.title.c_str(),
                   s.truncated ? "  [excerpt]" : "");
     }

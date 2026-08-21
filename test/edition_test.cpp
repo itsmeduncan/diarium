@@ -1,5 +1,5 @@
-// The edition's shape: a short sequence you flip through, with full stories
-// behind it. These assertions are the product thesis in executable form.
+// The edition's shape: nothing but story text, walked oldest-first. These
+// assertions are the product thesis in executable form.
 #include <string>
 #include <vector>
 
@@ -58,7 +58,7 @@ std::vector<Section> two_sections() {
 
 }  // namespace
 
-TEST_CASE("the edition you flip through is short; the stories sit behind it") {
+TEST_CASE("an edition is nothing but story text now") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
 
@@ -67,19 +67,20 @@ TEST_CASE("the edition you flip through is short; the stories sit behind it") {
   opts.max_age_days = 3650;
   const Edition ed = compose_edition(two_sections(), *fonts, opts);
 
-  REQUIRE(ed.browse_page_count > 0);
-  CHECK(ed.stats.items_published == 12);
-
-  // The whole point: browsing the paper is a dozen page turns, not two
-  // hundred, even though every story is present in full.
-  CHECK(ed.browse_page_count <= 8);
-  CHECK(ed.pages.size() > ed.browse_page_count);
+  REQUIRE(!ed.stories.empty());
+  size_t sum = 0;
+  for (const StoryRef& s : ed.stories) {
+    CHECK(s.first_page < ed.pages.size());
+    CHECK(s.page_count >= 1);
+    sum += s.page_count;
+  }
+  CHECK(sum == ed.pages.size());  // every page belongs to exactly one story
 
   // And it ends.
   CHECK(ed.pages.size() < 200);
 }
 
-TEST_CASE("every story is reachable from a lede") {
+TEST_CASE("every story has real pages of its own") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
 
@@ -91,82 +92,13 @@ TEST_CASE("every story is reachable from a lede") {
   REQUIRE(ed.stories.size() == 12);
   for (const StoryRef& s : ed.stories) {
     CAPTURE(s.title);
-    // The lede is on a page you can actually flip to.
-    CHECK(s.lede_page < ed.browse_page_count);
-    // It has somewhere to be tapped.
-    CHECK_FALSE(s.lede_bounds.empty());
-    CHECK(s.lede_bounds.y >= 0);
-    CHECK(s.lede_bounds.y + s.lede_bounds.h <= page_height());
-    // And the story it opens is real, and lives outside the browse sequence.
     CHECK(s.page_count > 0);
-    CHECK(s.first_page >= ed.browse_page_count);
     CHECK(s.first_page + s.page_count <= ed.pages.size());
     CHECK_FALSE(s.section.empty());
+    CHECK_FALSE(s.source.empty());
+    CHECK(s.key != 0);
+    CHECK(s.published != kNoDate);
   }
-}
-
-TEST_CASE("selecting a point on a lede finds its story") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-
-  ComposeOptions opts;
-  opts.now = 1786864000;
-  opts.max_age_days = 3650;
-  const Edition ed = compose_edition(two_sections(), *fonts, opts);
-  REQUIRE_FALSE(ed.stories.empty());
-
-  for (const StoryRef& s : ed.stories) {
-    CAPTURE(s.title);
-    const int cx = s.lede_bounds.x + s.lede_bounds.w / 2;
-    const int cy = s.lede_bounds.y + s.lede_bounds.h / 2;
-    const StoryRef* hit = ed.story_at(s.lede_page, cx, cy);
-    REQUIRE(hit != nullptr);
-    CHECK(hit->title == s.title);
-  }
-
-  // A tap in the folio hits nothing.
-  CHECK(ed.story_at(0, 60, page_height() - 10) == nullptr);
-}
-
-TEST_CASE("lede tap regions on a page do not overlap") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-
-  ComposeOptions opts;
-  opts.now = 1786864000;
-  opts.max_age_days = 3650;
-  const Edition ed = compose_edition(two_sections(), *fonts, opts);
-
-  for (size_t i = 0; i < ed.stories.size(); ++i) {
-    for (size_t j = i + 1; j < ed.stories.size(); ++j) {
-      const StoryRef& a = ed.stories[i];
-      const StoryRef& b = ed.stories[j];
-      if (a.lede_page != b.lede_page) continue;
-      const bool disjoint = a.lede_bounds.y + a.lede_bounds.h <= b.lede_bounds.y ||
-                            b.lede_bounds.y + b.lede_bounds.h <= a.lede_bounds.y ||
-                            a.lede_bounds.x + a.lede_bounds.w <= b.lede_bounds.x ||
-                            b.lede_bounds.x + b.lede_bounds.w <= a.lede_bounds.x;
-      CAPTURE(a.title);
-      CAPTURE(b.title);
-      CHECK(disjoint);
-    }
-  }
-}
-
-TEST_CASE("sections keep their configured order and are marked") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-
-  ComposeOptions opts;
-  opts.now = 1786864000;
-  opts.max_age_days = 3650;
-  const Edition ed = compose_edition(two_sections(), *fonts, opts);
-
-  REQUIRE(ed.section_marks.size() == 2);
-  CHECK(ed.section_marks[0].name == "Technology");
-  CHECK(ed.section_marks[1].name == "World");
-  CHECK(ed.section_marks[0].first_page < ed.section_marks[1].first_page);
-  CHECK(ed.section_marks[1].first_page < ed.browse_page_count);
 }
 
 TEST_CASE("stories run newest first within a section") {
@@ -210,22 +142,15 @@ TEST_CASE("stale stories are dropped and counted") {
   CHECK(ed.stories[0].title == "fresh");
 }
 
-TEST_CASE("an edition with no stories is one page that explains itself") {
+TEST_CASE("an edition with no stories has no pages") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
   const Edition ed = compose_edition({}, *fonts, ComposeOptions());
 
-  // Not zero pages: a device that woke up, found nothing, and showed a blank
-  // screen is indistinguishable from a device that is broken.
+  // Nothing but story text now, and there are no stories: the home dashboard
+  // is what tells the reader the paper came up empty, not a composed page.
   CHECK(ed.stories.empty());
-  CHECK(ed.browse_page_count == 1);
-  CHECK(ed.colophon_page == 0);
-
-  std::string text;
-  for (const Line& line : ed.pages[0].lines) {
-    for (const PositionedRun& r : line.runs) text += r.text + " ";
-  }
-  CHECK(text.find("0 stories") != std::string::npos);
+  CHECK(ed.pages.empty());
 }
 
 TEST_CASE("every section gets a share of the budget") {
@@ -338,70 +263,3 @@ TEST_CASE("no ceiling means every story is published") {
   CHECK(ed.stats.dropped_over_budget == 0);
 }
 
-TEST_CASE("the paper ends with a colophon that says so") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-
-  ComposeOptions opts;
-  opts.now = 1786864000;
-  opts.max_age_days = 3650;
-  opts.feeds_configured = 4;
-  const Edition ed = compose_edition(two_sections(), *fonts, opts);
-
-  // It is the last page you can flip to, and it belongs to no section.
-  REQUIRE(ed.browse_page_count > 0);
-  CHECK(ed.colophon_page == ed.browse_page_count - 1);
-  CHECK(ed.pages[ed.colophon_page].folio_left == ed.title);
-  for (const Edition::SectionMark& m : ed.section_marks) {
-    CHECK(m.first_page < ed.colophon_page);
-  }
-
-  // No story's lede lives on it — it is an ending, not an index page.
-  for (const StoryRef& s : ed.stories) {
-    CHECK(s.lede_page != ed.colophon_page);
-  }
-}
-
-TEST_CASE("a feed that failed is named on the colophon") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-
-  ComposeOptions opts;
-  opts.now = 1786864000;
-  opts.max_age_days = 3650;
-  opts.feeds_configured = 4;
-  opts.feed_problems.push_back(FeedProblem{"The Missing Times", "timed out"});
-  opts.feed_problems.push_back(FeedProblem{"Nothing Daily", "404"});
-
-  const Edition ed = compose_edition(two_sections(), *fonts, opts);
-
-  // Gather the text of the colophon page.
-  std::string text;
-  for (const Line& line : ed.pages[ed.colophon_page].lines) {
-    for (const PositionedRun& r : line.runs) text += r.text + " ";
-  }
-  CHECK(text.find("The Missing Times") != std::string::npos);
-  CHECK(text.find("timed out") != std::string::npos);
-  CHECK(text.find("Nothing Daily") != std::string::npos);
-  CHECK(text.find("2 of 4 feeds") != std::string::npos);
-}
-
-TEST_CASE("a clean run does not invent problems to report") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-
-  ComposeOptions opts;
-  opts.now = 1786864000;
-  opts.max_age_days = 3650;
-  opts.max_items = 100;  // nothing held over
-  opts.feeds_configured = 2;
-  const Edition ed = compose_edition(two_sections(), *fonts, opts);
-
-  std::string text;
-  for (const Line& line : ed.pages[ed.colophon_page].lines) {
-    for (const PositionedRun& r : line.runs) text += r.text + " ";
-  }
-  CHECK(text.find("didn't answer") == std::string::npos);
-  CHECK(text.find("held over") == std::string::npos);
-  CHECK(text.find("2 of 2 feeds") != std::string::npos);
-}
