@@ -5,7 +5,7 @@
 #include "core/base/datetime.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceClock final : public IClock {
@@ -35,4 +35,4 @@ class DeviceClock final : public IClock {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

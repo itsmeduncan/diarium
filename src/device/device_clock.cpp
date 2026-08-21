@@ -1,6 +1,6 @@
 #include "device/device_clock.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 Epoch DeviceClock::now() const {
@@ -30,4 +30,4 @@ void DeviceClock::set_wake_alarm(Epoch when) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

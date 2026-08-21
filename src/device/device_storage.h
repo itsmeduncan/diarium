@@ -7,7 +7,7 @@
 #include "Inkplate.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 // A card that will not mount is a normal state, not an exception: the first
@@ -34,4 +34,4 @@ class DeviceStorage final : public IStorage {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

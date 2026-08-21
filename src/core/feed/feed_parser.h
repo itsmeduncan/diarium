@@ -13,7 +13,7 @@
 #include "core/html/html_to_blocks.h"
 #include "core/io/byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct FeedParseOptions {
   // Stop after this many items. Feeds routinely carry 100+; an edition wants a
@@ -53,4 +53,4 @@ FeedParseStats parse_feed(ByteSource& src, ItemSink& sink,
 
 const char* feed_format_name(FeedFormat f);
 
-}  // namespace rsspaper
+}  // namespace diarium

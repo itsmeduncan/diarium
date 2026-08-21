@@ -16,7 +16,7 @@
 
 #include "core/io/byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 
 enum class XmlEvent : uint8_t {
   None,
@@ -128,4 +128,4 @@ class XmlPullParser {
   std::string self_close_prefix_;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

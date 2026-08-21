@@ -2,7 +2,7 @@
 
 #include <esp_sleep.h>
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 int DevicePower::battery_millivolts() const {
@@ -35,4 +35,4 @@ void DevicePower::deep_sleep_until(Epoch when) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

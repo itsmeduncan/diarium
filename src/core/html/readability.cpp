@@ -1,6 +1,6 @@
 #include "core/html/readability.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 // What a block is worth to the claim "this is the article". Prose scores by
@@ -80,4 +80,4 @@ std::vector<Block> extract_article(const std::vector<Block>& page,
   return article;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

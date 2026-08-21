@@ -6,7 +6,7 @@
 #define STBI_WRITE_NO_STDIO_SPRINTF
 #include "stb_image_write.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 
 bool write_png(const Framebuffer& fb, Depth depth, const std::string& path) {
@@ -19,4 +19,4 @@ bool write_png(const Framebuffer& fb, Depth depth, const std::string& path) {
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

@@ -14,7 +14,7 @@
 #include "core/config/feeds_config.h"
 #include "core/io/byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct OpmlOptions {
   // Where feeds that sit outside any folder go.
@@ -47,4 +47,4 @@ bool import_opml_file(const std::string& path, FeedList* out,
 // `parse_feeds_toml`.
 std::string to_feeds_toml(const FeedList& list);
 
-}  // namespace rsspaper
+}  // namespace diarium

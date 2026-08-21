@@ -3,7 +3,7 @@
 #include "core/base/str.h"
 #include "core/xml/entities.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 bool is_name_start(int c) {
@@ -432,4 +432,4 @@ XmlEvent XmlPullParser::next() {
   }
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

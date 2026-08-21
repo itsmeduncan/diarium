@@ -1,6 +1,6 @@
 #include "core/base/str.h"
 
-namespace rsspaper {
+namespace diarium {
 
 uint32_t utf8_next(const std::string& s, size_t& i) {
   if (i >= s.size()) return 0;
@@ -160,4 +160,4 @@ std::string to_hex64(uint64_t v) {
   return out;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

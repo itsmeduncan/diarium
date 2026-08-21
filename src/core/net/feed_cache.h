@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace rsspaper {
+namespace diarium {
 
 struct FeedValidators {
   std::string etag;
@@ -43,4 +43,4 @@ class FeedCache {
   std::vector<Entry> entries_;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

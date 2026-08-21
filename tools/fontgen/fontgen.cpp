@@ -22,15 +22,15 @@
 
 namespace {
 
-using rsspaper::Charset;
-using rsspaper::FaceSpec;
-using rsspaper::kFaceSpecs;
-using rsspaper::kFontPackFaceBytes;
-using rsspaper::kFontPackGlyphBytes;
-using rsspaper::kFontPackHeaderBytes;
-using rsspaper::kFontPackKernBytes;
-using rsspaper::kFontPackMagic;
-using rsspaper::kSubpixel;
+using diarium::Charset;
+using diarium::FaceSpec;
+using diarium::kFaceSpecs;
+using diarium::kFontPackFaceBytes;
+using diarium::kFontPackGlyphBytes;
+using diarium::kFontPackHeaderBytes;
+using diarium::kFontPackKernBytes;
+using diarium::kFontPackMagic;
+using diarium::kSubpixel;
 
 struct BakedGlyph {
   uint32_t codepoint = 0;
@@ -87,7 +87,7 @@ bool bake_face(const FaceSpec& spec, const std::string& fonts_dir,
                BakedFace* out, bool verbose, std::string* error) {
   std::string ttf;
   const std::string path = fonts_dir + "/" + spec.ttf;
-  if (!rsspaper::read_file(path, &ttf)) {
+  if (!diarium::read_file(path, &ttf)) {
     *error = "cannot read " + path;
     return false;
   }
@@ -115,7 +115,7 @@ bool bake_face(const FaceSpec& spec, const std::string& fonts_dir,
   out->line_gap = static_cast<int16_t>(line_gap * scale + 0.5f);
 
   uint32_t codepoints[512];
-  const size_t n = rsspaper::charset_codepoints(spec.charset, codepoints, 512);
+  const size_t n = diarium::charset_codepoints(spec.charset, codepoints, 512);
 
   // Glyph indices in the pack, parallel to out->glyphs, for the kern pass.
   std::vector<int> stb_indices;
@@ -187,7 +187,7 @@ bool bake_face(const FaceSpec& spec, const std::string& fonts_dir,
   // Kerning. Our own GPOS reader first, because stb skips the Extension
   // lookups modern fonts keep their pairs in; stb's reader is the fallback for
   // fonts with a legacy `kern` table.
-  rsspaper::fontgen::GposKerning gpos;
+  diarium::fontgen::GposKerning gpos;
   gpos.init(data, ttf.size());
 
   size_t probed = 0;
@@ -317,7 +317,7 @@ int main(int argc, char** argv) {
   if (verbose) std::printf("fontgen: baking from %s\n", fonts_dir.c_str());
 
   std::vector<BakedFace> faces;
-  faces.reserve(rsspaper::kFaceCount);
+  faces.reserve(diarium::kFaceCount);
   for (const FaceSpec& spec : kFaceSpecs) {
     BakedFace baked;
     std::string error;
@@ -329,7 +329,7 @@ int main(int argc, char** argv) {
   }
 
   const std::vector<uint8_t> pack = assemble(faces);
-  if (!rsspaper::write_file(out_path,
+  if (!diarium::write_file(out_path,
                             std::string(pack.begin(), pack.end()))) {
     std::fprintf(stderr, "fontgen: cannot write %s\n", out_path.c_str());
     return 1;

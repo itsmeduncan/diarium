@@ -18,7 +18,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace rsspaper {
+namespace diarium {
 namespace fontgen {
 
 class GposKerning {
@@ -55,4 +55,4 @@ class GposKerning {
 };
 
 }  // namespace fontgen
-}  // namespace rsspaper
+}  // namespace diarium

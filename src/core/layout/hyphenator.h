@@ -18,7 +18,7 @@
 
 #include "core/layout/line_breaker.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // The tables. Declared here so the generated file has something to define.
 namespace hyphen_en {
@@ -58,4 +58,4 @@ class LiangHyphenator final : public Hyphenator {
 // every caller to build its own.
 const Hyphenator& english_hyphenator();
 
-}  // namespace rsspaper
+}  // namespace diarium

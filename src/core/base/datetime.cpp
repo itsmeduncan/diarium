@@ -5,7 +5,7 @@
 
 #include "core/base/str.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 const char* const kMonthAbbr[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -312,4 +312,4 @@ uint32_t seconds_until_local_time(const std::string& hh_mm, Epoch local_now) {
   return static_cast<uint32_t>(when - local_now);
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

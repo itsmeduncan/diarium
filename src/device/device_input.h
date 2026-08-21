@@ -9,7 +9,7 @@
 #include "Inkplate.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceInput final : public IInput {
@@ -33,4 +33,4 @@ class DeviceInput final : public IInput {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

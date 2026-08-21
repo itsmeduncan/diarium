@@ -10,7 +10,7 @@
 #include "core/net/http_response.h"
 #include "core/net/url.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 namespace {
 
@@ -115,7 +115,7 @@ std::unique_ptr<ByteSource> DeviceHttpClient::get(const HttpRequest& request,
 
     std::string req = "GET " + parsed.path + " HTTP/1.1\r\n";
     req += "Host: " + parsed.host + "\r\n";
-    req += "User-Agent: RSSpaper/1.0\r\n";
+    req += "User-Agent: Diarium/1.0\r\n";
     req += "Accept: application/rss+xml, application/atom+xml, application/xml, text/xml\r\n";
     req += "Connection: close\r\n";
     if (!request.etag.empty()) req += "If-None-Match: " + request.etag + "\r\n";
@@ -180,4 +180,4 @@ std::unique_ptr<ByteSource> DeviceHttpClient::get(const HttpRequest& request,
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

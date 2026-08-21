@@ -1,6 +1,6 @@
 #include "core/layout/type_scale.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 Align g_body_align = Align::Left;
@@ -88,4 +88,4 @@ TextRole role_for_block(const Block& block) {
 void set_body_alignment(Align align) { g_body_align = align; }
 Align body_alignment() { return g_body_align; }
 
-}  // namespace rsspaper
+}  // namespace diarium

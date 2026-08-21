@@ -4,7 +4,7 @@
 
 #include "core/render/reduce.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 namespace {
 
@@ -120,4 +120,4 @@ void DeviceDisplay::set_frontlight(int level) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

@@ -1,6 +1,6 @@
 #include "device/device_input.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 namespace {
 
@@ -34,4 +34,4 @@ size_t DeviceInput::poll(TouchPoint* out, size_t max) {
 }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

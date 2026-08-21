@@ -4,7 +4,7 @@
 #include "core/html/html_to_blocks.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 

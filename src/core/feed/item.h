@@ -8,7 +8,7 @@
 #include "core/base/datetime.h"
 #include "core/html/block.h"
 
-namespace rsspaper {
+namespace diarium {
 
 enum class ContentSource : uint8_t {
   None,         // the feed gave us nothing renderable
@@ -55,4 +55,4 @@ struct Item {
   bool looks_truncated() const { return truncation != TruncationReason::None; }
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

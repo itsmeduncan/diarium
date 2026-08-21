@@ -1,4 +1,4 @@
-// `rsspaper-sim compose` — the whole pipeline, ending in PNGs you can look at.
+// `diarium-sim compose` — the whole pipeline, ending in PNGs you can look at.
 //
 // Feeds come from the fixture corpus until the fetcher lands; that resolution
 // lives in `sim/fixtures.h` so it stays out of the core.
@@ -18,7 +18,7 @@
 #include "sim/fixtures.h"
 #include "sim/png_writer.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 
 int cmd_compose(const std::vector<std::string>& args) {
@@ -158,4 +158,4 @@ int cmd_compose(const std::vector<std::string>& args) {
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

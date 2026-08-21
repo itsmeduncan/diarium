@@ -4,7 +4,7 @@
 
 #include "core/base/str.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 using hyphen_en::kExceptionCount;
@@ -139,4 +139,4 @@ const Hyphenator& english_hyphenator() {
   return instance;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

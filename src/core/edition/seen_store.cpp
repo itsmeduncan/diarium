@@ -6,7 +6,7 @@
 #include "core/base/str.h"
 #include "core/io/file_byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 
 bool SeenStore::load(const std::string& path, Epoch now) {
   std::string raw;
@@ -53,7 +53,7 @@ bool SeenStore::save(const std::string& path) const {
 
 std::string serialize_seen_store(const SeenStore& store) {
   std::string out =
-      "# rsspaper seen-store: dedup key (hex) and first-seen epoch\n";
+      "# diarium seen-store: dedup key (hex) and first-seen epoch\n";
   for (const SeenStore::Entry& e : store.entries_) {
     out += to_hex64(e.key) + " " + std::to_string(e.when) + "\n";
   }
@@ -73,4 +73,4 @@ bool SeenStore::mark(uint64_t key, Epoch when) {
   return true;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

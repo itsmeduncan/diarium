@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 char lower(char c) { return (c >= 'A' && c <= 'Z') ? c - 'A' + 'a' : c; }
@@ -103,4 +103,4 @@ bool HttpHeadParser::feed(const char* data, size_t n) {
   return true;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

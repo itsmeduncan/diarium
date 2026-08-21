@@ -9,7 +9,7 @@
 #include "core/feed/feed_parser.h"
 #include "core/io/file_byte_source.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace sim {
 namespace {
 
@@ -208,4 +208,4 @@ Edition compose_from_fixtures(const FeedList& config, const FontPack& fonts,
 }
 
 }  // namespace sim
-}  // namespace rsspaper
+}  // namespace diarium

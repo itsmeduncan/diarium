@@ -25,7 +25,7 @@
 
 #include "core/text/faces.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // Advances and kerning are stored in 1/16 px, not whole pixels.
 //
@@ -140,4 +140,4 @@ class FontPack {
   char names_[kFaceCount][16] = {};
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

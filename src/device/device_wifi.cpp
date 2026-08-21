@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 bool DeviceWifi::connect(const WifiConfig& config, uint32_t timeout_ms) {
@@ -29,4 +29,4 @@ void DeviceWifi::disconnect() {
 bool DeviceWifi::connected() const { return WiFi.status() == WL_CONNECTED; }
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

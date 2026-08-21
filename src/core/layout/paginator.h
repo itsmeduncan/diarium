@@ -13,7 +13,7 @@
 #include "core/layout/type_scale.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct PageTemplate {
   int margin_left = kSideMargin;
@@ -91,4 +91,4 @@ class Paginator {
   const Hyphenator& hyphenator_;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

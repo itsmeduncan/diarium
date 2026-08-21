@@ -1,6 +1,6 @@
 #include "core/ui/session.h"
 
-namespace rsspaper {
+namespace diarium {
 
 SessionIntent Session::intent(uint32_t now_ms) const {
   // Unsigned subtraction wraps, which is exactly what is wanted: millis()
@@ -12,4 +12,4 @@ SessionIntent Session::intent(uint32_t now_ms) const {
   return SessionIntent::Stay;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

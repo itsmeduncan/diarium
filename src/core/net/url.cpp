@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 constexpr size_t kMaxUrl = 2048;
@@ -86,4 +86,4 @@ std::string resolve_url(const std::string& base, const std::string& location) {
   return scheme + authority + dir + location;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

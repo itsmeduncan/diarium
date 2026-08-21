@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-namespace rsspaper {
+namespace diarium {
 
 struct SessionThresholds {
   // Rebuilding state from the card costs ~2.25 s; a page turn with state
@@ -37,4 +37,4 @@ class Session {
   uint32_t last_ = 0;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

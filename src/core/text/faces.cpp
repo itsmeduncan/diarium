@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-namespace rsspaper {
+namespace diarium {
 
 const FaceSpec kFaceSpecs[kFaceCount] = {
     {FaceId::Body, "body", "Literata7pt-Regular.ttf", 27, Charset::Latin1},
@@ -103,4 +103,4 @@ uint32_t fallback_codepoint(uint32_t cp) {
   return kTofuGlyph;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

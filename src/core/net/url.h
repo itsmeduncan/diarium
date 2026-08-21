@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <string>
 
-namespace rsspaper {
+namespace diarium {
 
 struct Url {
   bool secure = false;
@@ -25,4 +25,4 @@ bool parse_url(const std::string& text, Url* out);
 // costs one feed.
 std::string resolve_url(const std::string& base, const std::string& location);
 
-}  // namespace rsspaper
+}  // namespace diarium

@@ -15,7 +15,7 @@
 #include "core/render/framebuffer.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // `order` is story indices oldest-first; `unread` is the same length and says
 // which are still to read. Nothing here counts what is outstanding — the list
@@ -25,4 +25,4 @@ void render_contents(const FontPack& fonts, const Edition& edition,
                      const std::vector<bool>& unread, const std::string& strap,
                      Framebuffer* fb);
 
-}  // namespace rsspaper
+}  // namespace diarium

@@ -5,7 +5,7 @@
 
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 TEST_CASE("session stays awake immediately after a touch") {
   Session s{SessionThresholds{}};

@@ -15,7 +15,7 @@
 
 #include "core/layout/page.h"
 
-namespace rsspaper {
+namespace diarium {
 
 struct FeedEntry {
   std::string url;
@@ -24,7 +24,7 @@ struct FeedEntry {
 };
 
 struct EditionConfig {
-  std::string title = "RSSpaper";
+  std::string title = "Diarium";
   std::string wake_at = "05:30";  // local time, 24-hour
   // Minutes east of UTC. The device has no network to ask and no keyboard to
   // be asked, so the offset travels with the config on the card.
@@ -67,4 +67,4 @@ bool parse_feeds_toml(const std::string& text, FeedList* out,
 bool load_feeds_toml(const std::string& path, FeedList* out,
                      std::string* error);
 
-}  // namespace rsspaper
+}  // namespace diarium

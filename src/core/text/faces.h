@@ -15,7 +15,7 @@
 #include <cstddef>
 #include <cstdint>
 
-namespace rsspaper {
+namespace diarium {
 
 enum class FaceId : uint8_t {
   Body,        // running text
@@ -73,4 +73,4 @@ constexpr uint32_t kTofuGlyph = 0xFFFD;
 
 uint32_t fallback_codepoint(uint32_t cp);
 
-}  // namespace rsspaper
+}  // namespace diarium

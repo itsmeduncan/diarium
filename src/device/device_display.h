@@ -8,7 +8,7 @@
 #include "core/render/framebuffer.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceDisplay final : public IDisplay {
@@ -40,4 +40,4 @@ class DeviceDisplay final : public IDisplay {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

@@ -8,7 +8,7 @@
 #include "core/net/http_response.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 

@@ -18,7 +18,7 @@
 #include "core/text/font_pack.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 struct ComposeReport {
@@ -60,4 +60,4 @@ Edition compose_from_card(const FeedList& config, const FontPack& fonts,
                           Epoch now, const ComposeReport& fetched);
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

@@ -19,7 +19,7 @@
 
 #include "core/edition/edition.h"
 
-namespace rsspaper {
+namespace diarium {
 
 constexpr uint32_t kEditionMagic = 0x45505352;  // "RSPE"
 // 2: StoryRef gained a stable key and a source, so a story can be
@@ -37,4 +37,4 @@ std::string serialize_edition(const Edition& edition);
 bool deserialize_edition(const std::string& blob, Edition* edition,
                          std::string* error);
 
-}  // namespace rsspaper
+}  // namespace diarium

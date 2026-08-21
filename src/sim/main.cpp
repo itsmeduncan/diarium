@@ -1,4 +1,4 @@
-// rsspaper-sim — runs the whole device pipeline on a desktop.
+// diarium-sim — runs the whole device pipeline on a desktop.
 //
 // The point of this binary is that layout is the product, and layout needs to
 // be looked at. Everything above the HAL is the same code the Inkplate runs;
@@ -14,7 +14,7 @@ namespace {
 
 void usage() {
   std::fprintf(stderr,
-               "rsspaper-sim — desktop harness for the RSSpaper firmware\n"
+               "diarium-sim — desktop harness for the Diarium firmware\n"
                "\n"
                "  parse    <feed.xml>...            parse feeds, report what "
                "came out\n"
@@ -41,17 +41,17 @@ int main(int argc, char** argv) {
   const std::string cmd = argv[1];
   std::vector<std::string> args(argv + 2, argv + argc);
 
-  if (cmd == "parse") return rsspaper::sim::cmd_parse(args);
-  if (cmd == "compose") return rsspaper::sim::cmd_compose(args);
-  if (cmd == "read") return rsspaper::sim::cmd_read(args);
-  if (cmd == "opml") return rsspaper::sim::cmd_opml(args);
-  if (cmd == "screens") return rsspaper::sim::cmd_screens(args);
+  if (cmd == "parse") return diarium::sim::cmd_parse(args);
+  if (cmd == "compose") return diarium::sim::cmd_compose(args);
+  if (cmd == "read") return diarium::sim::cmd_read(args);
+  if (cmd == "opml") return diarium::sim::cmd_opml(args);
+  if (cmd == "screens") return diarium::sim::cmd_screens(args);
   if (cmd == "-h" || cmd == "--help" || cmd == "help") {
     usage();
     return 0;
   }
 
-  std::fprintf(stderr, "rsspaper-sim: unknown command '%s'\n\n", cmd.c_str());
+  std::fprintf(stderr, "diarium-sim: unknown command '%s'\n\n", cmd.c_str());
   usage();
   return 2;
 }

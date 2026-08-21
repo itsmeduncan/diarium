@@ -14,7 +14,7 @@
 
 #include "core/layout/hyphenator.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace hyphen_en {
 
 const size_t kPatternCount = 4938;
@@ -2845,4 +2845,4 @@ const char* const kExceptions[] = {
 const size_t kExceptionCount = 14;
 
 }  // namespace hyphen_en
-}  // namespace rsspaper
+}  // namespace diarium

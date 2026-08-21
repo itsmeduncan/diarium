@@ -1,4 +1,4 @@
-// IHttpClient over TLS. The only network requests RSSpaper ever makes.
+// IHttpClient over TLS. The only network requests Diarium ever makes.
 //
 // Conditional GET rides on the fields hal.h already carries: the caller puts
 // last time's validators in the request and reads the new ones out of the
@@ -11,7 +11,7 @@
 
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceHttpClient final : public IHttpClient {
@@ -28,4 +28,4 @@ class DeviceHttpClient final : public IHttpClient {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

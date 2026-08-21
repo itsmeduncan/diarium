@@ -16,7 +16,7 @@
 #include "core/layout/type_scale.h"
 #include "core/text/font_pack.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // The smallest unit that can't be split: a word, or a run of a word that
 // shares one face. Widths are in 1/16 px.
@@ -68,4 +68,4 @@ std::vector<BrokenLine> break_block(const Block& block, const RoleStyle& style,
                                     int measure, const FontPack& fonts,
                                     const Hyphenator& hyphenator);
 
-}  // namespace rsspaper
+}  // namespace diarium

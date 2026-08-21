@@ -9,7 +9,7 @@
 #include "device/device_storage.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DevicePower final : public IPower {
@@ -42,4 +42,4 @@ class DevicePower final : public IPower {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium

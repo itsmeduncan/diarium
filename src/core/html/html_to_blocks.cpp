@@ -3,7 +3,7 @@
 #include "core/base/str.h"
 #include "core/xml/entities.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 bool is_ws(char c) {
@@ -619,4 +619,4 @@ std::vector<Block> text_to_blocks(const std::string& text) {
   return out;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

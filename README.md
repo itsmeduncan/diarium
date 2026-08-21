@@ -1,8 +1,8 @@
-# RSSpaper
+# Diarium
 
 **A newspaper, not a feed.**
 
-RSSpaper is an e-ink RSS reader that behaves like a morning paper. It wakes up,
+Diarium is an e-ink RSS reader that behaves like a morning paper. It wakes up,
 fetches your feeds, composes a finite edition with a front page and sections,
 and then it is done. You read it, you reach the end, you put it down.
 
@@ -20,7 +20,7 @@ use it makes of your reading history: there is no count of what is
 outstanding, nothing that accumulates, and nothing that asks to be cleared.
 
 **Everything runs on the device.** There is no server, no account, and no
-companion app. The only network requests RSSpaper ever makes are to the feed
+companion app. The only network requests Diarium ever makes are to the feed
 URLs you configured. Nothing phones home, because there is no home to phone.
 
 ## Status
@@ -28,7 +28,7 @@ URLs you configured. Nothing phones home, because there is no home to phone.
 Early. The desktop simulator and the parsing/layout core are being built first,
 because the page is the product and the page needs to be looked at. Hardware
 support follows — tracked on the
-[1.0.0 milestone](https://github.com/itsmeduncan/rsspaper/milestone/1).
+[1.0.0 milestone](https://github.com/itsmeduncan/diarium/milestone/1).
 
 | Piece                             | State                                             |
 | --------------------------------- | ------------------------------------------------- |
@@ -100,7 +100,7 @@ make device-rm PATH_ON_CARD=/read.dat               # forget what you have read
 make device-compose    # fetch and compose now, rather than waiting for wake_at
 ```
 
-The board is found automatically; `RSSPAPER_PORT` picks one if a machine has
+The board is found automatically; `DIARIUM_PORT` picks one if a machine has
 more than one attached. `make help` lists everything.
 
 The console the device runs is one line at a time, so it is usable by hand
@@ -129,7 +129,7 @@ answered 304, and when the next edition is due.
 Inspect what the parser makes of a feed:
 
 ```sh
-./bin/rsspaper-sim parse --verbose test/fixtures/feeds/*.xml
+./bin/diarium-sim parse --verbose test/fixtures/feeds/*.xml
 ```
 
 See the page as the panel will actually show it, rather than as an 8-bit
@@ -137,17 +137,17 @@ render — thin serifs and hairline rules survive one reduction and not the
 other:
 
 ```sh
-./bin/rsspaper-sim compose --depth mono1 --pages 4   # 1-bit, Atkinson dithered
-./bin/rsspaper-sim compose --depth grey3             # the full-refresh mode
+./bin/diarium-sim compose --depth mono1 --pages 4   # 1-bit, Atkinson dithered
+./bin/diarium-sim compose --depth grey3             # the full-refresh mode
 ```
 
 `compose` saves the edition it built, and `read` loads it rather than
 composing again — which is the whole reason a page turn is cheap on a battery:
 
 ```sh
-./bin/rsspaper-sim compose --fresh        # writes out/edition.rspe
-./bin/rsspaper-sim read                   # "no re-parse, no re-layout"
-./bin/rsspaper-sim read --recompose       # ignore it and build a fresh one
+./bin/diarium-sim compose --fresh        # writes out/edition.rspe
+./bin/diarium-sim read                   # "no re-parse, no re-layout"
+./bin/diarium-sim read --recompose       # ignore it and build a fresh one
 ```
 
 By default `compose` writes only the pages you flip through. `--all-pages`
@@ -155,7 +155,7 @@ writes the story text behind them too, and `--index` prints the navigation
 map — every lede's page, its tap region, and the pages its story occupies:
 
 ```sh
-./bin/rsspaper-sim compose --fresh --index --all-pages
+./bin/diarium-sim compose --fresh --index --all-pages
 ```
 
 Read the paper. You land on a contents page and swipe onward through every
@@ -213,7 +213,7 @@ ssid = "your-network"   # omit the section and the device never fetches
 password = "..."        # never commit this; see config/feeds.local.toml
 
 [edition]
-title = "RSSpaper"       # the nameplate across the top of page one
+title = "Diarium"       # the nameplate across the top of page one
 wake_at = "05:30"        # local time the next edition is composed
 # max_items = 40         # optional ceiling; there is none by default
 max_age_days = 3         # older than this is not news
@@ -233,7 +233,7 @@ nesting collapses to the outermost folder — a reader's sub-folders are
 refinements, not sections:
 
 ```sh
-./bin/rsspaper-sim opml subscriptions.opml --out config/feeds.toml
+./bin/diarium-sim opml subscriptions.opml --out config/feeds.toml
 ```
 
 ## Non-goals

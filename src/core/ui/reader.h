@@ -25,7 +25,7 @@
 #include "core/ui/gesture.h"
 #include "hal/hal.h"
 
-namespace rsspaper {
+namespace diarium {
 
 // Where the rows of an overlay list begin, and how tall each one is. Shared
 // so that hit-testing, drawing and tests cannot disagree about which row is
@@ -173,4 +173,4 @@ class Reader {
   bool pending_context_change_ = true;
 };
 
-}  // namespace rsspaper
+}  // namespace diarium

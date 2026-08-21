@@ -6,7 +6,7 @@
 #include "core/config/feeds_config.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 TEST_CASE("edition carries a utc offset in minutes") {
   FeedList list;

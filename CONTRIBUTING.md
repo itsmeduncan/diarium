@@ -2,7 +2,7 @@
 
 ## The thesis is not up for negotiation
 
-RSSpaper is a newspaper, not a feed. Before proposing a feature, check it
+Diarium is a newspaper, not a feed. Before proposing a feature, check it
 against these:
 
 - **Editions end.** A refresh produces a front page, sections, and an end you
@@ -26,7 +26,7 @@ Features that are good ideas for a different product are still no.
 make check                       # unit tests + the portability gate
 make edition                     # render pages from the fixture feeds
 make read                        # read the paper from the keyboard
-./bin/rsspaper-sim parse f.xml   # see what the parser makes of a feed
+./bin/diarium-sim parse f.xml   # see what the parser makes of a feed
 ```
 
 Iterate in the simulator. It runs the same code as the device for everything
@@ -70,5 +70,5 @@ Tests use [doctest](https://github.com/doctest/doctest), vendored. Run a single
 case with:
 
 ```sh
-./bin/rsspaper-tests --test-case="*entities*"
+./bin/diarium-tests --test-case="*entities*"
 ```

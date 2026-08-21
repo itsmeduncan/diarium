@@ -12,7 +12,7 @@
 #include "doctest.h"
 #include "hal/hal.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 

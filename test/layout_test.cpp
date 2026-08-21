@@ -13,7 +13,7 @@
 #include "core/text/font_pack.h"
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 namespace {
 

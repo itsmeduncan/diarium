@@ -2,7 +2,7 @@
 
 #include "core/base/str.h"
 
-namespace rsspaper {
+namespace diarium {
 
 Framebuffer::Framebuffer(int width, int height)
     : w_(width > 0 ? width : 1), h_(height > 0 ? height : 1) {
@@ -85,4 +85,4 @@ int Framebuffer::draw_text(const Face& face, const std::string& utf8, int x,
   return draw_text_tracked(face, utf8, x, baseline, ink, 0);
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

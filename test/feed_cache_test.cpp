@@ -8,7 +8,7 @@
 
 #include "doctest.h"
 
-using namespace rsspaper;
+using namespace diarium;
 
 TEST_CASE("an unknown feed has no validators") {
   FeedCache cache;

@@ -6,7 +6,7 @@
 #include "core/io/file_byte_source.h"
 #include "core/xml/xml_pull.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 // OPML readers disagree about which attribute holds the display name; most
@@ -145,7 +145,7 @@ bool parse_opml(ByteSource& src, FeedList* out, OpmlOptions opts,
     }
   }
 
-  if (!local.title.empty() && out->edition.title == "RSSpaper") {
+  if (!local.title.empty() && out->edition.title == "Diarium") {
     // Only adopt the OPML's title if the caller hasn't set one; an imported
     // "Subscriptions" is a worse masthead than the default.
     if (!iequals(local.title, "subscriptions")) {
@@ -166,7 +166,7 @@ bool import_opml_file(const std::string& path, FeedList* out, OpmlOptions opts,
 
 std::string to_feeds_toml(const FeedList& list) {
   std::string out =
-      "# RSSpaper edition configuration.\n"
+      "# Diarium edition configuration.\n"
       "#\n"
       "# Section order here is section order in the paper.\n"
       "\n[edition]\n";
@@ -198,4 +198,4 @@ std::string to_feeds_toml(const FeedList& list) {
   return out;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

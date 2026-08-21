@@ -1,6 +1,6 @@
 #include "core/ui/gesture.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace {
 
 int abs_i(int v) { return v < 0 ? -v : v; }
@@ -103,4 +103,4 @@ GestureEvent GestureRecognizer::update(bool touching, int x, int y,
   return out;
 }
 
-}  // namespace rsspaper
+}  // namespace diarium

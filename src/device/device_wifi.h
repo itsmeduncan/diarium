@@ -7,7 +7,7 @@
 
 #include "core/config/feeds_config.h"
 
-namespace rsspaper {
+namespace diarium {
 namespace device {
 
 class DeviceWifi {
@@ -18,4 +18,4 @@ class DeviceWifi {
 };
 
 }  // namespace device
-}  // namespace rsspaper
+}  // namespace diarium
