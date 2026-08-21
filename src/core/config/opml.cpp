@@ -174,8 +174,6 @@ std::string to_feeds_toml(const FeedList& list) {
   out += "wake_at = " + quote_toml(list.edition.wake_at) + "\n";
   out += "max_items = " + std::to_string(list.edition.max_items) + "\n";
   out += "max_age_days = " + std::to_string(list.edition.max_age_days) + "\n";
-  out += "front_page_columns = " +
-         std::to_string(list.edition.front_page_columns) + "\n";
   out += std::string("hyphenate = ") +
          (list.edition.hyphenate ? "true" : "false") + "\n";
   out += std::string("body_alignment = ") +

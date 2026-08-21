@@ -32,7 +32,6 @@ struct EditionConfig {
   // Zero is no ceiling on the edition as a whole; per-feed caps still apply.
   size_t max_items = 0;
   int max_age_days = 3;
-  int front_page_columns = 2;
   Align body_alignment = Align::Left;
   // Portrait out of the box: the panel reads better stood on its short edge.
   // Landscape is a one-line opt-in here. This is a compose-time choice — change

@@ -224,7 +224,6 @@ Edition compose_from_card(const FeedList& config, const FontPack& fonts,
   opts.title = config.edition.title;
   opts.max_items = config.edition.max_items;
   opts.max_age_days = config.edition.max_age_days;
-  opts.front_page_columns = config.edition.front_page_columns;
   opts.body_alignment = config.edition.body_alignment;
   opts.hyphenate = config.edition.hyphenate;
   opts.feeds_configured = config.feeds.size();

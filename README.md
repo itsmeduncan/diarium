@@ -219,7 +219,6 @@ wake_at = "05:30"        # local time the next edition is composed
 # max_items = 40         # optional ceiling; there is none by default
 max_age_days = 3         # older than this is not news
 utc_offset_minutes = 0   # no network to ask, no keyboard to be asked
-front_page_columns = 2   # 1 to 4
 body_alignment = "ragged"  # or "justified", which wants hyphenation
 hyphenate = true
 
