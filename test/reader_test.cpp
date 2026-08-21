@@ -433,6 +433,74 @@ TEST_CASE("reading: the continuous oldest-first pass") {
   }
 }
 
+// choose_refresh(): a context change is always a full refresh, and enough
+// partial turns without one force a full refresh anyway, to keep e-ink
+// ghosting from building up. Re-homed on the surviving continuous-pass
+// gestures after the Browse-mode page-turning tests that used to cover this
+// were deleted along with next_page().
+TEST_CASE("reading: the refresh policy") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+  const Edition ed = make_edition(*fonts);
+
+  SUBCASE("entering an article is a full refresh") {
+    Rig rig;
+    ReaderPolicy policy;
+    policy.partial_turns_before_full = 100;  // isolate context changes
+    Reader reader(ed, *fonts, rig.hal(), policy);
+    reader.load_read_state("read.dat");
+
+    reader.render();  // first paint is a full refresh
+    CHECK(rig.display.count(RefreshMode::Full) == 1);
+
+    // Home -> Article is a context change.
+    REQUIRE(reader.handle(swipe(Gesture::SwipeRight)));
+    reader.render();
+    CHECK(rig.display.count(RefreshMode::Full) == 2);
+
+    // Article -> next Article is a context change too.
+    REQUIRE(reader.handle(swipe(Gesture::SwipeRight)));
+    reader.render();
+    CHECK(rig.display.count(RefreshMode::Full) == 3);
+  }
+
+  SUBCASE("ghosting is cleaned up after enough partial scrolls") {
+    // A dedicated long article rather than `ed`: the shared fixture's
+    // stories top out at 3 pages, too short to exercise a threshold of 2
+    // more than once. One long story is all this needs.
+    Section tech{"Technology", {}};
+    tech.items.push_back(story("A Long Read", 5, 40));
+    ComposeOptions opts;
+    opts.now = 1786864000;
+    opts.max_age_days = 3650;
+    const Edition long_ed = compose_edition({tech}, *fonts, opts);
+    REQUIRE_FALSE(long_ed.stories.empty());
+    REQUIRE(long_ed.stories[0].page_count >= 4);
+
+    Rig rig;
+    ReaderPolicy policy;
+    policy.partial_turns_before_full = 2;
+    Reader reader(long_ed, *fonts, rig.hal(), policy);
+    reader.load_read_state("read.dat");
+
+    REQUIRE(reader.handle(swipe(Gesture::SwipeRight)));
+    reader.render();  // the full refresh from entering this article
+    const size_t fulls_before = rig.display.count(RefreshMode::Full);
+
+    int turns = 0;
+    for (int i = 0; i < 20; ++i) {
+      if (!reader.handle(swipe(Gesture::SwipeDown))) break;
+      reader.render();
+      ++turns;
+    }
+    REQUIRE(turns >= 3);
+    // With a threshold of 2, three scrolls must have triggered at least one
+    // clean beyond the initial paint. That is the entire point of the policy.
+    CHECK(rig.display.count(RefreshMode::Partial) >= 2);
+    CHECK(rig.display.count(RefreshMode::Full) > fulls_before);
+  }
+}
+
 // A discreet mark when the battery is genuinely low, and nothing at all when
 // it is fine. No percentage, because lithium discharge is flat through most
 // of its range and any percentage would be a lie exactly where it matters.
