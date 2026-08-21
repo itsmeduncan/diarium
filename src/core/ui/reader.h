@@ -33,10 +33,6 @@ enum class ReaderMode : uint8_t {
   Finished,   // the news ran out
 };
 
-// The last browse page is the colophon: it says the paper has ended, and why
-// it is the length it is. That is a composed page rather than a special screen
-// so it persists with the edition and needs no rendering of its own.
-
 struct ReaderPolicy {
   // Partial refreshes between full ones. E-ink ghosting accumulates; this is
   // the number of page turns before the panel gets cleaned up.

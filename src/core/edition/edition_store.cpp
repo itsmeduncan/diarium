@@ -122,22 +122,13 @@ std::string serialize_edition(const Edition& ed) {
 
   put_i64(out, ed.date);
   put_str(out, ed.title);
-  put_u32(out, static_cast<uint32_t>(ed.browse_page_count));
-  put_u32(out, static_cast<uint32_t>(ed.colophon_page));
 
   put_u32(out, static_cast<uint32_t>(ed.stats.items_in));
   put_u32(out, static_cast<uint32_t>(ed.stats.dropped_seen));
   put_u32(out, static_cast<uint32_t>(ed.stats.dropped_stale));
   put_u32(out, static_cast<uint32_t>(ed.stats.dropped_over_budget));
   put_u32(out, static_cast<uint32_t>(ed.stats.items_published));
-  put_u32(out, static_cast<uint32_t>(ed.stats.front_page_overflow));
   put_u32(out, static_cast<uint32_t>(ed.stats.truncated_published));
-
-  put_u32(out, static_cast<uint32_t>(ed.section_marks.size()));
-  for (const Edition::SectionMark& m : ed.section_marks) {
-    put_str(out, m.name);
-    put_u32(out, static_cast<uint32_t>(m.first_page));
-  }
 
   put_u32(out, static_cast<uint32_t>(ed.stories.size()));
   for (const StoryRef& s : ed.stories) {
@@ -145,11 +136,6 @@ std::string serialize_edition(const Edition& ed) {
     put_str(out, s.title);
     put_str(out, s.section);
     put_str(out, s.source);
-    put_u32(out, static_cast<uint32_t>(s.lede_page));
-    put_i32(out, s.lede_bounds.x);
-    put_i32(out, s.lede_bounds.y);
-    put_i32(out, s.lede_bounds.w);
-    put_i32(out, s.lede_bounds.h);
     put_u32(out, static_cast<uint32_t>(s.first_page));
     put_u32(out, static_cast<uint32_t>(s.page_count));
     put_u8(out, s.truncated ? 1 : 0);
@@ -213,45 +199,26 @@ bool deserialize_edition(const std::string& blob, Edition* out,
   Edition ed;
   ed.date = r.i64();
   ed.title = r.str();
-  ed.browse_page_count = r.u32();
-  ed.colophon_page = r.u32();
 
   ed.stats.items_in = r.u32();
   ed.stats.dropped_seen = r.u32();
   ed.stats.dropped_stale = r.u32();
   ed.stats.dropped_over_budget = r.u32();
   ed.stats.items_published = r.u32();
-  ed.stats.front_page_overflow = r.u32();
   ed.stats.truncated_published = r.u32();
 
-  const uint32_t section_count = r.u32();
-  if (!r.plausible_count(section_count, 8)) return fail("section table is corrupt");
-  for (uint32_t i = 0; i < section_count && r.ok(); ++i) {
-    Edition::SectionMark m;
-    m.name = r.str();
-    m.first_page = r.u32();
-    ed.section_marks.push_back(std::move(m));
-  }
-
   const uint32_t story_count = r.u32();
-  if (!r.plausible_count(story_count, 33)) return fail("story table is corrupt");
+  if (!r.plausible_count(story_count, 37)) return fail("story table is corrupt");
   for (uint32_t i = 0; i < story_count && r.ok(); ++i) {
     StoryRef s;
     s.key = static_cast<uint64_t>(r.i64());
     s.title = r.str();
     s.section = r.str();
     s.source = r.str();
-    s.lede_page = r.u32();
-    s.lede_bounds.x = r.i32();
-    s.lede_bounds.y = r.i32();
-    s.lede_bounds.w = r.i32();
-    s.lede_bounds.h = r.i32();
     s.first_page = r.u32();
     s.page_count = r.u32();
     s.truncated = r.u8() != 0;
-    // Version 2 predates publication dates. Reading such an edition is fine;
-    // it simply has no dates to order by until it is composed again.
-    s.published = version >= 3 ? static_cast<Epoch>(r.i64()) : kNoDate;
+    s.published = static_cast<Epoch>(r.i64());
     ed.stories.push_back(std::move(s));
   }
 
@@ -310,14 +277,10 @@ bool deserialize_edition(const std::string& blob, Edition* out,
   }
 
   if (!r.ok()) return fail("saved edition is truncated");
-  if (ed.browse_page_count > ed.pages.size()) {
-    return fail("saved edition claims more browse pages than it has");
-  }
   // A story pointing outside the pages it was saved with would send the
   // reader into nothing.
   for (const StoryRef& s : ed.stories) {
-    if (s.first_page + s.page_count > ed.pages.size() ||
-        s.lede_page >= ed.pages.size()) {
+    if (s.first_page + s.page_count > ed.pages.size()) {
       return fail("saved edition has a story pointing past its pages");
     }
   }

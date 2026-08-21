@@ -74,19 +74,10 @@ TEST_CASE("an edition survives a round trip byte for byte") {
 
   CHECK(restored.date == original.date);
   CHECK(restored.title == original.title);
-  CHECK(restored.browse_page_count == original.browse_page_count);
-  CHECK(restored.colophon_page == original.colophon_page);
   CHECK(restored.pages.size() == original.pages.size());
   CHECK(restored.stats.items_published == original.stats.items_published);
   CHECK(restored.stats.truncated_published ==
         original.stats.truncated_published);
-
-  REQUIRE(restored.section_marks.size() == original.section_marks.size());
-  for (size_t i = 0; i < original.section_marks.size(); ++i) {
-    CHECK(restored.section_marks[i].name == original.section_marks[i].name);
-    CHECK(restored.section_marks[i].first_page ==
-          original.section_marks[i].first_page);
-  }
 
   REQUIRE(restored.stories.size() == original.stories.size());
   for (size_t i = 0; i < original.stories.size(); ++i) {
@@ -95,14 +86,10 @@ TEST_CASE("an edition survives a round trip byte for byte") {
     const StoryRef& b = restored.stories[i];
     CHECK(b.title == a.title);
     CHECK(b.section == a.section);
-    CHECK(b.lede_page == a.lede_page);
     CHECK(b.first_page == a.first_page);
     CHECK(b.page_count == a.page_count);
     CHECK(b.truncated == a.truncated);
-    CHECK(b.lede_bounds.x == a.lede_bounds.x);
-    CHECK(b.lede_bounds.y == a.lede_bounds.y);
-    CHECK(b.lede_bounds.w == a.lede_bounds.w);
-    CHECK(b.lede_bounds.h == a.lede_bounds.h);
+    CHECK(b.published == a.published);
   }
 
   for (size_t p = 0; p < original.pages.size(); ++p) {
@@ -133,7 +120,7 @@ TEST_CASE("an edition survives a round trip byte for byte") {
   CHECK(serialize_edition(restored) == blob);
 }
 
-TEST_CASE("a restored edition still navigates") {
+TEST_CASE("a restored edition's stories still point at real pages") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
   const Edition original = sample(*fonts);
@@ -143,11 +130,9 @@ TEST_CASE("a restored edition still navigates") {
   REQUIRE(deserialize_edition(serialize_edition(original), &restored, &error));
 
   for (const StoryRef& s : restored.stories) {
-    const int cx = s.lede_bounds.x + s.lede_bounds.w / 2;
-    const int cy = s.lede_bounds.y + s.lede_bounds.h / 2;
-    const StoryRef* hit = restored.story_at(s.lede_page, cx, cy);
-    REQUIRE(hit != nullptr);
-    CHECK(hit->title == s.title);
+    CAPTURE(s.title);
+    CHECK(s.page_count > 0);
+    CHECK(s.first_page + s.page_count <= restored.pages.size());
   }
 }
 
@@ -256,15 +241,15 @@ TEST_CASE("an empty seen-store blob is not an error") {
 }
 
 TEST_CASE("the version gate accepts the formats it claims to") {
-  // A format bump must not brick a device whose only copy of the paper is the
-  // one already on its card, so the reader accepts back to kMinEditionVersion.
-  // Whether a real v2 edition round-trips is verified on the device, against
-  // an actual v2 file, which is the only place that fact lives.
+  // A format bump must not crash on a device whose only copy of the paper is
+  // the one already on its card — it must be refused and degrade into
+  // "compose a fresh edition". Versions 2 and 3 carried browse pages this
+  // build no longer lays out, so kMinEditionVersion == kEditionVersion here:
+  // nothing older round-trips, by design.
   Edition ed;
   ed.date = 1786864000;
   ed.title = "Diarium";
   ed.pages.push_back(Page());
-  ed.browse_page_count = 1;
   const std::string good = serialize_edition(ed);
 
   auto with_version = [&good](uint16_t v) {
