@@ -39,6 +39,16 @@ constexpr uint16_t kMinEditionVersion = 4;
 
 std::string serialize_edition(const Edition& edition);
 
+// The little-endian primitives underneath serialize_edition, exposed so the
+// streaming v5 writer (edition_stream.h) writes the same bytes for the same
+// fields rather than forking its own copy.
+void put_u8(ByteSink& sink, uint8_t v);
+void put_u16(ByteSink& sink, uint16_t v);
+void put_u32(ByteSink& sink, uint32_t v);
+void put_i32(ByteSink& sink, int32_t v);
+void put_i64(ByteSink& sink, int64_t v);
+void put_str(ByteSink& sink, const std::string& s);
+
 // The per-page encoding, shared by the whole-blob v4 writer above and the
 // streaming v5 writer (edition_stream.h) — a page looks the same on disk
 // either way.

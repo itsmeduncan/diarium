@@ -3,7 +3,6 @@
 #include <vector>
 
 namespace diarium {
-namespace {
 
 void put_u8(ByteSink& out, uint8_t v) { out.write(&v, 1); }
 void put_u32(ByteSink& out, uint32_t v) {
@@ -32,6 +31,8 @@ void put_str(ByteSink& out, const std::string& s) {
   put_u32(out, static_cast<uint32_t>(s.size()));
   out.write(s.data(), s.size());
 }
+
+namespace {
 
 // A cursor that can't read off the end. Every failure is the same failure —
 // the blob is not what we expected — so it is tracked once rather than at
