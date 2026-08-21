@@ -42,93 +42,6 @@ void Reader::set_page(size_t page, bool context_change) {
   pending_context_change_ = pending_context_change_ || context_change;
 }
 
-bool Reader::next_page() {
-  if (mode_ == ReaderMode::Sections) return false;
-
-  if (mode_ == ReaderMode::Story) {
-    const StoryRef* s = open_story();
-    if (s == nullptr) return back();
-    const size_t last = s->first_page + s->page_count - 1;
-    if (page_ >= last) {
-      // The end of a story returns you to where you chose it. A story is not
-      // a place you fall out of into the next story's text.
-      return back();
-    }
-    set_page(page_ + 1, false);
-    return true;
-  }
-
-  if (page_ + 1 >= edition_.browse_page_count) return false;
-  set_page(page_ + 1, false);
-  return true;
-}
-
-bool Reader::previous_page() {
-  if (mode_ == ReaderMode::Sections) return false;
-
-  if (mode_ == ReaderMode::Story) {
-    const StoryRef* s = open_story();
-    if (s == nullptr) return back();
-    if (page_ <= s->first_page) return back();
-    set_page(page_ - 1, false);
-    return true;
-  }
-
-  if (page_ == 0) return false;
-  set_page(page_ - 1, false);
-  return true;
-}
-
-bool Reader::open_story_at(int x, int y) {
-  if (mode_ != ReaderMode::Browse) return false;
-  const StoryRef* hit = edition_.story_at(page_, x, y);
-  if (hit == nullptr || hit->page_count == 0) return false;
-
-  for (size_t i = 0; i < edition_.stories.size(); ++i) {
-    if (&edition_.stories[i] == hit) {
-      story_index_ = i;
-      break;
-    }
-  }
-  have_story_ = true;
-  return_page_ = page_;
-  mode_ = ReaderMode::Story;
-  set_page(hit->first_page, true);
-  return true;
-}
-
-bool Reader::back() {
-  if (mode_ == ReaderMode::Sections) {
-    mode_ = have_story_ ? ReaderMode::Story : ReaderMode::Browse;
-    needs_render_ = true;
-    pending_context_change_ = true;
-    return true;
-  }
-  if (mode_ != ReaderMode::Story) return false;
-
-  mode_ = ReaderMode::Browse;
-  have_story_ = false;
-  set_page(return_page_, true);
-  return true;
-}
-
-bool Reader::toggle_sections() {
-  if (mode_ == ReaderMode::Sections) return back();
-  if (edition_.section_marks.empty()) return false;
-  mode_ = ReaderMode::Sections;
-  needs_render_ = true;
-  pending_context_change_ = true;
-  return true;
-}
-
-bool Reader::jump_to_section(size_t index) {
-  if (index >= edition_.section_marks.size()) return false;
-  mode_ = ReaderMode::Browse;
-  have_story_ = false;
-  set_page(edition_.section_marks[index].first_page, true);
-  return true;
-}
-
 // The top-right corner, big enough to find in the dark without looking.
 bool Reader::in_light_corner(int x, int y) const {
   return x >= page_width() - 140 && y <= 140;
@@ -217,34 +130,8 @@ bool Reader::handle(const GestureEvent& event) {
     return false;
   }
 
-  switch (event.kind) {
-    case Gesture::SwipeLeft:
-      return next_page();
-    case Gesture::SwipeRight:
-      // From the overview, rightwards is into the news rather than backwards
-      // through pages you have already passed.
-      return mode_ == ReaderMode::Browse ? begin_reading() : previous_page();
-    case Gesture::SwipeDown:
-      return toggle_sections();
-    case Gesture::SwipeUp:
-      return mode_ == ReaderMode::Sections ? back() : false;
-    case Gesture::Tap:
-      if (mode_ == ReaderMode::Sections) {
-        const size_t rows = edition_.section_marks.size();
-        const size_t index = section_row_at(event.y);
-        if (index < rows) {
-          confirm_mark_all_ = false;
-          return jump_to_section(index);
-        }
-        if (index == rows) return mark_everything_read();
-        confirm_mark_all_ = false;
-        return back();
-      }
-      if (mode_ == ReaderMode::Story) return false;
-      return open_story_at(event.x, event.y);
-    case Gesture::None:
-      return false;
-  }
+  // Home: rightwards is into the news. Nothing else does anything here.
+  if (event.kind == Gesture::SwipeRight) return begin_reading();
   return false;
 }
 
@@ -262,94 +149,25 @@ bool Reader::tick() {
   return true;
 }
 
-size_t Reader::section_row_at(int y) const {
-  if (y < kOverlayFirstY) return static_cast<size_t>(-1);
-  return static_cast<size_t>((y - kOverlayFirstY) / kOverlayRowHeight);
-}
-
-void Reader::render_section_overlay() {
-  Framebuffer& fb = hal_.display->framebuffer();
-  fb.fill(kPaper);
-
-  const Face& head = fonts_.face(FaceId::Head);
-  const Face& body = fonts_.face(FaceId::BodyBold);
-  const Face& meta = fonts_.face(FaceId::Meta);
-
-  int y = 70;
-  if (head.valid()) {
-    fb.draw_text(head, "Sections", kSideMargin * kSubpixel, y, kInk);
-    y += head.descent() + 24;
-    fb.fill_rect(kSideMargin, y, page_width() - 2 * kSideMargin, 2, kInk);
-  }
-
-  y = kOverlayFirstY;
-  const int row_height = kOverlayRowHeight;
-  for (size_t i = 0; i < edition_.section_marks.size(); ++i) {
-    const Edition::SectionMark& m = edition_.section_marks[i];
-    if (y + row_height > page_height() - 60) break;
-    if (body.valid()) {
-      fb.draw_text(body, m.name, kSideMargin * kSubpixel, y + body.ascent(),
-                   kInk);
-    }
-    if (meta.valid()) {
-      const std::string page = "page " + std::to_string(m.first_page + 1);
-      const int w = meta.measure(page);
-      fb.draw_text(meta, page, (page_width() - kSideMargin) * kSubpixel - w,
-                   y + body.ascent(), 90);
-    }
-    y += row_height;
-    fb.fill_rect(kSideMargin, y - 18, page_width() - 2 * kSideMargin, 1, 190);
-  }
-
-  // And below the sections, the way out of a backlog. A second tap confirms,
-  // because a mis-tap that silently discards a week of unread news would be
-  // worse than any modal.
-  if (body.valid() && y + row_height <= page_height() - 60) {
-    const size_t left = unread_remaining();
-    const std::string label =
-        confirm_mark_all_ ? "Tap again to mark everything read"
-                          : "Mark everything read";
-    fb.draw_text(body, label, kSideMargin * kSubpixel, y + body.ascent(),
-                 left == 0 ? 150 : kInk);
-  }
-
-  if (meta.valid()) {
-    const std::string hint = "Swipe up or tap the heading to go back";
-    fb.draw_text(meta, hint, kSideMargin * kSubpixel, page_height() - 40, 120);
-  }
-}
-
 void Reader::render() {
   if (hal_.display == nullptr) return;
   needs_render_ = false;
 
-  if (mode_ == ReaderMode::Sections) {
-    render_section_overlay();
-  } else if (mode_ == ReaderMode::Finished) {
+  if (mode_ == ReaderMode::Finished) {
     render_finished();
-  } else if (mode_ == ReaderMode::Browse && page_ == 0) {
-    // Page one is drawn rather than composed: it is a view of what is left to
-    // read, and that changes as you read while the edition does not. The
-    // pages behind it are the composed ledes, still there to be flipped
-    // through.
+  } else if (mode_ == ReaderMode::Home) {
+    // Home is drawn rather than composed: it is a view of what is left to
+    // read, and that changes as you read while the edition does not.
     std::vector<bool> unread;
     unread.reserve(order_.size());
     for (size_t i = 0; i < order_.size(); ++i) {
       unread.push_back(!read_.has(edition_.stories[order_[i]].key));
     }
     render_home(fonts_, edition_, order_, unread, "composed on device",
-               &hal_.display->framebuffer());
+                &hal_.display->framebuffer());
   } else {
     if (page_ >= edition_.pages.size()) return;
     renderer_.render(edition_.pages[page_], &hal_.display->framebuffer());
-    if (edition_.pages[page_].is_front_page) {
-      MastheadInfo info;
-      info.title = edition_.title;
-      info.date_line = format_masthead_date(edition_.date);
-      info.strap = std::to_string(edition_.stats.items_published) +
-                   " stories · composed on device";
-      renderer_.render_masthead(info, &hal_.display->framebuffer());
-    }
   }
 
   render_battery_mark();
@@ -368,21 +186,7 @@ std::string Reader::position() const {
            std::to_string(s.page_count) + " — " + s.title;
   }
   if (mode_ == ReaderMode::Finished) return "no more news";
-  switch (mode_) {
-    case ReaderMode::Sections:
-      return "sections";
-    case ReaderMode::Story: {
-      const StoryRef* s = open_story();
-      if (s == nullptr) return "story";
-      return "story \"" + s->title + "\" page " +
-             std::to_string(page_ - s->first_page + 1) + "/" +
-             std::to_string(s->page_count);
-    }
-    case ReaderMode::Browse:
-      break;
-  }
-  return "browsing page " + std::to_string(page_ + 1) + "/" +
-         std::to_string(edition_.browse_page_count);
+  return "home";
 }
 
 
@@ -508,15 +312,14 @@ bool Reader::mark_everything_read() {
   return true;
 }
 
-// The contents page is home: a view of what is left to read. This is not a
-// "back" — reading is a line and there is no stack to pop — so it does not
-// restore where you were, it puts the paper down. Nothing becomes unread by
-// coming here, so swiping onward resumes at the oldest story still
-// outstanding, which is the one after whatever was on screen.
+// Home is a view of what is left to read. This is not a "back" — reading is
+// a line and there is no stack to pop — so it does not restore where you
+// were, it puts the paper down. Nothing becomes unread by coming here, so
+// swiping onward resumes at the oldest story still outstanding, which is the
+// one after whatever was on screen.
 bool Reader::go_home() {
-  if (mode_ == ReaderMode::Browse && page_ == 0) return false;
-  confirm_mark_all_ = false;
-  mode_ = ReaderMode::Browse;
+  if (mode_ == ReaderMode::Home) return false;
+  mode_ = ReaderMode::Home;
   have_story_ = false;
   set_page(0, true);
   return true;

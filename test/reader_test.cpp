@@ -150,6 +150,34 @@ Edition make_edition(const FontPack& fonts) {
   return compose_edition({tech, world}, fonts, opts);
 }
 
+// A ready-to-swipe reader: a fresh edition, a fresh rig, read state loaded
+// and nothing else. Heap-allocated and deliberately never freed — the rig and
+// edition have to outlive the returned Reader, which only holds references
+// into them, and the test binary exits long before that would matter.
+Reader fresh_reader(const FontPack& fonts) {
+  Rig* rig = new Rig();
+  Edition* ed = new Edition(make_edition(fonts));
+  Reader reader(*ed, fonts, rig->hal());
+  reader.load_read_state("read.dat");
+  return reader;
+}
+
+GestureEvent swipe(Gesture kind) {
+  GestureEvent e;
+  e.kind = kind;
+  return e;
+}
+
+// The bottom-left corner, where a long press means "take me home" — see
+// `Reader::in_home_corner`.
+GestureEvent long_press_home_corner() {
+  GestureEvent e;
+  e.kind = Gesture::LongPress;
+  e.x = 40;
+  e.y = page_height() - 40;
+  return e;
+}
+
 }  // namespace
 
 TEST_CASE("gestures: taps, swipes and long presses") {
@@ -227,200 +255,29 @@ TEST_CASE("gestures: taps, swipes and long presses") {
   }
 }
 
-TEST_CASE("the reader turns pages and stops at the end of the paper") {
+// Home is the entry state, and the way there and back.
+TEST_CASE("the reader wakes on the home page") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-  Rig rig;
-  Reader reader(ed, *fonts, rig.hal());
-
-  CHECK(reader.mode() == ReaderMode::Browse);
-  CHECK(reader.current_page() == 0);
-
-  for (size_t i = 1; i < ed.browse_page_count; ++i) {
-    CHECK(reader.next_page());
-    CHECK(reader.current_page() == i);
-  }
-  // The last browse page is the colophon, which says the paper has ended.
-  // There is nothing past it — and crucially not page one of the story text,
-  // which is what a naive "page_ + 1" would walk into.
-  CHECK(reader.current_page() == ed.colophon_page);
-  CHECK_FALSE(reader.next_page());
-  CHECK(reader.current_page() == ed.colophon_page);
-  CHECK(reader.mode() == ReaderMode::Browse);
-
-  CHECK(reader.previous_page());
-  CHECK(reader.current_page() == ed.colophon_page - 1);
+  Reader reader = fresh_reader(*fonts);
+  CHECK(reader.mode() == ReaderMode::Home);
 }
 
-TEST_CASE("you cannot page backwards off the front") {
+TEST_CASE("a right swipe from home opens the oldest unread story") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-  Rig rig;
-  Reader reader(ed, *fonts, rig.hal());
-  CHECK_FALSE(reader.previous_page());
-  CHECK(reader.current_page() == 0);
+  Reader reader = fresh_reader(*fonts);
+  REQUIRE(reader.handle(swipe(Gesture::SwipeRight)));
+  CHECK(reader.mode() == ReaderMode::Article);
 }
 
-TEST_CASE("tapping a lede opens the story and back returns to it") {
+TEST_CASE("the home gesture returns to the home page mid-pass") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-  REQUIRE_FALSE(ed.stories.empty());
-
-  const StoryRef& target = ed.stories[0];
-  Rig rig;
-  Reader reader(ed, *fonts, rig.hal());
-
-  // Get to the page the lede is on.
-  while (reader.current_page() < target.lede_page) REQUIRE(reader.next_page());
-  const size_t lede_page = reader.current_page();
-
-  const int cx = target.lede_bounds.x + target.lede_bounds.w / 2;
-  const int cy = target.lede_bounds.y + target.lede_bounds.h / 2;
-  REQUIRE(reader.open_story_at(cx, cy));
-
-  CHECK(reader.mode() == ReaderMode::Story);
-  CHECK(reader.current_page() == target.first_page);
-  REQUIRE(reader.open_story() != nullptr);
-  CHECK(reader.open_story()->title == target.title);
-
-  CHECK(reader.back());
-  CHECK(reader.mode() == ReaderMode::Browse);
-  CHECK(reader.current_page() == lede_page);
-}
-
-TEST_CASE("tapping empty space opens nothing") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-  Rig rig;
-  Reader reader(ed, *fonts, rig.hal());
-  CHECK_FALSE(reader.open_story_at(5, page_height() - 5));
-  CHECK(reader.mode() == ReaderMode::Browse);
-}
-
-TEST_CASE("reaching the end of a story returns to its lede") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-
-  // A story of more than one page, so the walk is real.
-  const StoryRef* target = nullptr;
-  for (const StoryRef& s : ed.stories) {
-    if (s.page_count > 1) {
-      target = &s;
-      break;
-    }
-  }
-  REQUIRE(target != nullptr);
-
-  Rig rig;
-  Reader reader(ed, *fonts, rig.hal());
-  while (reader.current_page() < target->lede_page) REQUIRE(reader.next_page());
-  const size_t lede_page = reader.current_page();
-
-  REQUIRE(reader.open_story_at(target->lede_bounds.x + 10,
-                               target->lede_bounds.y + 10));
-  for (size_t i = 1; i < target->page_count; ++i) {
-    CHECK(reader.next_page());
-    CHECK(reader.mode() == ReaderMode::Story);
-  }
-  // One more turn walks out of the story, back to where it was chosen.
-  CHECK(reader.next_page());
-  CHECK(reader.mode() == ReaderMode::Browse);
-  CHECK(reader.current_page() == lede_page);
-}
-
-TEST_CASE("paging back from a story's first page leaves the story") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-  const StoryRef& target = ed.stories[0];
-
-  Rig rig;
-  Reader reader(ed, *fonts, rig.hal());
-  while (reader.current_page() < target.lede_page) REQUIRE(reader.next_page());
-  REQUIRE(reader.open_story_at(target.lede_bounds.x + 10,
-                               target.lede_bounds.y + 10));
-  CHECK(reader.previous_page());
-  CHECK(reader.mode() == ReaderMode::Browse);
-}
-
-TEST_CASE("the section overlay jumps and closes") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-  REQUIRE(ed.section_marks.size() >= 2);
-
-  Rig rig;
-  Reader reader(ed, *fonts, rig.hal());
-
-  CHECK(reader.toggle_sections());
-  CHECK(reader.mode() == ReaderMode::Sections);
-  // Page turns do nothing while the overlay is up.
-  CHECK_FALSE(reader.next_page());
-
-  CHECK(reader.jump_to_section(1));
-  CHECK(reader.mode() == ReaderMode::Browse);
-  CHECK(reader.current_page() == ed.section_marks[1].first_page);
-
-  CHECK(reader.toggle_sections());
-  CHECK(reader.toggle_sections());
-  CHECK(reader.mode() == ReaderMode::Browse);
-  CHECK_FALSE(reader.jump_to_section(99));
-}
-
-TEST_CASE("page turns are partial; changing context is a full refresh") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-  const StoryRef& target = ed.stories[0];
-
-  Rig rig;
-  ReaderPolicy policy;
-  policy.partial_turns_before_full = 100;  // isolate context changes
-  Reader reader(ed, *fonts, rig.hal(), policy);
-
-  reader.render();  // first paint is a full refresh
-  CHECK(rig.display.count(RefreshMode::Full) == 1);
-
-  while (reader.current_page() < target.lede_page) {
-    reader.next_page();
-    reader.render();
-  }
-  const size_t fulls_before = rig.display.count(RefreshMode::Full);
-  CHECK(rig.display.count(RefreshMode::Partial) >= 1);
-
-  reader.open_story_at(target.lede_bounds.x + 10, target.lede_bounds.y + 10);
-  reader.render();
-  CHECK(rig.display.count(RefreshMode::Full) == fulls_before + 1);
-}
-
-TEST_CASE("ghosting is cleaned up after enough partial turns") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-  const Edition ed = make_edition(*fonts);
-
-  Rig rig;
-  ReaderPolicy policy;
-  policy.partial_turns_before_full = 2;
-  Reader reader(ed, *fonts, rig.hal(), policy);
-  reader.render();
-
-  int turns = 0;
-  for (int i = 0; i < 20; ++i) {
-    if (!reader.next_page()) break;
-    reader.render();
-    ++turns;
-  }
-  REQUIRE(turns >= 3);
-  // With a threshold of 2, three turns must have triggered at least one clean
-  // beyond the initial paint. That is the entire point of the policy.
-  CHECK(rig.display.count(RefreshMode::Full) >= 2);
-  CHECK(rig.display.count(RefreshMode::Partial) >= 2);
-  CHECK(static_cast<int>(rig.display.modes.size()) == turns + 1);
+  Reader reader = fresh_reader(*fonts);
+  reader.handle(swipe(Gesture::SwipeRight));            // into Article
+  REQUIRE(reader.handle(long_press_home_corner()));     // long-press bottom-left
+  CHECK(reader.mode() == ReaderMode::Home);
 }
 
 TEST_CASE("the reader describes where it is") {
@@ -429,10 +286,17 @@ TEST_CASE("the reader describes where it is") {
   const Edition ed = make_edition(*fonts);
   Rig rig;
   Reader reader(ed, *fonts, rig.hal());
+  reader.load_read_state("read.dat");
 
-  CHECK(reader.position().find("browsing page 1/") != std::string::npos);
-  reader.toggle_sections();
-  CHECK(reader.position() == "sections");
+  CHECK(reader.position() == "home");
+
+  REQUIRE(reader.handle(swipe(Gesture::SwipeRight)));
+  CHECK(reader.position().find("article 1/") != std::string::npos);
+
+  for (size_t i = 0; i < ed.stories.size() + 2; ++i) {
+    reader.handle(swipe(Gesture::SwipeRight));
+  }
+  CHECK(reader.position() == "no more news");
 }
 
 // The continuous pass: an overview you land on, then every unread article
@@ -458,7 +322,7 @@ TEST_CASE("reading: the continuous oldest-first pass") {
     Reader r(ed, *fonts, rig.hal());
     r.load_read_state("read.dat");
     r.render();
-    REQUIRE(r.mode() == ReaderMode::Browse);
+    REQUIRE(r.mode() == ReaderMode::Home);
 
     GestureEvent e;
     e.kind = Gesture::SwipeRight;
@@ -627,73 +491,6 @@ TEST_CASE("reading: the battery mark") {
   }
 }
 
-// The way out of a backlog. Two taps, because a carry-over pile with no exit
-// is an inbox and an exit that fires on a mis-tap is worse than one.
-TEST_CASE("reading: marking everything read") {
-  const FontPack* fonts = pack();
-  if (fonts == nullptr) return;
-  Edition ed = make_edition(*fonts);
-
-  auto tap_row = [&](Reader& r, size_t row) {
-    GestureEvent e;
-    e.kind = Gesture::Tap;
-    e.x = page_width() / 2;
-    e.y = kOverlayFirstY + static_cast<int>(row) * kOverlayRowHeight + 4;
-    return r.handle(e);
-  };
-
-  SUBCASE("one tap arms it, a second clears the backlog") {
-    Rig rig;
-    Reader r(ed, *fonts, rig.hal());
-    r.load_read_state("read.dat");
-
-    GestureEvent down;
-    down.kind = Gesture::SwipeDown;
-    REQUIRE(r.handle(down));
-    REQUIRE(r.mode() == ReaderMode::Sections);
-
-    const size_t row = ed.section_marks.size();
-    REQUIRE(tap_row(r, row));
-    CHECK(r.mode() == ReaderMode::Sections);  // armed, not fired
-
-    REQUIRE(tap_row(r, row));
-    CHECK(r.mode() == ReaderMode::Finished);
-  }
-
-  SUBCASE("everything really is read afterwards") {
-    Rig rig;
-    {
-      Reader r(ed, *fonts, rig.hal());
-      r.load_read_state("read.dat");
-      GestureEvent down;
-      down.kind = Gesture::SwipeDown;
-      REQUIRE(r.handle(down));
-      const size_t row = ed.section_marks.size();
-      REQUIRE(tap_row(r, row));
-      REQUIRE(tap_row(r, row));
-    }
-
-    Reader fresh(ed, *fonts, rig.hal());
-    fresh.load_read_state("read.dat");
-    GestureEvent right;
-    right.kind = Gesture::SwipeRight;
-    fresh.handle(right);
-    CHECK(fresh.mode() == ReaderMode::Finished);
-  }
-
-  SUBCASE("tapping a section still jumps rather than arming anything") {
-    Rig rig;
-    Reader r(ed, *fonts, rig.hal());
-    r.load_read_state("read.dat");
-    GestureEvent down;
-    down.kind = Gesture::SwipeDown;
-    REQUIRE(r.handle(down));
-    if (ed.section_marks.empty()) return;
-    REQUIRE(tap_row(r, 0));
-    CHECK(r.mode() == ReaderMode::Browse);
-  }
-}
-
 // A light with a switch. Nothing reacts to the room, nothing ramps, and the
 // level survives being put down.
 TEST_CASE("reading: the frontlight") {
@@ -809,7 +606,7 @@ TEST_CASE("reading: the way home") {
     REQUIRE(r.mode() == ReaderMode::Article);
 
     REQUIRE(r.handle(corner(Gesture::LongPress)));
-    CHECK(r.mode() == ReaderMode::Browse);
+    CHECK(r.mode() == ReaderMode::Home);
     CHECK(r.current_page() == 0);
   }
 
@@ -839,21 +636,6 @@ TEST_CASE("reading: the way home") {
     CHECK(r.mode() == ReaderMode::Article);
   }
 
-  SUBCASE("it comes back from a lede page too") {
-    Rig rig;
-    Reader r(ed, *fonts, rig.hal());
-    r.load_read_state("read.dat");
-
-    GestureEvent left;
-    left.kind = Gesture::SwipeLeft;
-    REQUIRE(r.handle(left));
-    REQUIRE(r.current_page() == 1);
-
-    REQUIRE(r.handle(corner(Gesture::LongPress)));
-    CHECK(r.mode() == ReaderMode::Browse);
-    CHECK(r.current_page() == 0);
-  }
-
   SUBCASE("and from the end of the news") {
     Rig rig;
     Reader r(ed, *fonts, rig.hal());
@@ -864,7 +646,7 @@ TEST_CASE("reading: the way home") {
     REQUIRE(r.mode() == ReaderMode::Finished);
 
     REQUIRE(r.handle(corner(Gesture::LongPress)));
-    CHECK(r.mode() == ReaderMode::Browse);
+    CHECK(r.mode() == ReaderMode::Home);
     CHECK(r.current_page() == 0);
   }
 
@@ -872,7 +654,7 @@ TEST_CASE("reading: the way home") {
     Rig rig;
     Reader r(ed, *fonts, rig.hal());
     r.load_read_state("read.dat");
-    REQUIRE(r.mode() == ReaderMode::Browse);
+    REQUIRE(r.mode() == ReaderMode::Home);
     REQUIRE(r.current_page() == 0);
 
     CHECK_FALSE(r.handle(corner(Gesture::LongPress)));
@@ -894,7 +676,7 @@ TEST_CASE("reading: the way home") {
     const uint64_t was = third->key;
 
     REQUIRE(r.handle(corner(Gesture::LongPress)));
-    REQUIRE(r.mode() == ReaderMode::Browse);
+    REQUIRE(r.mode() == ReaderMode::Home);
 
     // Resuming picks up the oldest thing still unread, which is the one after
     // the article that was on screen — it was marked read on arrival.
