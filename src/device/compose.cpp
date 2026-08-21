@@ -100,6 +100,14 @@ void fetch_all(const FeedList& config, IHttpClient* http, IStorage* storage,
         ++local.feeds_failed;
         local.problems.push_back(FeedProblem{feed.url, "could not be saved"});
       }
+      // Free the feed's TLS session before opening any article's. The device's
+      // internal RAM barely fits one mbedTLS context; holding this one open
+      // while the article fetches below open theirs put two live at once, and
+      // that is what tipped a heavy morning into "SSL - Memory allocation
+      // failed" on the next handshake. The article pages are read back from the
+      // card, not from this stream, so nothing below needs it.
+      body.reset();
+
       // With the feed in hand, pull the pages behind anything the publisher
       // cut short. Parsing here costs a handful of items, not an edition, and
       // it is the only moment the radio is up.
@@ -223,6 +231,14 @@ Edition compose_from_card(const FeedList& config, const FontPack& fonts,
   opts.now = when;
   opts.title = config.edition.title;
   opts.max_items = config.edition.max_items;
+  // A memory-safety ceiling on the composed edition, not a preference. The
+  // whole edition is held in RAM to serialize and to read, and the device's
+  // scarce internal RAM runs out past a few hundred pages: measured on a
+  // 6FLICK, ~145 pages serialise and save, ~199 abort. 120 leaves margin for
+  // the one story that overshoots the budget as it is laid out. When it bites,
+  // the paper is a little shorter that day rather than the compose crashing —
+  // and feeds.toml's max_items still bounds the story count above this.
+  opts.max_pages = 120;
   opts.max_age_days = config.edition.max_age_days;
   opts.body_alignment = config.edition.body_alignment;
   opts.hyphenate = config.edition.hyphenate;

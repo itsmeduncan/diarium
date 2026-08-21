@@ -123,8 +123,24 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
   PageTemplate story_tmpl;
   story_tmpl.columns = 1;
 
+  // A memory-safety stop, not a preference. The whole edition is held in RAM
+  // to serialize and to read, and the device's internal RAM runs out past a
+  // few hundred pages — the compose aborts rather than degrading. So when the
+  // page budget is reached, the remaining stories are dropped (and counted)
+  // instead. The desktop leaves max_pages at zero and is never bounded here.
+  bool budget_reached = false;
   for (const Section& s : sections) {
-    for (const Item& it : s.items) {
+    if (budget_reached) {
+      ed.stats.dropped_over_budget += s.items.size();
+      continue;
+    }
+    for (size_t ii = 0; ii < s.items.size(); ++ii) {
+      if (opts.max_pages > 0 && ed.pages.size() >= opts.max_pages) {
+        ed.stats.dropped_over_budget += s.items.size() - ii;
+        budget_reached = true;
+        break;
+      }
+      const Item& it = s.items[ii];
       std::vector<FlowElement> story;
       story.push_back(element(TextRole::ArticleHead, it.title));
       const std::string by = byline_for(it);

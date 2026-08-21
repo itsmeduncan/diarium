@@ -101,6 +101,30 @@ TEST_CASE("every story has real pages of its own") {
   }
 }
 
+TEST_CASE("a page budget bounds the edition instead of letting it grow") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  ComposeOptions opts;
+  const Edition full = compose_edition(two_sections(), *fonts, opts);
+  REQUIRE(full.pages.size() > 10);  // the fixture is comfortably multi-page
+
+  // The budget is a memory-safety stop, not a preference: the edition must not
+  // grow past it, and the stories that could not fit are dropped and counted
+  // rather than the paper growing until the device runs out of RAM.
+  opts.max_pages = 8;
+  const Edition capped = compose_edition(two_sections(), *fonts, opts);
+  CHECK(capped.pages.size() < full.pages.size());
+  // At most one story overshoots — the one being laid out when the budget was
+  // reached. Fixture stories run a few pages each.
+  CHECK(capped.pages.size() <= opts.max_pages + 12);
+  CHECK(capped.stats.dropped_over_budget > 0);
+  // The all-story-text invariant still holds: every page belongs to a story.
+  size_t sum = 0;
+  for (const StoryRef& s : capped.stories) sum += s.page_count;
+  CHECK(sum == capped.pages.size());
+}
+
 TEST_CASE("stories run newest first within a section") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;
