@@ -176,12 +176,6 @@ bool parse_feeds_toml(const std::string& text, FeedList* out,
         size_t n = 0;
         if (!parse_size(raw, &n)) return fail("max_age_days must be a whole number");
         out->edition.max_age_days = static_cast<int>(n);
-      } else if (key == "front_page_columns") {
-        size_t n = 0;
-        if (!parse_size(raw, &n) || n < 1 || n > 4) {
-          return fail("front_page_columns must be between 1 and 4");
-        }
-        out->edition.front_page_columns = static_cast<int>(n);
       } else if (key == "hyphenate") {
         out->edition.hyphenate = !(value == "false" || value == "no" ||
                                    value == "0" || value == "off");

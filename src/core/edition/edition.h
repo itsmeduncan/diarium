@@ -43,7 +43,6 @@ struct ComposeOptions {
   // Stories older than this are stale news, however recently they appeared in
   // the feed.
   int max_age_days = 3;
-  int front_page_columns = 2;
   Align body_alignment = Align::Left;
   bool hyphenate = true;
   // How many feeds were configured, and which of them failed.
