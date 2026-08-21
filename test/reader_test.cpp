@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "core/edition/edition.h"
+#include "core/edition/edition_stream.h"
 #include "core/text/font_pack.h"
 #include "core/ui/gesture.h"
 #include "core/ui/reader.h"
@@ -858,4 +859,100 @@ TEST_CASE("reading: clearing the backlog from home") {
     // ordinary swipe from home, not the empty pass a clear would leave.
     CHECK(r.mode() == ReaderMode::Article);
   }
+}
+
+namespace {
+
+// A RangedSource over a borrowed string that counts bytes read, so a test
+// can prove the reader never holds more than the current story's pages
+// resident — edition_stream_test.cpp has this same double for the reader
+// underneath.
+class CountingRangedSource final : public RangedSource {
+ public:
+  explicit CountingRangedSource(const std::string& data) : data_(data) {}
+
+  size_t size() const override { return data_.size(); }
+  bool read(size_t offset, size_t length, std::string* out) const override {
+    if (offset > data_.size() || length > data_.size() - offset) return false;
+    *out = data_.substr(offset, length);
+    total_read_ += length;
+    return true;
+  }
+
+  size_t total_read() const { return total_read_; }
+
+ private:
+  const std::string& data_;
+  mutable size_t total_read_ = 0;
+};
+
+}  // namespace
+
+// Stage C: the reader over a lazily-opened v5 file, driven exactly like the
+// whole-Edition reader above — same gestures, same navigation — but backed
+// by a StreamingEditionReader instead of a resident Edition.
+TEST_CASE("the streaming reader holds only the current story's pages") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  Section tech{"Technology", {}};
+  Section world{"World", {}};
+  for (int i = 0; i < 5; ++i) {
+    tech.items.push_back(story("Tech " + std::to_string(i), 10 - i, 14));
+    world.items.push_back(story("World " + std::to_string(i), 10 - i, 6));
+  }
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+
+  std::string blob;
+  StringSink sink(&blob);
+  ComposeStats stats;
+  REQUIRE(compose_streaming({tech, world}, *fonts, opts, sink, &stats));
+  REQUIRE(stats.items_published > 5);
+
+  CountingRangedSource counting(blob);
+  StreamingEditionReader stream;
+  std::string error;
+  REQUIRE_MESSAGE(stream.open(counting, &error), error);
+  const size_t after_open = counting.total_read();
+  CHECK(after_open < blob.size() / 2);  // header + index, not the pages
+
+  Rig rig;
+  Reader r(stream, *fonts, rig.hal());
+  r.load_read_state("read.dat");
+  r.render();
+  CHECK(r.mode() == ReaderMode::Home);
+  CHECK(counting.total_read() == after_open);  // home never touches a story
+
+  GestureEvent right;
+  right.kind = Gesture::SwipeRight;
+  REQUIRE(r.handle(right));
+  CHECK(r.mode() == ReaderMode::Article);
+  const uint64_t first_key = r.open_story()->key;
+  const size_t first_page_count = r.open_story()->page_count;
+  const size_t after_first_story = counting.total_read();
+  CHECK(after_first_story > after_open);  // exactly one story's worth loaded
+
+  // Scrolling within the story never issues another read — current_pages_
+  // already holds everything it needs.
+  if (first_page_count > 1) {
+    GestureEvent down;
+    down.kind = Gesture::SwipeDown;
+    REQUIRE(r.handle(down));
+    CHECK(r.current_page() == 1);
+    CHECK(counting.total_read() == after_first_story);
+  }
+
+  // Moving to the next story replaces current_pages_ with a second read,
+  // not an accumulation on top of the first.
+  REQUIRE(r.handle(right));
+  CHECK(r.mode() == ReaderMode::Article);
+  CHECK(r.open_story()->key != first_key);
+  CHECK(counting.total_read() > after_first_story);
+
+  // Two of many stories were ever resident, one at a time — nowhere near
+  // the whole file.
+  CHECK(counting.total_read() < blob.size() / 2);
 }

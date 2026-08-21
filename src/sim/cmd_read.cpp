@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -17,6 +18,7 @@
 #include "core/config/feeds_config.h"
 #include "core/edition/edition.h"
 #include "core/edition/edition_store.h"
+#include "core/edition/edition_stream.h"
 #include "core/io/file_byte_source.h"
 #include "core/feed/feed_parser.h"
 #include "core/text/font_pack.h"
@@ -28,6 +30,25 @@
 namespace diarium {
 namespace sim {
 namespace {
+
+// Adapts a path on an IStorage into the core's RangedSource seam, so a
+// StreamingEditionReader can open lazily against whatever the sim's storage
+// holds without core/ ever knowing storage exists. `storage` and the file
+// at `path` must outlive whatever this is handed to.
+class StorageRangedSource final : public RangedSource {
+ public:
+  StorageRangedSource(IStorage* storage, std::string path)
+      : storage_(storage), path_(std::move(path)) {}
+
+  size_t size() const override { return storage_->size(path_); }
+  bool read(size_t offset, size_t length, std::string* out) const override {
+    return storage_->read_range(path_, offset, length, out);
+  }
+
+ private:
+  IStorage* storage_;
+  std::string path_;
+};
 
 void print_help() {
   std::printf(
@@ -104,30 +125,56 @@ int cmd_read(const std::vector<std::string>& args) {
   }
 
   // Prefer a saved edition, which is what the device does: composition
-  // happened at wake, and reading it again should cost nothing.
-  Edition ed;
+  // happened at wake, and reading it again should cost nothing. `compose`
+  // now streams v5 by default, so that is tried first, lazily — only its
+  // footer, header and index ever come resident here, the same as on
+  // device. A v4 file (an older --save, or one written before this branch)
+  // still loads whole, and if neither reads, the fixtures are composed
+  // fresh.
   const std::string load_path = flag(args, "--edition", "out/edition.rspe");
-  std::string blob;
-  bool loaded = false;
-  if (!has_flag(args, "--recompose") && read_file(load_path, &blob)) {
-    std::string load_error;
-    if (deserialize_edition(blob, &ed, &load_error)) {
-      loaded = true;
-      std::printf("loaded %s (%zu KB, no re-parse, no re-layout)\n",
-                  load_path.c_str(), blob.size() / 1024);
-    } else {
-      std::fprintf(stderr, "read: %s — composing instead\n",
-                   load_error.c_str());
+  const bool allow_load = !has_flag(args, "--recompose");
+
+  SimStorage edition_storage(".");
+  StorageRangedSource edition_ranged(&edition_storage, load_path);
+  StreamingEditionReader stream;
+  bool loaded_v5 = false;
+  if (allow_load) {
+    std::string open_error;
+    if (stream.open(edition_ranged, &open_error)) {
+      loaded_v5 = true;
+      std::printf(
+          "loaded %s (v5, streamed — one story resident at a time)\n",
+          load_path.c_str());
     }
   }
-  if (!loaded) {
-    FixtureComposeOptions fixture_opts;
-    fixture_opts.fixtures_dir = fixtures_dir;
-    fixture_opts.fresh = true;
-    FixtureComposeReport report;
-    ed = compose_from_fixtures(config, fonts, fixture_opts, &report);
+
+  Edition ed;  // only populated when the v5 path above did not pan out
+  if (!loaded_v5) {
+    bool loaded_v4 = false;
+    std::string blob;
+    if (allow_load && read_file(load_path, &blob)) {
+      std::string load_error;
+      if (deserialize_edition(blob, &ed, &load_error)) {
+        loaded_v4 = true;
+        std::printf("loaded %s (%zu KB, no re-parse, no re-layout)\n",
+                    load_path.c_str(), blob.size() / 1024);
+      } else {
+        std::fprintf(stderr, "read: %s — composing instead\n",
+                     load_error.c_str());
+      }
+    }
+    if (!loaded_v4) {
+      FixtureComposeOptions fixture_opts;
+      fixture_opts.fixtures_dir = fixtures_dir;
+      fixture_opts.fresh = true;
+      FixtureComposeReport report;
+      ed = compose_from_fixtures(config, fonts, fixture_opts, &report);
+    }
   }
-  if (ed.pages.empty()) {
+
+  const Epoch edition_date = loaded_v5 ? stream.date() : ed.date;
+  const size_t story_count = loaded_v5 ? stream.index().size() : ed.stories.size();
+  if (story_count == 0) {
     std::fprintf(stderr, "read: the edition is empty\n");
     return 1;
   }
@@ -135,7 +182,7 @@ int cmd_read(const std::vector<std::string>& args) {
   ensure_output_dir(out_dir);
   SimDisplay display(out_dir, Depth::Grey8);
   SimInput input;
-  SimClock clock(ed.date);
+  SimClock clock(edition_date);
   SimPower power;
   SimStorage storage(out_dir);
   SimHttpClient http(fixtures_dir, true);
@@ -148,14 +195,19 @@ int cmd_read(const std::vector<std::string>& args) {
   hal.storage = &storage;
   hal.http = &http;
 
-  Reader reader(ed, fonts, hal);
+  // Either constructor gives the same interface below; only how a page's
+  // bytes get here differs.
+  const std::unique_ptr<Reader> reader_storage =
+      loaded_v5 ? std::unique_ptr<Reader>(new Reader(stream, fonts, hal))
+               : std::unique_ptr<Reader>(new Reader(ed, fonts, hal));
+  Reader& reader = *reader_storage;
   // The reading order is built here, so this is not optional: without it the
   // pass has nothing to walk and the first swipe says the news ran out.
   reader.load_read_state("read.dat");
   reader.render();
 
-  std::printf("Diarium — %s\n", format_masthead_date(ed.date).c_str());
-  std::printf("%zu stories in this edition\n", ed.stories.size());
+  std::printf("Diarium — %s\n", format_masthead_date(edition_date).c_str());
+  std::printf("%zu stories in this edition\n", story_count);
   print_help();
 
   char line[256];

@@ -20,6 +20,7 @@
 
 #include "core/edition/seen_store.h"
 #include "core/edition/edition.h"
+#include "core/edition/edition_stream.h"
 #include "core/render/page_renderer.h"
 #include "core/text/font_pack.h"
 #include "core/ui/gesture.h"
@@ -56,6 +57,13 @@ struct ReaderPolicy {
 class Reader {
  public:
   Reader(const Edition& edition, const FontPack& fonts, Hal hal,
+         ReaderPolicy policy = ReaderPolicy());
+
+  // The lazy path: the index (small, resident — see owned_shell_ below)
+  // comes from `stream`, and the current story's pages are loaded from it
+  // on demand as the pass moves, rather than a whole resident Edition.
+  // `stream` must outlive this Reader.
+  Reader(StreamingEditionReader& stream, const FontPack& fonts, Hal hal,
          ReaderPolicy policy = ReaderPolicy());
 
   // Draws the current page and pushes it to the panel.
@@ -117,8 +125,22 @@ class Reader {
 
   void set_page(size_t page, bool context_change);
   RefreshMode choose_refresh(bool context_change);
+  // The page the Article render branch should draw: current_pages_[page_]
+  // when streaming, edition_->pages[page_] otherwise. Null if out of range.
+  const Page* current_render_page() const;
 
-  const Edition& edition_;
+  // Non-null in both modes: the whole-Edition constructor points this at
+  // the caller's Edition; the streaming constructor points it at
+  // owned_shell_, which carries only the index (title, date, StoryRefs) —
+  // never a resident pages list — built once from stream_->index().
+  const Edition* edition_;
+  Edition owned_shell_;
+  // Set only by the streaming constructor. When set, the reader is in the
+  // lazy mode: pages come from current_pages_, loaded a story at a time by
+  // show_article_at, never from a resident Edition::pages.
+  StreamingEditionReader* stream_ = nullptr;
+  std::vector<Page> current_pages_;
+
   const FontPack& fonts_;
   PageRenderer renderer_;
   Hal hal_;

@@ -11,15 +11,37 @@ namespace diarium {
 
 Reader::Reader(const Edition& edition, const FontPack& fonts, Hal hal,
                ReaderPolicy policy)
-    : edition_(edition),
+    : edition_(&edition),
       fonts_(fonts),
       renderer_(fonts),
       hal_(hal),
       policy_(policy) {}
 
+Reader::Reader(StreamingEditionReader& stream, const FontPack& fonts, Hal hal,
+               ReaderPolicy policy)
+    : edition_(&owned_shell_),
+      stream_(&stream),
+      fonts_(fonts),
+      renderer_(fonts),
+      hal_(hal),
+      policy_(policy) {
+  // The index only — title, date, and every StoryRef — never a pages list.
+  // reading_order(), the home dashboard and every metadata lookup below
+  // work on this exactly as they would on a whole resident Edition; only
+  // the article render path (current_render_page) and story navigation
+  // (show_article_at) know pages come from stream_ instead.
+  owned_shell_.date = stream.date();
+  owned_shell_.title = stream.title();
+  owned_shell_.stats = stream.stats();
+  owned_shell_.stories.reserve(stream.index().size());
+  for (const StreamIndexEntry& e : stream.index()) {
+    owned_shell_.stories.push_back(e.ref);
+  }
+}
+
 const StoryRef* Reader::open_story() const {
-  if (!have_story_ || story_index_ >= edition_.stories.size()) return nullptr;
-  return &edition_.stories[story_index_];
+  if (!have_story_ || story_index_ >= edition_->stories.size()) return nullptr;
+  return &edition_->stories[story_index_];
 }
 
 RefreshMode Reader::choose_refresh(bool context_change) {
@@ -36,10 +58,22 @@ RefreshMode Reader::choose_refresh(bool context_change) {
 }
 
 void Reader::set_page(size_t page, bool context_change) {
-  if (page >= edition_.pages.size()) return;
+  // Streaming: current_pages_ already holds whatever story show_article_at
+  // just loaded (or is empty before any story has been opened), so it is
+  // the bound in that mode — edition_->pages is deliberately never
+  // populated when stream_ is set.
+  const size_t bound =
+      stream_ != nullptr ? current_pages_.size() : edition_->pages.size();
+  if (page >= bound) return;
   page_ = page;
   needs_render_ = true;
   pending_context_change_ = pending_context_change_ || context_change;
+}
+
+const Page* Reader::current_render_page() const {
+  const std::vector<Page>& pages = stream_ != nullptr ? current_pages_ : edition_->pages;
+  if (page_ >= pages.size()) return nullptr;
+  return &pages[page_];
 }
 
 // The top-right corner, big enough to find in the dark without looking.
@@ -168,13 +202,14 @@ void Reader::render() {
     std::vector<bool> unread;
     unread.reserve(order_.size());
     for (size_t i = 0; i < order_.size(); ++i) {
-      unread.push_back(!read_.has(edition_.stories[order_[i]].key));
+      unread.push_back(!read_.has(edition_->stories[order_[i]].key));
     }
-    render_home(fonts_, edition_, order_, unread, "composed on device",
+    render_home(fonts_, *edition_, order_, unread, "composed on device",
                 &hal_.display->framebuffer(), confirm_mark_all_);
   } else {
-    if (page_ >= edition_.pages.size()) return;
-    renderer_.render(edition_.pages[page_], &hal_.display->framebuffer());
+    const Page* p = current_render_page();
+    if (p == nullptr) return;
+    renderer_.render(*p, &hal_.display->framebuffer());
   }
 
   render_battery_mark();
@@ -186,7 +221,7 @@ void Reader::render() {
 
 std::string Reader::position() const {
   if (mode_ == ReaderMode::Article && order_pos_ < order_.size()) {
-    const StoryRef& s = edition_.stories[order_[order_pos_]];
+    const StoryRef& s = edition_->stories[order_[order_pos_]];
     return "article " + std::to_string(order_pos_ + 1) + "/" +
            std::to_string(order_.size()) + " page " +
            std::to_string(article_page_ + 1) + "/" +
@@ -205,25 +240,25 @@ std::string Reader::position() const {
 
 void Reader::load_read_state(const std::string& path) {
   read_path_ = path;
-  order_ = edition_.reading_order();
+  order_ = edition_->reading_order();
   if (hal_.storage == nullptr) return;
   std::string blob;
   if (!hal_.storage->read(path, &blob)) return;  // nothing read yet
-  read_.deserialize(blob, edition_.date);
+  read_.deserialize(blob, edition_->date);
 }
 
 size_t Reader::unread_remaining() const {
   size_t n = 0;
   for (size_t i = 0; i < order_.size(); ++i) {
-    if (!read_.has(edition_.stories[order_[i]].key)) ++n;
+    if (!read_.has(edition_->stories[order_[i]].key)) ++n;
   }
   return n;
 }
 
 void Reader::mark_current_read() {
   if (order_pos_ >= order_.size()) return;
-  const StoryRef& s = edition_.stories[order_[order_pos_]];
-  if (!read_.mark(s.key, edition_.date)) return;  // already read
+  const StoryRef& s = edition_->stories[order_[order_pos_]];
+  if (!read_.mark(s.key, edition_->date)) return;  // already read
   if (hal_.storage != nullptr && !read_path_.empty()) {
     hal_.storage->write(read_path_, serialize_seen_store(read_));
   }
@@ -236,7 +271,7 @@ bool Reader::show_article_at(size_t order_pos, bool context_change) {
     pending_context_change_ = true;
     return true;
   }
-  const StoryRef& s = edition_.stories[order_[order_pos]];
+  const StoryRef& s = edition_->stories[order_[order_pos]];
   if (s.page_count == 0) return false;
 
   order_pos_ = order_pos;
@@ -244,6 +279,11 @@ bool Reader::show_article_at(size_t order_pos, bool context_change) {
   mode_ = ReaderMode::Article;
   story_index_ = order_[order_pos];
   have_story_ = true;
+  // Streaming: load exactly this story's pages, replacing whatever the
+  // previous one left in current_pages_ — never more than one story
+  // resident. Whole-Edition mode has nothing to load; the pages are
+  // already there.
+  if (stream_ != nullptr) current_pages_ = stream_->load_story_pages(story_index_);
   set_page(s.first_page, context_change);
   mark_current_read();
   return true;
@@ -252,7 +292,7 @@ bool Reader::show_article_at(size_t order_pos, bool context_change) {
 // Enters the pass at the oldest thing not yet read.
 bool Reader::begin_reading() {
   for (size_t i = 0; i < order_.size(); ++i) {
-    if (!read_.has(edition_.stories[order_[i]].key)) {
+    if (!read_.has(edition_->stories[order_[i]].key)) {
       return show_article_at(i, true);
     }
   }
@@ -264,7 +304,7 @@ bool Reader::begin_reading() {
 
 bool Reader::next_article() {
   for (size_t i = order_pos_ + 1; i < order_.size(); ++i) {
-    if (!read_.has(edition_.stories[order_[i]].key)) {
+    if (!read_.has(edition_->stories[order_[i]].key)) {
       return show_article_at(i, true);
     }
   }
@@ -284,7 +324,7 @@ bool Reader::previous_article() {
 
 bool Reader::scroll_down() {
   if (order_pos_ >= order_.size()) return false;
-  const StoryRef& s = edition_.stories[order_[order_pos_]];
+  const StoryRef& s = edition_->stories[order_[order_pos_]];
   if (static_cast<size_t>(article_page_) + 1 >= s.page_count) return false;
   ++article_page_;
   set_page(s.first_page + static_cast<size_t>(article_page_), false);
@@ -294,7 +334,7 @@ bool Reader::scroll_down() {
 bool Reader::scroll_up() {
   if (order_pos_ >= order_.size() || article_page_ == 0) return false;
   --article_page_;
-  const StoryRef& s = edition_.stories[order_[order_pos_]];
+  const StoryRef& s = edition_->stories[order_[order_pos_]];
   set_page(s.first_page + static_cast<size_t>(article_page_), false);
   return true;
 }
@@ -312,7 +352,7 @@ bool Reader::mark_everything_read() {
   }
   confirm_mark_all_ = false;
 
-  for (const StoryRef& s : edition_.stories) read_.mark(s.key, edition_.date);
+  for (const StoryRef& s : edition_->stories) read_.mark(s.key, edition_->date);
   if (hal_.storage != nullptr && !read_path_.empty()) {
     hal_.storage->write(read_path_, serialize_seen_store(read_));
   }
