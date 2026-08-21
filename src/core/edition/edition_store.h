@@ -60,4 +60,90 @@ void write_page(ByteSink& sink, const Page& page);
 bool deserialize_edition(const std::string& blob, Edition* edition,
                          std::string* error);
 
+// A cursor over a string that can't read off the end. Every failure is the
+// same failure — the blob is not what we expected — so it is tracked once
+// (`ok()`) rather than at every call site. Public so the streaming v5 reader
+// (edition_stream.h) can decode its header/index/pages with the same cursor
+// deserialize_edition uses, rather than a second implementation.
+class Reader {
+ public:
+  explicit Reader(const std::string& data) : d_(data) {}
+
+  bool ok() const { return ok_; }
+  size_t remaining() const { return ok_ ? d_.size() - at_ : 0; }
+
+  uint8_t u8() {
+    if (!want(1)) return 0;
+    return static_cast<uint8_t>(d_[at_++]);
+  }
+  uint16_t u16() {
+    if (!want(2)) return 0;
+    const uint16_t v = static_cast<uint16_t>(
+        static_cast<uint8_t>(d_[at_]) |
+        (static_cast<uint8_t>(d_[at_ + 1]) << 8));
+    at_ += 2;
+    return v;
+  }
+  uint32_t u32() {
+    if (!want(4)) return 0;
+    const uint32_t v = static_cast<uint32_t>(static_cast<uint8_t>(d_[at_])) |
+                       (static_cast<uint32_t>(static_cast<uint8_t>(d_[at_ + 1]))
+                        << 8) |
+                       (static_cast<uint32_t>(static_cast<uint8_t>(d_[at_ + 2]))
+                        << 16) |
+                       (static_cast<uint32_t>(static_cast<uint8_t>(d_[at_ + 3]))
+                        << 24);
+    at_ += 4;
+    return v;
+  }
+  int32_t i32() { return static_cast<int32_t>(u32()); }
+  int64_t i64() {
+    const uint32_t lo = u32();
+    const uint32_t hi = u32();
+    return static_cast<int64_t>((static_cast<uint64_t>(hi) << 32) | lo);
+  }
+  std::string str() {
+    const uint32_t n = u32();
+    // A length longer than the blob is the signature of a corrupt file, and
+    // the one that would otherwise allocate gigabytes.
+    if (!ok_ || n > remaining()) {
+      ok_ = false;
+      return std::string();
+    }
+    std::string s = d_.substr(at_, n);
+    at_ += n;
+    return s;
+  }
+
+  // Guards every count read from the blob against the space left, so a
+  // corrupt length can't make us reserve memory we don't have.
+  bool plausible_count(uint32_t n, size_t min_bytes_each) {
+    if (!ok_) return false;
+    if (min_bytes_each > 0 && n > remaining() / min_bytes_each) {
+      ok_ = false;
+      return false;
+    }
+    return true;
+  }
+
+ private:
+  bool want(size_t n) {
+    if (!ok_ || d_.size() - at_ < n) {
+      ok_ = false;
+      return false;
+    }
+    return true;
+  }
+
+  const std::string& d_;
+  size_t at_ = 0;
+  bool ok_ = true;
+};
+
+// The per-page decode, mirroring write_page. Returns false (and leaves
+// `page` possibly partially filled) if the reader ran out of bytes or found
+// an implausible count — the caller checks `reader.ok()` once at the end
+// rather than after every page.
+bool read_page(Reader& reader, Page* page);
+
 }  // namespace diarium

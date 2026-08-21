@@ -57,4 +57,34 @@ class StreamingEditionWriter {
   std::vector<StreamIndexEntry> index_;
 };
 
+// Parses a v5 file's header, footer and index up front — small, and cheap to
+// hold resident — and loads a story's pages only when asked. For Stage A the
+// source is a whole in-memory string (Stage C swaps in a seekable device
+// source); the point demonstrated here is that only one story's pages need
+// to be decoded at a time, not that the bytes arrive lazily too.
+class StreamingEditionReader {
+ public:
+  // Parses header + footer + index from the whole file. Returns false and
+  // sets `error` on truncation, corruption, or a version this build doesn't
+  // know how to read — never throws, matching deserialize_edition's
+  // "degrade, don't crash" contract for a stale or damaged card.
+  bool open(const std::string& file, std::string* error);
+
+  Epoch date() const { return date_; }
+  const std::string& title() const { return title_; }
+  const ComposeStats& stats() const { return stats_; }
+  const std::vector<StreamIndexEntry>& index() const { return index_; }
+
+  // Deserialises story i's pages from its byte range. Empty on any error
+  // (out-of-range index, or a corrupt story's worth of bytes).
+  std::vector<Page> load_story_pages(size_t i) const;
+
+ private:
+  std::string file_;
+  Epoch date_ = kNoDate;
+  std::string title_;
+  ComposeStats stats_;
+  std::vector<StreamIndexEntry> index_;
+};
+
 }  // namespace diarium

@@ -32,88 +32,6 @@ void put_str(ByteSink& out, const std::string& s) {
   out.write(s.data(), s.size());
 }
 
-namespace {
-
-// A cursor that can't read off the end. Every failure is the same failure —
-// the blob is not what we expected — so it is tracked once rather than at
-// every call site.
-class Reader {
- public:
-  explicit Reader(const std::string& data) : d_(data) {}
-
-  bool ok() const { return ok_; }
-  size_t remaining() const { return ok_ ? d_.size() - at_ : 0; }
-
-  uint8_t u8() {
-    if (!want(1)) return 0;
-    return static_cast<uint8_t>(d_[at_++]);
-  }
-  uint16_t u16() {
-    if (!want(2)) return 0;
-    const uint16_t v = static_cast<uint16_t>(
-        static_cast<uint8_t>(d_[at_]) |
-        (static_cast<uint8_t>(d_[at_ + 1]) << 8));
-    at_ += 2;
-    return v;
-  }
-  uint32_t u32() {
-    if (!want(4)) return 0;
-    const uint32_t v = static_cast<uint32_t>(static_cast<uint8_t>(d_[at_])) |
-                       (static_cast<uint32_t>(static_cast<uint8_t>(d_[at_ + 1]))
-                        << 8) |
-                       (static_cast<uint32_t>(static_cast<uint8_t>(d_[at_ + 2]))
-                        << 16) |
-                       (static_cast<uint32_t>(static_cast<uint8_t>(d_[at_ + 3]))
-                        << 24);
-    at_ += 4;
-    return v;
-  }
-  int32_t i32() { return static_cast<int32_t>(u32()); }
-  int64_t i64() {
-    const uint32_t lo = u32();
-    const uint32_t hi = u32();
-    return static_cast<int64_t>((static_cast<uint64_t>(hi) << 32) | lo);
-  }
-  std::string str() {
-    const uint32_t n = u32();
-    // A length longer than the blob is the signature of a corrupt file, and
-    // the one that would otherwise allocate gigabytes.
-    if (!ok_ || n > remaining()) {
-      ok_ = false;
-      return std::string();
-    }
-    std::string s = d_.substr(at_, n);
-    at_ += n;
-    return s;
-  }
-
-  // Guards every count read from the blob against the space left, so a
-  // corrupt length can't make us reserve memory we don't have.
-  bool plausible_count(uint32_t n, size_t min_bytes_each) {
-    if (!ok_) return false;
-    if (min_bytes_each > 0 && n > remaining() / min_bytes_each) {
-      ok_ = false;
-      return false;
-    }
-    return true;
-  }
-
- private:
-  bool want(size_t n) {
-    if (!ok_ || d_.size() - at_ < n) {
-      ok_ = false;
-      return false;
-    }
-    return true;
-  }
-
-  const std::string& d_;
-  size_t at_ = 0;
-  bool ok_ = true;
-};
-
-}  // namespace
-
 void write_page(ByteSink& out, const Page& p) {
   put_u8(out, p.is_front_page ? 1 : 0);
   put_str(out, p.folio_left);
@@ -147,6 +65,59 @@ void write_page(ByteSink& out, const Page& p) {
     put_i32(out, s.h);
     put_str(out, s.alt);
   }
+}
+
+bool read_page(Reader& r, Page* out) {
+  Page p;
+  p.is_front_page = r.u8() != 0;
+  p.folio_left = r.str();
+  p.folio_right = r.str();
+
+  const uint32_t line_count = r.u32();
+  if (!r.plausible_count(line_count, 8)) return false;
+  for (uint32_t l = 0; l < line_count && r.ok(); ++l) {
+    Line line;
+    line.baseline = r.i32();
+    const uint32_t run_count = r.u32();
+    if (!r.plausible_count(run_count, 9)) return false;
+    for (uint32_t k = 0; k < run_count && r.ok(); ++k) {
+      PositionedRun run;
+      const uint8_t face = r.u8();
+      run.face = face < kFaceCount ? static_cast<FaceId>(face) : FaceId::Body;
+      run.x = r.i32();
+      run.text = r.str();
+      line.runs.push_back(std::move(run));
+    }
+    p.lines.push_back(std::move(line));
+  }
+
+  const uint32_t rule_count = r.u32();
+  if (!r.plausible_count(rule_count, 17)) return false;
+  for (uint32_t k = 0; k < rule_count && r.ok(); ++k) {
+    Rule rule;
+    rule.x = r.i32();
+    rule.y = r.i32();
+    rule.w = r.i32();
+    rule.h = r.i32();
+    rule.grey = r.u8();
+    p.rules.push_back(rule);
+  }
+
+  const uint32_t image_count = r.u32();
+  if (!r.plausible_count(image_count, 20)) return false;
+  for (uint32_t k = 0; k < image_count && r.ok(); ++k) {
+    ImageSlot slot;
+    slot.x = r.i32();
+    slot.y = r.i32();
+    slot.w = r.i32();
+    slot.h = r.i32();
+    slot.alt = r.str();
+    p.images.push_back(std::move(slot));
+  }
+
+  if (!r.ok()) return false;
+  *out = std::move(p);
+  return true;
 }
 
 std::string serialize_edition(const Edition& ed) {
@@ -235,52 +206,7 @@ bool deserialize_edition(const std::string& blob, Edition* out,
   ed.pages.reserve(page_count);
   for (uint32_t i = 0; i < page_count && r.ok(); ++i) {
     Page p;
-    p.is_front_page = r.u8() != 0;
-    p.folio_left = r.str();
-    p.folio_right = r.str();
-
-    const uint32_t line_count = r.u32();
-    if (!r.plausible_count(line_count, 8)) return fail("line table is corrupt");
-    for (uint32_t l = 0; l < line_count && r.ok(); ++l) {
-      Line line;
-      line.baseline = r.i32();
-      const uint32_t run_count = r.u32();
-      if (!r.plausible_count(run_count, 9)) return fail("run table is corrupt");
-      for (uint32_t k = 0; k < run_count && r.ok(); ++k) {
-        PositionedRun run;
-        const uint8_t face = r.u8();
-        run.face = face < kFaceCount ? static_cast<FaceId>(face) : FaceId::Body;
-        run.x = r.i32();
-        run.text = r.str();
-        line.runs.push_back(std::move(run));
-      }
-      p.lines.push_back(std::move(line));
-    }
-
-    const uint32_t rule_count = r.u32();
-    if (!r.plausible_count(rule_count, 17)) return fail("rule table is corrupt");
-    for (uint32_t k = 0; k < rule_count && r.ok(); ++k) {
-      Rule rule;
-      rule.x = r.i32();
-      rule.y = r.i32();
-      rule.w = r.i32();
-      rule.h = r.i32();
-      rule.grey = r.u8();
-      p.rules.push_back(rule);
-    }
-
-    const uint32_t image_count = r.u32();
-    if (!r.plausible_count(image_count, 20)) return fail("image table is corrupt");
-    for (uint32_t k = 0; k < image_count && r.ok(); ++k) {
-      ImageSlot slot;
-      slot.x = r.i32();
-      slot.y = r.i32();
-      slot.w = r.i32();
-      slot.h = r.i32();
-      slot.alt = r.str();
-      p.images.push_back(std::move(slot));
-    }
-
+    if (!read_page(r, &p)) return fail("saved edition is truncated");
     ed.pages.push_back(std::move(p));
   }
 
