@@ -14,6 +14,7 @@
 #include <string>
 
 #include "core/base/datetime.h"
+#include "core/io/byte_sink.h"
 #include "core/io/byte_source.h"
 #include "core/render/framebuffer.h"
 
@@ -97,6 +98,18 @@ class IStorage {
   virtual bool write(const std::string& path, const std::string& data) = 0;
   virtual bool exists(const std::string& path) = 0;
   virtual bool remove(const std::string& path) = 0;
+
+  // Open a path for streaming writes. Returns null on failure. Writing goes
+  // through the returned ByteSink; destroying it closes the file. Lets a
+  // caller append a file — an edition, a fetched feed — bigger than it wants
+  // to hold resident, one chunk at a time.
+  virtual std::unique_ptr<ByteSink> open_write(const std::string& path) = 0;
+  // Total size of a file, or 0 if absent.
+  virtual size_t size(const std::string& path) = 0;
+  // Read [offset, offset+length) into out. False if the range runs past the
+  // file, or the file is absent. Never returns more than the file holds.
+  virtual bool read_range(const std::string& path, size_t offset,
+                          size_t length, std::string* out) = 0;
 };
 
 struct HttpRequest {

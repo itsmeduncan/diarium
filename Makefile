@@ -20,7 +20,10 @@ BIN       = bin
 
 CORE_SRCS := $(shell find src/core -name '*.cpp' 2>/dev/null | sort)
 SIM_SRCS  := $(shell find src/sim src/hal -name '*.cpp' 2>/dev/null | sort)
-TEST_SRCS := $(shell find test -name '*.cpp' 2>/dev/null | sort)
+# Plus sim/sim_storage.cpp, standalone (see below): the tests exercise the
+# real SimStorage rather than a stand-in, without pulling in sim's PNG
+# writer or its own main().
+TEST_SRCS := $(shell find test -name '*.cpp' 2>/dev/null | sort) src/sim/sim_storage.cpp
 FONT_SRCS := $(shell find tools/fontgen -name '*.cpp' 2>/dev/null | sort)
 HYPH_SRCS := $(shell find tools/hyphgen -name '*.cpp' 2>/dev/null | sort)
 

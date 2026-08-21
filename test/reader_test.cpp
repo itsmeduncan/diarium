@@ -2,6 +2,7 @@
 // device will implement — with a fake display that records refresh modes
 // instead of driving a panel.
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -88,6 +89,45 @@ class FakeStorage final : public IStorage {
     return files.count(path) != 0;
   }
   bool remove(const std::string& path) override { return files.erase(path) != 0; }
+
+  // A whole-string sink is enough for a fake: nothing here is trying to
+  // prove the chunking, only to let a Reader that calls open_write compile
+  // and behave. See RangedSource / StreamingEditionReader for the real
+  // lazy-loading proof.
+  class Sink final : public ByteSink {
+   public:
+    Sink(std::map<std::string, std::string>* files, std::string path)
+        : files_(files), path_(std::move(path)) {}
+    ~Sink() override { (*files_)[path_] = data_; }
+    bool write(const void* data, size_t n) override {
+      data_.append(static_cast<const char*>(data), n);
+      return true;
+    }
+    size_t position() const override { return data_.size(); }
+    bool ok() const override { return true; }
+
+   private:
+    std::map<std::string, std::string>* files_;
+    std::string path_;
+    std::string data_;
+  };
+
+  std::unique_ptr<ByteSink> open_write(const std::string& path) override {
+    return std::unique_ptr<ByteSink>(new Sink(&files, path));
+  }
+  size_t size(const std::string& path) override {
+    auto it = files.find(path);
+    return it == files.end() ? 0 : it->second.size();
+  }
+  bool read_range(const std::string& path, size_t offset, size_t length,
+                  std::string* out) override {
+    auto it = files.find(path);
+    if (it == files.end()) return false;
+    const std::string& data = it->second;
+    if (offset > data.size() || length > data.size() - offset) return false;
+    *out = data.substr(offset, length);
+    return true;
+  }
 
   std::map<std::string, std::string> files;
 };

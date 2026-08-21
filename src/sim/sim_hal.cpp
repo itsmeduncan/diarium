@@ -37,23 +37,6 @@ int SimDisplay::refresh_cost_ms() const {
   return total;
 }
 
-bool SimStorage::read(const std::string& path, std::string* out) {
-  return read_file(full(path), out);
-}
-
-bool SimStorage::write(const std::string& path, const std::string& data) {
-  return write_file(full(path), data);
-}
-
-bool SimStorage::exists(const std::string& path) {
-  struct stat st;
-  return ::stat(full(path).c_str(), &st) == 0;
-}
-
-bool SimStorage::remove(const std::string& path) {
-  return ::remove(full(path).c_str()) == 0;
-}
-
 std::unique_ptr<ByteSource> SimHttpClient::get(const HttpRequest& request,
                                                HttpResponse* out) {
   HttpResponse response;

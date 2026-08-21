@@ -2,6 +2,7 @@
 // holds firmware only, so the scarce 4 MB stays free and OTA stays possible.
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "Inkplate.h"
@@ -27,6 +28,11 @@ class DeviceStorage final : public IStorage {
   bool write(const std::string& path, const std::string& data) override;
   bool exists(const std::string& path) override;
   bool remove(const std::string& path) override;
+
+  std::unique_ptr<ByteSink> open_write(const std::string& path) override;
+  size_t size(const std::string& path) override;
+  bool read_range(const std::string& path, size_t offset, size_t length,
+                  std::string* out) override;
 
  private:
   Inkplate* panel_;

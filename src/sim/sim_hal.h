@@ -13,6 +13,7 @@
 
 #include "hal/hal.h"
 #include "sim/png_writer.h"
+#include "sim/sim_storage.h"
 
 namespace diarium {
 namespace sim {
@@ -97,19 +98,6 @@ class SimPower final : public IPower {
 
  private:
   Epoch slept_until_ = kNoDate;
-};
-
-class SimStorage final : public IStorage {
- public:
-  explicit SimStorage(std::string root) : root_(std::move(root)) {}
-  bool read(const std::string& path, std::string* out) override;
-  bool write(const std::string& path, const std::string& data) override;
-  bool exists(const std::string& path) override;
-  bool remove(const std::string& path) override;
-
- private:
-  std::string full(const std::string& path) const { return root_ + "/" + path; }
-  std::string root_;
 };
 
 // Serves the fixture corpus in place of the network. The real client (issue

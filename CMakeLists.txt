@@ -34,7 +34,10 @@ target_include_directories(diarium-sim SYSTEM PRIVATE third_party/stb)
 
 if(TEST_SOURCES)
   enable_testing()
-  add_executable(diarium-tests ${TEST_SOURCES})
+  # sim/sim_storage.cpp, standalone: the tests exercise the real SimStorage
+  # rather than a stand-in, without pulling in sim's PNG writer or its own
+  # main() the way linking all of src/sim would.
+  add_executable(diarium-tests ${TEST_SOURCES} src/sim/sim_storage.cpp)
   target_link_libraries(diarium-tests PRIVATE diarium_core)
   target_include_directories(diarium-tests SYSTEM PRIVATE third_party/doctest)
   # Tests read test/fixtures relative to the repository root.
