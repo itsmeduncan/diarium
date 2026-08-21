@@ -163,4 +163,14 @@ std::vector<Page> StreamingEditionReader::load_story_pages(size_t i) const {
   return pages;
 }
 
+bool write_edition_streaming(ByteSink& sink, const Edition& edition) {
+  StreamingEditionWriter w(sink, edition.date, edition.title, edition.stats);
+  for (const StoryRef& s : edition.stories) {
+    const auto begin = edition.pages.begin() + static_cast<ptrdiff_t>(s.first_page);
+    const auto end = begin + static_cast<ptrdiff_t>(s.page_count);
+    w.add_story(s, std::vector<Page>(begin, end));
+  }
+  return w.finish();
+}
+
 }  // namespace diarium

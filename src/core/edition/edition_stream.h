@@ -87,4 +87,13 @@ class StreamingEditionReader {
   std::vector<StreamIndexEntry> index_;
 };
 
+// Bridges an already-composed, resident Edition to the streaming writer —
+// what Stage B's compose calls per-story instead, once selection and
+// pagination themselves work a story at a time. Returns false if the sink
+// failed. Copies each story's page slice before writing it, so this does not
+// itself avoid holding the whole edition resident; it exists to prove the
+// v5 format round-trips a real composed edition and that a story's pages
+// load independently of the rest.
+bool write_edition_streaming(ByteSink& sink, const Edition& edition);
+
 }  // namespace diarium

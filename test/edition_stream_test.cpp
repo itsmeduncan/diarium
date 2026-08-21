@@ -7,6 +7,7 @@
 
 #include "core/edition/edition_stream.h"
 #include "core/io/byte_sink.h"
+#include "core/text/font_pack.h"
 #include "doctest.h"
 
 using namespace diarium;
@@ -151,5 +152,102 @@ TEST_CASE("a corrupt v5 file is refused, not crashed on") {
     std::string error;
     CHECK_FALSE(r.open("", &error));
     CHECK_FALSE(error.empty());
+  }
+}
+
+// A fixture that goes through real compose_edition/layout, so the bridge is
+// proved against the shape edition.cpp actually produces — not just the
+// hand-built pages above.
+namespace {
+
+const FontPack* pack() {
+  static FontPack fonts;
+  static bool tried = false;
+  if (!tried) {
+    tried = true;
+    std::string error;
+    fonts.load_file("build/literata.rfp", &error);
+  }
+  return fonts.loaded() ? &fonts : nullptr;
+}
+
+Item fixture_item(const std::string& title, int day, size_t paragraphs) {
+  Item it;
+  it.title = title;
+  it.author = "A Reporter";
+  it.source_name = "The Source";
+  it.guid = title;
+  it.published = 1786000000 + day * 86400;
+  it.summary_text = "Summary of " + title + ".";
+  for (size_t i = 0; i < paragraphs; ++i) {
+    Block b;
+    b.type = BlockType::Paragraph;
+    b.text = "Body paragraph " + std::to_string(i) + " of " + title +
+             ", long enough to wrap across several lines of the measure.";
+    it.blocks.push_back(std::move(b));
+  }
+  return it;
+}
+
+std::vector<Section> two_fixture_sections() {
+  Section tech{"Technology", {}};
+  Section world{"World", {}};
+  for (int i = 0; i < 6; ++i) {
+    tech.items.push_back(fixture_item("Tech story " + std::to_string(i), 10 - i, 12));
+    world.items.push_back(fixture_item("World story " + std::to_string(i), 10 - i, 8));
+  }
+  return {tech, world};
+}
+
+}  // namespace
+
+TEST_CASE("write_edition_streaming bridges a composed Edition") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  const Edition ed = compose_edition(two_fixture_sections(), *fonts, opts);
+  REQUIRE(!ed.stories.empty());
+
+  std::string out;
+  StringSink sink(&out);
+  REQUIRE(write_edition_streaming(sink, ed));
+
+  StreamingEditionReader r;
+  std::string error;
+  REQUIRE_MESSAGE(r.open(out, &error), error);
+
+  CHECK(r.date() == ed.date);
+  CHECK(r.title() == ed.title);
+  REQUIRE(r.index().size() == ed.stories.size());
+
+  for (size_t i = 0; i < ed.stories.size(); ++i) {
+    CAPTURE(i);
+    const StoryRef& original = ed.stories[i];
+    const StreamIndexEntry& entry = r.index()[i];
+    CHECK(entry.ref.key == original.key);
+    CHECK(entry.ref.title == original.title);
+    CHECK(entry.ref.section == original.section);
+    CHECK(entry.ref.source == original.source);
+    CHECK(entry.ref.page_count == original.page_count);
+    CHECK(entry.ref.truncated == original.truncated);
+    CHECK(entry.ref.published == original.published);
+
+    // One-story access: loading story i costs exactly its own pages, not the
+    // whole edition's.
+    const std::vector<Page> loaded = r.load_story_pages(i);
+    REQUIRE(loaded.size() == original.page_count);
+    for (size_t p = 0; p < loaded.size(); ++p) {
+      const Page& want = ed.pages[original.first_page + p];
+      REQUIRE(loaded[p].lines.size() == want.lines.size());
+      for (size_t l = 0; l < want.lines.size(); ++l) {
+        REQUIRE(loaded[p].lines[l].runs.size() == want.lines[l].runs.size());
+        for (size_t k = 0; k < want.lines[l].runs.size(); ++k) {
+          CHECK(loaded[p].lines[l].runs[k].text == want.lines[l].runs[k].text);
+        }
+      }
+    }
   }
 }
