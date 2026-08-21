@@ -1,5 +1,6 @@
-// Composing an edition: the step that turns a pile of items into a newspaper
-// with a front page, sections, and a last page.
+// Composing an edition: the step that turns a pile of items into story-text
+// pages, walked oldest-first. There is no front-of-paper — no front page, no
+// section ledes, no colophon — just the stories themselves.
 #pragma once
 
 #include <cstdint>
@@ -45,10 +46,7 @@ struct ComposeOptions {
   int front_page_columns = 2;
   Align body_alignment = Align::Left;
   bool hyphenate = true;
-  // How many section headlines the front page lists per section.
-  size_t front_page_per_section = 2;
-  // How many feeds were configured, and which of them failed. Both appear on
-  // the colophon.
+  // How many feeds were configured, and which of them failed.
   size_t feeds_configured = 0;
   std::vector<FeedProblem> feed_problems;
 };
@@ -62,7 +60,9 @@ struct ComposeStats {
   size_t dropped_stale = 0;
   size_t dropped_over_budget = 0;
   size_t items_published = 0;
-  // Front-page teasers that did not fit on the single front page.
+  // Vestigial: the front page that used to overflow is gone, so nothing
+  // increments this any more and it stays 0. Retained rather than pulled
+  // out of the struct, per an earlier scope call on this task.
   size_t front_page_overflow = 0;
   size_t truncated_published = 0;
 };
