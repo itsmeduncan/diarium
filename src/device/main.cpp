@@ -436,6 +436,13 @@ void setup() {
   d.clock.seed_if_unset(edition.date);
   d.input.begin();
 
+  // The framebuffer was built at the default geometry before the card told us
+  // the orientation; make it match now. Without this the reader draws a
+  // 758-wide portrait page into the 1024-wide buffer claimed at boot, and the
+  // blit rotates the mismatch into garbage — a landscape page smeared into
+  // portrait. Cheap: portrait and landscape are the same pixel count.
+  d.display.framebuffer().resize(page_width(), page_height());
+
   Hal hal = d.as_hal();
   static Reader r(edition, fonts, hal);
   reader = &r;

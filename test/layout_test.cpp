@@ -10,6 +10,7 @@
 #include "core/layout/line_breaker.h"
 #include "core/layout/paginator.h"
 #include "core/layout/type_scale.h"
+#include "core/render/framebuffer.h"
 #include "core/text/font_pack.h"
 #include "doctest.h"
 
@@ -68,6 +69,30 @@ TEST_CASE("orientation swaps the page axes onto the same panel") {
 
   // The panel's raster is 1024x758 either way; only the long axis moves.
   CHECK(page_width() * page_height() == 1024 * 758);
+
+  set_orientation(saved);
+}
+
+TEST_CASE("a framebuffer resizes to a late orientation change") {
+  // The device builds its framebuffer to claim PSRAM before it has read the
+  // card and knows the orientation. This is that exact sequence — landscape at
+  // construction, portrait once the config is in — and the bug it regressed:
+  // a portrait page drawn into a buffer still shaped landscape.
+  const Orientation saved = orientation();
+
+  set_orientation(Orientation::Landscape);
+  Framebuffer fb;  // built 1024x758, as on the device before config is read
+  CHECK(fb.width() == 1024);
+  CHECK(fb.height() == 758);
+
+  set_orientation(Orientation::Portrait);
+  fb.resize(page_width(), page_height());
+  CHECK(fb.width() == 758);
+  CHECK(fb.height() == 1024);
+  // The foot of a portrait page: out of bounds at 758 tall, in bounds now. If
+  // resize did not take, this write is silently dropped and the read fails.
+  fb.set(500, 1000, kInk);
+  CHECK(fb.get(500, 1000) == kInk);
 
   set_orientation(saved);
 }
