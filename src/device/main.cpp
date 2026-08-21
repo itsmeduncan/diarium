@@ -14,7 +14,7 @@
 #include "core/config/feeds_config.h"
 #include "core/text/font_pack.h"
 #include "core/base/datetime.h"
-#include "core/ui/contents.h"
+#include "core/ui/home.h"
 #include "core/ui/notice.h"
 #include "core/ui/gesture.h"
 #include "core/ui/reader.h"
@@ -295,8 +295,8 @@ void compose_wake(device::DeviceHal& d) {
     // a device that looks like nothing happened overnight.
     const std::vector<size_t> order = ed.reading_order();
     const std::vector<bool> unread(order.size(), true);
-    render_contents(fonts, ed, order, unread, "composed on device",
-                    &d.display.framebuffer());
+    render_home(fonts, ed, order, unread, "composed on device",
+               &d.display.framebuffer());
     d.display.flush(RefreshMode::Full);
   } else {
     Serial.println("could not save the edition");
