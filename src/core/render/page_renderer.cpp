@@ -37,7 +37,7 @@ int PageRenderer::render_masthead(const MastheadInfo& info,
   if (!lead.valid()) return 0;
 
   const std::string title = to_upper_ascii(info.title);
-  const int measure = kPageWidth - 2 * kSideMargin;
+  const int measure = page_width() - 2 * kSideMargin;
 
   // Solve for the tracking that makes the title span the measure exactly.
   const int natural = lead.measure(title);
@@ -54,7 +54,7 @@ int PageRenderer::render_masthead(const MastheadInfo& info,
   const int baseline = kNameplateTop + lead.ascent();
   const int drawn_width = natural + tracking * (gaps > 0 ? gaps : 0);
   const int start_x =
-      (kPageWidth * kSubpixel - drawn_width) / 2;
+      (page_width() * kSubpixel - drawn_width) / 2;
   fb->draw_text_tracked(lead, title, start_x, baseline, kInk, tracking);
 
   int y = baseline + lead.descent() + kNameplateRuleGap;
@@ -69,7 +69,7 @@ int PageRenderer::render_masthead(const MastheadInfo& info,
   if (!info.strap.empty() && meta.valid()) {
     const int w = meta.measure(info.strap);
     fb->draw_text(meta, info.strap,
-                  (kPageWidth - kSideMargin) * kSubpixel - w,
+                  (page_width() - kSideMargin) * kSubpixel - w,
                   y + meta.ascent(), kInk);
   }
   y += meta.ascent() + meta.descent() + 3;
@@ -83,8 +83,8 @@ void PageRenderer::render_folio(const Page& page, Framebuffer* fb) const {
   if (!meta.valid()) return;
   if (page.folio_left.empty() && page.folio_right.empty()) return;
 
-  const int y = kPageHeight - 26;
-  fb->fill_rect(kSideMargin, y - 11, kPageWidth - 2 * kSideMargin, 1, 185);
+  const int y = page_height() - 26;
+  fb->fill_rect(kSideMargin, y - 11, page_width() - 2 * kSideMargin, 1, 185);
 
   if (!page.folio_left.empty()) {
     fb->draw_text(meta, page.folio_left, kSideMargin * kSubpixel,
@@ -93,7 +93,7 @@ void PageRenderer::render_folio(const Page& page, Framebuffer* fb) const {
   if (!page.folio_right.empty()) {
     const int w = meta.measure(page.folio_right);
     fb->draw_text(meta, page.folio_right,
-                  (kPageWidth - kSideMargin) * kSubpixel - w,
+                  (page_width() - kSideMargin) * kSubpixel - w,
                   y + meta.ascent() - 4, 90);
   }
 }

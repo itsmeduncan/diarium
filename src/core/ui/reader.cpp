@@ -131,13 +131,13 @@ bool Reader::jump_to_section(size_t index) {
 
 // The top-right corner, big enough to find in the dark without looking.
 bool Reader::in_light_corner(int x, int y) const {
-  return x >= kPageWidth - 140 && y <= 140;
+  return x >= page_width() - 140 && y <= 140;
 }
 
 // The opposite corner, the same size. Two corners, two things you can always
 // reach: the light, and the way out.
 bool Reader::in_home_corner(int x, int y) const {
-  return x <= 140 && y >= kPageHeight - 140;
+  return x <= 140 && y >= page_height() - 140;
 }
 
 void Reader::load_frontlight(const std::string& path) {
@@ -278,14 +278,14 @@ void Reader::render_section_overlay() {
   if (head.valid()) {
     fb.draw_text(head, "Sections", kSideMargin * kSubpixel, y, kInk);
     y += head.descent() + 24;
-    fb.fill_rect(kSideMargin, y, kPageWidth - 2 * kSideMargin, 2, kInk);
+    fb.fill_rect(kSideMargin, y, page_width() - 2 * kSideMargin, 2, kInk);
   }
 
   y = kOverlayFirstY;
   const int row_height = kOverlayRowHeight;
   for (size_t i = 0; i < edition_.section_marks.size(); ++i) {
     const Edition::SectionMark& m = edition_.section_marks[i];
-    if (y + row_height > kPageHeight - 60) break;
+    if (y + row_height > page_height() - 60) break;
     if (body.valid()) {
       fb.draw_text(body, m.name, kSideMargin * kSubpixel, y + body.ascent(),
                    kInk);
@@ -293,17 +293,17 @@ void Reader::render_section_overlay() {
     if (meta.valid()) {
       const std::string page = "page " + std::to_string(m.first_page + 1);
       const int w = meta.measure(page);
-      fb.draw_text(meta, page, (kPageWidth - kSideMargin) * kSubpixel - w,
+      fb.draw_text(meta, page, (page_width() - kSideMargin) * kSubpixel - w,
                    y + body.ascent(), 90);
     }
     y += row_height;
-    fb.fill_rect(kSideMargin, y - 18, kPageWidth - 2 * kSideMargin, 1, 190);
+    fb.fill_rect(kSideMargin, y - 18, page_width() - 2 * kSideMargin, 1, 190);
   }
 
   // And below the sections, the way out of a backlog. A second tap confirms,
   // because a mis-tap that silently discards a week of unread news would be
   // worse than any modal.
-  if (body.valid() && y + row_height <= kPageHeight - 60) {
+  if (body.valid() && y + row_height <= page_height() - 60) {
     const size_t left = unread_remaining();
     const std::string label =
         confirm_mark_all_ ? "Tap again to mark everything read"
@@ -314,7 +314,7 @@ void Reader::render_section_overlay() {
 
   if (meta.valid()) {
     const std::string hint = "Swipe up or tap the heading to go back";
-    fb.draw_text(meta, hint, kSideMargin * kSubpixel, kPageHeight - 40, 120);
+    fb.draw_text(meta, hint, kSideMargin * kSubpixel, page_height() - 40, 120);
   }
 }
 
@@ -535,8 +535,8 @@ void Reader::render_battery_mark() {
   // reliably empty on every page.
   const int w = 26;
   const int h = 13;
-  const int x = (kPageWidth - w) / 2;
-  const int y = kPageHeight - 30;
+  const int x = (page_width() - w) / 2;
+  const int y = page_height() - 30;
 
   fb.frame_rect(x, y, w, h, kInk);
   fb.fill_rect(x + w, y + 4, 3, h - 8, kInk);  // the terminal
@@ -556,7 +556,7 @@ void Reader::render_finished() {
     fb.draw_text(head, "That is all the news", kSideMargin * kSubpixel, y, kInk);
     y += head.descent() + 28;
   }
-  fb.fill_rect(kSideMargin, y, kPageWidth - 2 * kSideMargin, 2, kInk);
+  fb.fill_rect(kSideMargin, y, page_width() - 2 * kSideMargin, 2, kInk);
   y += 56;
 
   if (body.valid()) {

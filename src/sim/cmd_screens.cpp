@@ -27,6 +27,13 @@ int cmd_screens(const std::vector<std::string>& args) {
   const std::string out_dir = flag(args, "--out", "out/screens");
   const std::string title = flag(args, "--title", "Diarium");
 
+  // These are device-drawn screens, so they follow the device default —
+  // portrait — unless asked otherwise. Set before the framebuffer is built:
+  // its default size is the page geometry.
+  set_orientation(flag(args, "--orientation", "portrait") == "landscape"
+                      ? Orientation::Landscape
+                      : Orientation::Portrait);
+
   FontPack fonts;
   std::string error;
   if (!fonts.load_file(fonts_path, &error)) {

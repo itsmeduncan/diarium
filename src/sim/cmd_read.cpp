@@ -48,8 +48,8 @@ void print_help() {
 // Synthesises a press-move-release through the gesture recogniser, so the
 // keyboard exercises the same path a finger will.
 void synth_swipe(SimInput* input, Reader* reader, int dx, int dy) {
-  const int cx = kPageWidth / 2;
-  const int cy = kPageHeight / 2;
+  const int cx = page_width() / 2;
+  const int cy = page_height() / 2;
   GestureRecognizer local;
   input->advance(20);
   GestureEvent e = local.update(true, cx, cy, input->millis());
@@ -113,6 +113,11 @@ int cmd_read(const std::vector<std::string>& args) {
     std::fprintf(stderr, "read: %s\n", error.c_str());
     return 1;
   }
+
+  // Must match the orientation the edition was composed under, or the reader's
+  // furniture lands at landscape coordinates over portrait pages.
+  set_orientation(config.edition.orientation);
+
   FontPack fonts;
   if (!fonts.load_file(fonts_path, &error)) {
     std::fprintf(stderr, "read: %s\n", error.c_str());
@@ -217,7 +222,7 @@ int cmd_read(const std::vector<std::string>& args) {
       synth_swipe(&input, &reader, 0, 200);
       changed = true;
     } else if (cmd == "g") {
-      synth_long_press(&input, &reader, 40, kPageHeight - 40);
+      synth_long_press(&input, &reader, 40, page_height() - 40);
       changed = true;
     } else if (cmd == "b") {
       changed = reader.back();

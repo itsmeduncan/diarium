@@ -36,7 +36,7 @@ void render_contents(const FontPack& fonts, const Edition& edition,
   fb->fill(kPaper);
 
   const int left = kSideMargin;
-  const int right = kPageWidth - kSideMargin;
+  const int right = page_width() - kSideMargin;
   const int width = right - left;
 
   const Face& lead = fonts.face(FaceId::Lead);
@@ -52,7 +52,7 @@ void render_contents(const FontPack& fonts, const Edition& edition,
     const int tracking = 10 * kSubpixel;
     const int measured =
         lead.measure(caps) + tracking * static_cast<int>(caps.size());
-    const int x = (kPageWidth * kSubpixel - measured) / 2;
+    const int x = (page_width() * kSubpixel - measured) / 2;
     fb->draw_text_tracked(lead, caps, x, y, kInk, tracking);
   }
 
@@ -83,7 +83,7 @@ void render_contents(const FontPack& fonts, const Edition& edition,
   size_t shown = 0;
   for (size_t i = 0; i < order.size(); ++i) {
     if (i < unread.size() && !unread[i]) continue;
-    if (y + row > kPageHeight - 96) break;
+    if (y + row > page_height() - 96) break;
 
     const StoryRef& s = edition.stories[order[i]];
     ++shown;
@@ -113,7 +113,7 @@ void render_contents(const FontPack& fonts, const Edition& edition,
     }
 
     y += row;
-    if (y + rule_gap < kPageHeight - 96) {
+    if (y + rule_gap < page_height() - 96) {
       fb->fill_rect(text_left, y - rule_gap, right - text_left, 1, 200);
     }
   }
@@ -129,9 +129,9 @@ void render_contents(const FontPack& fonts, const Edition& edition,
     const int tracking = 4 * kSubpixel;
     const int measured =
         meta.measure(hint) + tracking * static_cast<int>(std::string(hint).size());
-    const int x = (kPageWidth * kSubpixel - measured) / 2;
-    fb->fill_rect(left, kPageHeight - 74, width, 1, 200);
-    fb->draw_text_tracked(meta, hint, x, kPageHeight - 34, 110, tracking);
+    const int x = (page_width() * kSubpixel - measured) / 2;
+    fb->fill_rect(left, page_height() - 74, width, 1, 200);
+    fb->draw_text_tracked(meta, hint, x, page_height() - 34, 110, tracking);
   }
 }
 

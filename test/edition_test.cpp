@@ -96,7 +96,7 @@ TEST_CASE("every story is reachable from a lede") {
     // It has somewhere to be tapped.
     CHECK_FALSE(s.lede_bounds.empty());
     CHECK(s.lede_bounds.y >= 0);
-    CHECK(s.lede_bounds.y + s.lede_bounds.h <= kPageHeight);
+    CHECK(s.lede_bounds.y + s.lede_bounds.h <= page_height());
     // And the story it opens is real, and lives outside the browse sequence.
     CHECK(s.page_count > 0);
     CHECK(s.first_page >= ed.browse_page_count);
@@ -125,7 +125,7 @@ TEST_CASE("selecting a point on a lede finds its story") {
   }
 
   // A tap in the folio hits nothing.
-  CHECK(ed.story_at(0, 60, kPageHeight - 10) == nullptr);
+  CHECK(ed.story_at(0, 60, page_height() - 10) == nullptr);
 }
 
 TEST_CASE("lede tap regions on a page do not overlap") {

@@ -185,6 +185,14 @@ bool parse_feeds_toml(const std::string& text, FeedList* out,
       } else if (key == "hyphenate") {
         out->edition.hyphenate = !(value == "false" || value == "no" ||
                                    value == "0" || value == "off");
+      } else if (key == "orientation") {
+        if (value == "portrait") {
+          out->edition.orientation = Orientation::Portrait;
+        } else if (value == "landscape") {
+          out->edition.orientation = Orientation::Landscape;
+        } else {
+          return fail("orientation must be \"portrait\" or \"landscape\"");
+        }
       } else if (key == "body_alignment") {
         if (value == "justified" || value == "justify") {
           out->edition.body_alignment = Align::Justify;

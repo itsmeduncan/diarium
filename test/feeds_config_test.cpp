@@ -43,6 +43,35 @@ TEST_CASE("a nonsense utc offset is an error that names the key") {
   CHECK(error.find("utc_offset_minutes") != std::string::npos);
 }
 
+TEST_CASE("orientation defaults to portrait and parses both ways") {
+  // Portrait is the product default: an [edition] with no orientation key is
+  // the common case, and the device stands on its short edge out of the box.
+  FeedList list;
+  std::string error;
+  REQUIRE(parse_feeds_toml("[[feed]]\nurl = \"http://example.com/f\"\n",
+                           &list, &error));
+  CHECK(list.edition.orientation == Orientation::Portrait);
+
+  REQUIRE(parse_feeds_toml("[edition]\norientation = \"landscape\"\n"
+                           "[[feed]]\nurl = \"http://example.com/f\"\n",
+                           &list, &error));
+  CHECK(list.edition.orientation == Orientation::Landscape);
+
+  REQUIRE(parse_feeds_toml("[edition]\norientation = \"portrait\"\n"
+                           "[[feed]]\nurl = \"http://example.com/f\"\n",
+                           &list, &error));
+  CHECK(list.edition.orientation == Orientation::Portrait);
+}
+
+TEST_CASE("an unknown orientation is a legible error, not a silent default") {
+  FeedList list;
+  std::string error;
+  CHECK_FALSE(parse_feeds_toml("[edition]\norientation = \"sideways\"\n"
+                               "[[feed]]\nurl = \"http://example.com/f\"\n",
+                               &list, &error));
+  CHECK(error.find("orientation") != std::string::npos);
+}
+
 TEST_CASE("wifi credentials parse from their own section") {
   // Dummies only. Real credentials live on the card and never in the repo.
   FeedList list;

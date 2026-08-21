@@ -24,7 +24,7 @@ constexpr uint8_t kPaper = 255;
 
 class Framebuffer {
  public:
-  Framebuffer(int width = kPageWidth, int height = kPageHeight);
+  Framebuffer(int width = page_width(), int height = page_height());
 
   int width() const { return w_; }
   int height() const { return h_; }
