@@ -231,23 +231,66 @@ bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
   const std::vector<Section> selected =
       select_sections(std::move(sections), opts, &selection_stats);
 
-  // The header is committed here, right after selection and before any
-  // story is laid out — nothing in a streaming writer holds enough to know
-  // the final published/dropped counts any earlier than that. See the
-  // `stats` doc on the declaration.
-  StreamingEditionWriter writer(sink, opts.now, opts.title, selection_stats);
-
   const Hyphenator& hyphenator =
       opts.hyphenate ? english_hyphenator() : null_hyphenator();
   const Paginator paginator(fonts, hyphenator);
   PageTemplate story_tmpl;
   story_tmpl.columns = 1;
 
+  // How many of the selected items will actually survive the max_pages
+  // backstop — decided before the header is written below, since the
+  // writer's constructor commits it immediately, before any story is laid
+  // out for real. Without a ceiling (every call site today except the
+  // device's) every selected item survives and this costs nothing beyond
+  // counting. With one, a dry run — the same paginate_story calls the real
+  // pass below makes, its pages discarded rather than written — finds
+  // exactly where the budget bites, so the header reports what actually
+  // lands in the index rather than the pre-budget selection count. The
+  // real pass then trusts this count rather than re-deriving its own
+  // cutoff, so the two cannot disagree.
+  size_t total_selected = 0;
+  size_t surviving = 0;
+  size_t surviving_truncated = 0;
+  for (const Section& s : selected) {
+    total_selected += s.items.size();
+    if (opts.max_pages == 0) {
+      for (const Item& it : s.items) {
+        ++surviving;
+        if (it.looks_truncated()) ++surviving_truncated;
+      }
+    }
+  }
+  if (opts.max_pages > 0) {
+    size_t dry_pages = 0;
+    bool dry_budget_reached = false;
+    for (const Section& s : selected) {
+      if (dry_budget_reached) continue;
+      for (const Item& it : s.items) {
+        if (dry_pages >= opts.max_pages) {
+          dry_budget_reached = true;
+          break;
+        }
+        std::vector<Page> scratch;
+        paginate_story(it, s.name, paginator, story_tmpl, 0, &scratch);
+        dry_pages += scratch.size();
+        ++surviving;
+        if (it.looks_truncated()) ++surviving_truncated;
+      }
+    }
+  }
+
+  ComposeStats header_stats = selection_stats;
+  header_stats.items_published = surviving;
+  header_stats.truncated_published = surviving_truncated;
+  header_stats.dropped_over_budget += total_selected - surviving;
+
+  StreamingEditionWriter writer(sink, opts.now, opts.title, header_stats);
+
   ComposeStats actual = selection_stats;
   actual.items_published = 0;
   actual.truncated_published = 0;
 
-  size_t total_pages = 0;
+  size_t written = 0;
   bool budget_reached = false;
   for (const Section& s : selected) {
     if (budget_reached) {
@@ -255,7 +298,7 @@ bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
       continue;
     }
     for (size_t ii = 0; ii < s.items.size(); ++ii) {
-      if (opts.max_pages > 0 && total_pages >= opts.max_pages) {
+      if (written >= surviving) {
         actual.dropped_over_budget += s.items.size() - ii;
         budget_reached = true;
         break;
@@ -266,11 +309,11 @@ bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
       // never through a global index — there is no global page list here.
       StoryRef ref = paginate_story(s.items[ii], s.name, paginator,
                                     story_tmpl, 0, &pages);
-      total_pages += pages.size();
       writer.add_story(ref, pages);
       // `pages` frees here, at the end of the loop body, before the next
       // story is laid out — nothing bigger than one story is ever resident.
 
+      ++written;
       ++actual.items_published;
       if (s.items[ii].looks_truncated()) ++actual.truncated_published;
     }

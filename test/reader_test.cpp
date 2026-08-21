@@ -956,3 +956,90 @@ TEST_CASE("the streaming reader holds only the current story's pages") {
   // the whole file.
   CHECK(counting.total_read() < blob.size() / 2);
 }
+
+namespace {
+
+// A RangedSource that fails exactly one byte range, simulating a corrupt or
+// unreadable slice of a real SD card — otherwise passes reads straight
+// through to the borrowed string.
+class FailingRangeSource final : public RangedSource {
+ public:
+  FailingRangeSource(const std::string& data, size_t fail_offset)
+      : data_(data), fail_offset_(fail_offset) {}
+
+  size_t size() const override { return data_.size(); }
+  bool read(size_t offset, size_t length, std::string* out) const override {
+    if (offset == fail_offset_) return false;
+    if (offset > data_.size() || length > data_.size() - offset) return false;
+    *out = data_.substr(offset, length);
+    return true;
+  }
+
+ private:
+  const std::string& data_;
+  size_t fail_offset_;
+};
+
+}  // namespace
+
+TEST_CASE("a corrupt story slice is skipped, not shown blank or marked read") {
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  Section tech{"Technology", {}};
+  for (int i = 0; i < 3; ++i) {
+    tech.items.push_back(story("Tech " + std::to_string(i), 10 - i, 6));
+  }
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+
+  std::string blob;
+  StringSink sink(&blob);
+  ComposeStats stats;
+  REQUIRE(compose_streaming({tech}, *fonts, opts, sink, &stats));
+  REQUIRE(stats.items_published == 3);
+
+  // Find the oldest story — the one a fresh Reader opens first — so the
+  // fault can be aimed at exactly its byte range.
+  StreamingEditionReader probe;
+  std::string probe_error;
+  REQUIRE_MESSAGE(probe.open(blob, &probe_error), probe_error);
+  size_t oldest = 0;
+  for (size_t i = 1; i < probe.index().size(); ++i) {
+    if (probe.index()[i].ref.published < probe.index()[oldest].ref.published) {
+      oldest = i;
+    }
+  }
+  const uint64_t oldest_key = probe.index()[oldest].ref.key;
+  const size_t fail_offset = probe.index()[oldest].byte_offset;
+
+  FailingRangeSource faulty(blob, fail_offset);
+  StreamingEditionReader stream;
+  std::string error;
+  REQUIRE_MESSAGE(stream.open(faulty, &error), error);
+
+  Rig rig;
+  Reader r(stream, *fonts, rig.hal());
+  r.load_read_state("read.dat");
+
+  REQUIRE(r.handle(swipe(Gesture::SwipeRight)));
+  // The corrupt story was skipped, not shown: the reader landed on a
+  // different one instead of getting stuck on it.
+  CHECK(r.mode() == ReaderMode::Article);
+  REQUIRE(r.open_story() != nullptr);
+  CHECK(r.open_story()->key != oldest_key);
+
+  // Not shown means not consumed: it must still be unread, so a corrupt
+  // slice doesn't silently vanish the story from every future edition too.
+  SeenStore seen;
+  auto it = rig.storage.files.find("read.dat");
+  if (it != rig.storage.files.end()) seen.deserialize(it->second, opts.now);
+  CHECK_FALSE(seen.has(oldest_key));
+
+  // And the panel actually updated rather than being left blank and
+  // unflushed while the reader silently sat on the corrupt story.
+  r.render();
+  CHECK(rig.display.modes.size() > 0);
+}

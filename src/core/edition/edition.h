@@ -123,13 +123,13 @@ Edition compose_edition(std::vector<Section> sections, const FontPack& fonts,
 // PSRAM. Returns false if the sink failed.
 //
 // `stats`, if given, is filled with the actual published/dropped counts once
-// every selected story has been written. It can differ from what ends up in
-// the v5 file's own header: that header is committed by the writer's
-// constructor right after selection, before any story is laid out, because
-// nothing here holds enough to know the final numbers any earlier than that
-// — the max_pages backstop below can still trim trailing stories afterwards.
-// A caller that wants the true count reads `*stats`, not the file it just
-// wrote.
+// every selected story has been written, and matches what the v5 file's own
+// header says: the writer's constructor commits that header right after
+// selection, before any story is laid out for real, so when there is a
+// max_pages ceiling this runs a write-nothing dry layout first to learn
+// exactly which stories the backstop will drop — the same layout the real
+// pass repeats while actually writing — so the header is not left reporting
+// the pre-budget selection count.
 bool compose_streaming(std::vector<Section> sections, const FontPack& fonts,
                        const ComposeOptions& opts, ByteSink& sink,
                        ComposeStats* stats = nullptr);

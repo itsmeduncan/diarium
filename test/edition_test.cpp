@@ -301,6 +301,12 @@ TEST_CASE("compose_streaming writes the same stories compose_edition would, one 
 
   CHECK(r.date() == whole.date);
   CHECK(r.title() == whole.title);
+  // The v5 file's own header, not just the out-param above: pins the header
+  // to the real survivor count rather than the constant zero a prior bug
+  // left it at.
+  CHECK(r.stats().items_published == whole.stats.items_published);
+  CHECK(r.stats().items_published == whole.stories.size());
+  CHECK(r.stats().truncated_published == whole.stats.truncated_published);
   REQUIRE(r.index().size() == whole.stories.size());
 
   for (size_t i = 0; i < whole.stories.size(); ++i) {
@@ -347,9 +353,14 @@ TEST_CASE("compose_streaming's page budget still bounds the streamed count") {
   StreamingEditionReader r;
   std::string error;
   REQUIRE_MESSAGE(r.open(out, &error), error);
-  // *stats is corrected for the backstop, so it — not the header a caller
-  // never reads directly — is what must match what actually landed on disk.
+  // The backstop trims trailing stories after selection but before the
+  // header is written; a dry layout pass finds where first, so both the
+  // out-param and the file's own header — read back here via `r.stats()`,
+  // not the out-param — report what actually landed in the index.
   CHECK(r.index().size() == stats.items_published);
+  CHECK(r.stats().items_published == stats.items_published);
+  CHECK(r.stats().truncated_published == stats.truncated_published);
+  CHECK(r.stats().dropped_over_budget == stats.dropped_over_budget);
 
   size_t total_pages = 0;
   for (const StreamIndexEntry& e : r.index()) total_pages += e.ref.page_count;

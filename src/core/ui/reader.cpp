@@ -265,27 +265,44 @@ void Reader::mark_current_read() {
 }
 
 bool Reader::show_article_at(size_t order_pos, bool context_change) {
-  if (order_pos >= order_.size()) {
-    mode_ = ReaderMode::Finished;
-    needs_render_ = true;
-    pending_context_change_ = true;
+  // A loop, not a single attempt: a corrupt or failed slice on a real card
+  // (load_story_pages returning empty for a story whose metadata says it
+  // has pages) must not strand the reader on a blank, unflushed panel, and
+  // must not mark a story the reader never actually showed as read — so a
+  // failed load is treated as if that position had nothing to show, and the
+  // search moves on to the next one exactly the way running out of order_
+  // already did.
+  while (order_pos < order_.size()) {
+    const StoryRef& s = edition_->stories[order_[order_pos]];
+    if (s.page_count == 0) return false;
+
+    std::vector<Page> loaded;
+    if (stream_ != nullptr) {
+      loaded = stream_->load_story_pages(order_[order_pos]);
+      if (loaded.empty()) {
+        ++order_pos;
+        continue;
+      }
+    }
+
+    order_pos_ = order_pos;
+    article_page_ = 0;
+    mode_ = ReaderMode::Article;
+    story_index_ = order_[order_pos];
+    have_story_ = true;
+    // Streaming: the pages just loaded above, replacing whatever the
+    // previous story left in current_pages_ — never more than one story
+    // resident. Whole-Edition mode has nothing to load; the pages are
+    // already there.
+    if (stream_ != nullptr) current_pages_ = std::move(loaded);
+    set_page(s.first_page, context_change);
+    mark_current_read();
     return true;
   }
-  const StoryRef& s = edition_->stories[order_[order_pos]];
-  if (s.page_count == 0) return false;
 
-  order_pos_ = order_pos;
-  article_page_ = 0;
-  mode_ = ReaderMode::Article;
-  story_index_ = order_[order_pos];
-  have_story_ = true;
-  // Streaming: load exactly this story's pages, replacing whatever the
-  // previous one left in current_pages_ — never more than one story
-  // resident. Whole-Edition mode has nothing to load; the pages are
-  // already there.
-  if (stream_ != nullptr) current_pages_ = stream_->load_story_pages(story_index_);
-  set_page(s.first_page, context_change);
-  mark_current_read();
+  mode_ = ReaderMode::Finished;
+  needs_render_ = true;
+  pending_context_change_ = true;
   return true;
 }
 
