@@ -253,6 +253,17 @@ bool compose_from_card(const FeedList& config, const FontPack& fonts,
   opts.feeds_configured = config.feeds.size();
   opts.feed_problems = problems;
 
+  // Nothing new — every story is already read. Do NOT open the file: a
+  // streaming write truncates it on open, so composing an empty paper would
+  // clobber the good edition already on the card. Composing twice in a morning
+  // finds everything seen, so this is the common case, not the rare one.
+  size_t remaining = 0;
+  for (const Section& s : sections) remaining += s.items.size();
+  if (remaining == 0) {
+    if (stats != nullptr) *stats = ComposeStats{};
+    return true;
+  }
+
   CardArticleSource articles(storage);
   std::unique_ptr<ByteSink> edition_sink = storage->open_write("/edition.rspe");
   if (edition_sink == nullptr) return false;

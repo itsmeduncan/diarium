@@ -11,10 +11,10 @@
 #include "Inkplate.h"
 #include "core/edition/edition.h"
 #include "core/edition/edition_store.h"
+#include "core/edition/edition_stream.h"
 #include "core/config/feeds_config.h"
 #include "core/text/font_pack.h"
 #include "core/base/datetime.h"
-#include "core/ui/home.h"
 #include "core/ui/notice.h"
 #include "core/ui/gesture.h"
 #include "core/ui/reader.h"
@@ -37,12 +37,43 @@ Inkplate panel(INKPLATE_3BIT);
 // session, and they are deliberately not on the stack.
 device::DeviceHal* hal_impl = nullptr;
 FontPack fonts;
+// Populated by load_paper: `edition` for the v4 (whole-file) fallback path,
+// `stream_edition` for the v5 (lazy) path — never both. `using_stream` says
+// which; `paper_date`/`paper_title` are read off whichever one is live, so
+// the rest of the firmware (the sleep screen, the clock seed) doesn't need
+// to know which path loaded.
 Edition edition;
+StreamingEditionReader stream_edition;
+bool using_stream = false;
+Epoch paper_date = kNoDate;
+std::string paper_title;
 Reader* reader = nullptr;
 Session session{SessionThresholds{}};
 // Kept from feeds.toml so the idle sleep can aim at the next edition.
 std::string wake_at = "05:30";
 GestureRecognizer gestures;
+
+// Adapts a path on an IStorage into the core's RangedSource seam, so a
+// StreamingEditionReader can open lazily against the card without core/
+// ever knowing storage exists — the device mirror of sim/cmd_read.cpp's
+// StorageRangedSource. `storage` and the file at `path` must outlive
+// whatever this is handed to; load_paper's instance is a function-local
+// static for exactly that reason (stream_edition keeps a pointer into it
+// for as long as the Reader built from stream_edition is in use).
+class StorageRangedSource final : public RangedSource {
+ public:
+  StorageRangedSource(IStorage* storage, std::string path)
+      : storage_(storage), path_(std::move(path)) {}
+
+  size_t size() const override { return storage_->size(path_); }
+  bool read(size_t offset, size_t length, std::string* out) const override {
+    return storage_->read_range(path_, offset, length, out);
+  }
+
+ private:
+  IStorage* storage_;
+  std::string path_;
+};
 
 // Says what went wrong on the panel rather than only down the serial line,
 // which nobody reading a newspaper is watching.
@@ -67,6 +98,25 @@ bool load_paper(device::DeviceHal& d) {
     show_notice(d, "No type", error.c_str());
     return false;
   }
+
+  // Prefer the lazy v5 path — compose_from_card writes this now, and only
+  // the footer, header and index come resident here, the same as on the
+  // desktop (sim/cmd_read.cpp). A failed open here just means "not a v5
+  // file" as often as "corrupt" (an old v4 edition, or nothing at all), so
+  // nothing is shown for it: the v4 attempt below reports absence or
+  // corruption on its own terms.
+  static StorageRangedSource edition_source(&d.storage, "/edition.rspe");
+  if (stream_edition.open(edition_source, &error)) {
+    if (stream_edition.index().empty()) {
+      show_notice(d, "No paper yet", "The edition on the card has no stories.");
+      return false;
+    }
+    using_stream = true;
+    paper_date = stream_edition.date();
+    paper_title = stream_edition.title();
+    return true;
+  }
+
   if (!d.storage.read("/edition.rspe", &blob)) {
     show_notice(d, "No paper yet",
                 "The card has no edition on it. Compose one and copy it over.");
@@ -80,6 +130,9 @@ bool load_paper(device::DeviceHal& d) {
     show_notice(d, "No paper yet", "The edition on the card has no pages.");
     return false;
   }
+  using_stream = false;
+  paper_date = edition.date;
+  paper_title = edition.title;
   return true;
 }
 
@@ -292,32 +345,26 @@ void compose_wake(device::DeviceHal& d) {
   // Local, not UTC: a paper is dated the day the reader is having, and at
   // nine in the evening those are not the same day.
   const Epoch local_now = d.clock.now() + d.clock.utc_offset_seconds();
-  Edition ed = device::compose_from_card(config, fonts, &d.storage, &read_state,
-                                         local_now, fetched);
-  Serial.printf("composed %u pages, %u stories in %u ms\n",
-                (unsigned)ed.pages.size(), (unsigned)ed.stories.size(),
-                (unsigned)(millis() - t0));
+  ComposeStats stats;
+  const bool saved = device::compose_from_card(config, fonts, &d.storage,
+                                               &read_state, local_now, fetched,
+                                               &stats);
+  Serial.printf("composed %u stories in %u ms\n",
+                (unsigned)stats.items_published, (unsigned)(millis() - t0));
 
-  // A colophon and nothing else is not a paper. Composing twice in a morning
-  // finds everything already seen, and replacing a good edition with an empty
-  // one loses the reader their news for no gain.
-  if (ed.stories.empty()) {
+  // A colophon and nothing else is not a paper. compose_from_card leaves a
+  // good edition on the card alone rather than clobbering it with an empty
+  // one when nothing survived dedup — composing twice in a morning finds
+  // everything already seen, so that is the common case here, not the rare
+  // one. There is no resident Edition left to draw a cover from any more:
+  // the panel is repainted on the next read wake instead, not here.
+  if (!saved) {
+    Serial.println("could not save the edition — keeping the paper on the card");
+  } else if (stats.items_published == 0) {
     Serial.println("nothing new — keeping the paper already on the card");
-  } else if (d.storage.write("/edition.rspe", serialize_edition(ed))) {
-    // The read state is the reader's to write, not the composer's: composing
-    // must not mark anything read.
-    Serial.println("saved");
-
-    // Draw the new paper before sleeping. E-ink holds the last image, so
-    // without this the panel keeps yesterday's cover and the reader picks up
-    // a device that looks like nothing happened overnight.
-    const std::vector<size_t> order = ed.reading_order();
-    const std::vector<bool> unread(order.size(), true);
-    render_home(fonts, ed, order, unread, "composed on device",
-               &d.display.framebuffer());
-    d.display.flush(RefreshMode::Full);
   } else {
-    Serial.println("could not save the edition");
+    Serial.printf("saved (%u dropped over budget)\n",
+                  (unsigned)stats.dropped_over_budget);
   }
 
   // The next edition is due at wake_at, local. Sleeping a flat day instead
@@ -406,9 +453,21 @@ void setup() {
   const uint32_t t0 = millis();
   if (!load_paper(d)) return;
   Serial.printf("[t] load_paper %u\n", (unsigned)(millis() - t_mark));
+  // The v5 path has no resident page list to size — the index it does hold
+  // resident already carries every story's page_count, so the total is a
+  // cheap sum rather than something that needs a page array to answer.
+  size_t loaded_pages = edition.pages.size();
+  size_t loaded_stories = edition.stories.size();
+  if (using_stream) {
+    loaded_stories = stream_edition.index().size();
+    loaded_pages = 0;
+    for (const StreamIndexEntry& e : stream_edition.index()) {
+      loaded_pages += e.ref.page_count;
+    }
+  }
   Serial.printf("loaded in %u ms: %u pages, %u stories\n",
-                (unsigned)(millis() - t0), (unsigned)edition.pages.size(),
-                (unsigned)edition.stories.size());
+                (unsigned)(millis() - t0), (unsigned)loaded_pages,
+                (unsigned)loaded_stories);
 
   // What is actually on the card. A config that is not found should say so
   // rather than leaving the reader to wonder. Diagnostics for a host, so it
@@ -451,7 +510,7 @@ void setup() {
   // Only a fallback now: a compose wake sets the clock from the servers it
   // talks to. Seeding from an edition's own date is how the device came to
   // believe it was permanently the day those fixtures were composed.
-  d.clock.seed_if_unset(edition.date);
+  d.clock.seed_if_unset(paper_date);
   d.input.begin();
 
   // The framebuffer was built at the default geometry before the card told us
@@ -462,8 +521,17 @@ void setup() {
   d.display.framebuffer().resize(page_width(), page_height());
 
   Hal hal = d.as_hal();
-  static Reader r(edition, fonts, hal);
-  reader = &r;
+  // Exactly one of these constructs, matching whichever path load_paper
+  // took: the lazy Reader over stream_edition (which itself only holds the
+  // index resident, and one story's pages at a time as the pass moves), or
+  // the whole-Edition Reader for a v4 fallback.
+  if (using_stream) {
+    static Reader r(stream_edition, fonts, hal);
+    reader = &r;
+  } else {
+    static Reader r(edition, fonts, hal);
+    reader = &r;
+  }
   reader->load_read_state("read.dat");
   reader->load_frontlight("light.dat");
   t_mark = millis();
@@ -472,7 +540,7 @@ void setup() {
   Serial.printf("[t] TOTAL to a visible page %u\n", (unsigned)(millis() - t_boot));
   session.touched(millis());
   Serial.printf("dated %s (rtc %ld)\n",
-                format_masthead_date(edition.date).c_str(),
+                format_masthead_date(paper_date).c_str(),
                 (long)d.clock.now());
   Serial.printf("reading — %s\n", reader->position().c_str());
 }
@@ -506,7 +574,7 @@ void loop() {
     // E-ink holds whatever was last drawn, so a sleeping paper sits on the
     // table showing this. Worth it being the nameplate rather than whichever
     // paragraph you happened to stop on.
-    render_sleep_page(fonts, edition.title, format_masthead_date(edition.date),
+    render_sleep_page(fonts, paper_title, format_masthead_date(paper_date),
                       &hal_impl->display.framebuffer());
     hal_impl->display.flush(RefreshMode::Full);
 
