@@ -36,6 +36,14 @@ struct ComposeOptions {
   // what you want when you are a week behind the news. Set it if you would
   // rather have a paper of a predictable length.
   size_t max_items = 0;
+  // A hard ceiling on the composed edition's page count. Zero means no ceiling.
+  // Unlike max_items, this is not a preference — it is a memory-safety limit
+  // the device sets, because the whole edition is held in RAM to serialize and
+  // to read, and past a few hundred KB the device's scarce internal RAM runs
+  // out and the compose aborts. When the budget is reached the remaining
+  // stories are dropped (counted in dropped_over_budget) rather than the paper
+  // growing until it crashes. The desktop leaves this at zero.
+  size_t max_pages = 0;
   // When there is a ceiling, the stories every section gets before any section
   // gets more — otherwise the budget is spent in section order and the last
   // section vanishes because the front was busy.
