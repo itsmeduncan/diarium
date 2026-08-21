@@ -194,16 +194,17 @@ bool Reader::handle(const GestureEvent& event) {
   }
 
   // The continuous pass has its own gestures: right goes onward through the
-  // news, and up and down move within the article you are on.
+  // news, and down keeps reading further into the article while up steps
+  // back a page.
   if (mode_ == ReaderMode::Article) {
     switch (event.kind) {
       case Gesture::SwipeRight:
         return next_article();
       case Gesture::SwipeLeft:
         return previous_article();
-      case Gesture::SwipeUp:
-        return scroll_down();
       case Gesture::SwipeDown:
+        return scroll_down();
+      case Gesture::SwipeUp:
         return scroll_up();
       default:
         return false;

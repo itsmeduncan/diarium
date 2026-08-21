@@ -490,7 +490,7 @@ TEST_CASE("reading: the continuous oldest-first pass") {
     }
   }
 
-  SUBCASE("swiping up and down scrolls within the article") {
+  SUBCASE("swiping down keeps reading and swiping up goes back") {
     Rig rig;
     Reader r(ed, *fonts, rig.hal());
     r.load_read_state("read.dat");
@@ -505,16 +505,16 @@ TEST_CASE("reading: the continuous oldest-first pass") {
     if (r.mode() != ReaderMode::Article) return;
 
     const size_t top = r.current_page();
-    GestureEvent up;
-    up.kind = Gesture::SwipeUp;
-    CHECK(r.handle(up));
-    CHECK(r.current_page() == top + 1);
-
     GestureEvent down;
     down.kind = Gesture::SwipeDown;
     CHECK(r.handle(down));
+    CHECK(r.current_page() == top + 1);
+
+    GestureEvent up;
+    up.kind = Gesture::SwipeUp;
+    CHECK(r.handle(up));
     CHECK(r.current_page() == top);
-    CHECK_FALSE(r.handle(down));  // already at the top of the article
+    CHECK_FALSE(r.handle(up));  // already at the top of the article
   }
 
   SUBCASE("scrolling stops at the end of the article rather than running on") {
@@ -526,10 +526,10 @@ TEST_CASE("reading: the continuous oldest-first pass") {
     REQUIRE(r.handle(right));
 
     const size_t pages = r.open_story()->page_count;
-    GestureEvent up;
-    up.kind = Gesture::SwipeUp;
-    for (size_t i = 0; i + 1 < pages; ++i) CHECK(r.handle(up));
-    CHECK_FALSE(r.handle(up));
+    GestureEvent down;
+    down.kind = Gesture::SwipeDown;
+    for (size_t i = 0; i + 1 < pages; ++i) CHECK(r.handle(down));
+    CHECK_FALSE(r.handle(down));
     CHECK(r.mode() == ReaderMode::Article);  // scrolling never advances
   }
 
