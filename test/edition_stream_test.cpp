@@ -201,6 +201,115 @@ std::vector<Section> two_fixture_sections() {
 
 }  // namespace
 
+namespace {
+
+// A RangedSource over a borrowed string that counts every byte it hands
+// back, so a test can assert the reader asked for footer-and-index-sized
+// slices rather than the whole file — the point of Stage C, not just that
+// the bytes round-trip.
+class CountingRangedSource final : public RangedSource {
+ public:
+  explicit CountingRangedSource(const std::string& data) : data_(data) {}
+
+  size_t size() const override { return data_.size(); }
+  bool read(size_t offset, size_t length, std::string* out) const override {
+    if (offset > data_.size() || length > data_.size() - offset) return false;
+    *out = data_.substr(offset, length);
+    ++read_calls_;
+    total_read_ += length;
+    return true;
+  }
+
+  size_t total_read() const { return total_read_; }
+  size_t read_calls() const { return read_calls_; }
+
+ private:
+  const std::string& data_;
+  mutable size_t total_read_ = 0;
+  mutable size_t read_calls_ = 0;
+};
+
+}  // namespace
+
+TEST_CASE("the ranged reader opens on footer + index alone, not the whole file") {
+  // A real composed edition, not the tiny hand-built pages above: a dozen
+  // stories of several paragraphs each, so the index is a small fraction of
+  // the file and the proof means something. The hand-built two-story file
+  // above is barely bigger than its own footer and index.
+  const FontPack* fonts = pack();
+  if (fonts == nullptr) return;
+
+  ComposeOptions opts;
+  opts.now = 1786864000;
+  opts.max_age_days = 3650;
+  const Edition ed = compose_edition(two_fixture_sections(), *fonts, opts);
+  REQUIRE(ed.stories.size() > 5);
+
+  std::string file;
+  StringSink sink(&file);
+  REQUIRE(write_edition_streaming(sink, ed));
+
+  CountingRangedSource counting(file);
+  StreamingEditionReader r;
+  std::string error;
+  REQUIRE_MESSAGE(r.open(counting, &error), error);
+
+  // The point: opening cost the footer, a header probe and the index — not
+  // any story's pages, which here are most of the file.
+  CHECK(counting.total_read() < file.size() / 2);
+  CHECK(counting.read_calls() > 0);
+
+  CHECK(r.date() == ed.date);
+  CHECK(r.title() == ed.title);
+  REQUIRE(r.index().size() == ed.stories.size());
+
+  // A story's pages load on demand, costing that story's bytes and no more.
+  const size_t before = counting.total_read();
+  const std::vector<Page> loaded = r.load_story_pages(0);
+  const StreamIndexEntry& first = r.index()[0];
+  REQUIRE(loaded.size() == first.ref.page_count);
+  CHECK(loaded[0].lines[0].runs[0].text ==
+        ed.pages[ed.stories[0].first_page].lines[0].runs[0].text);
+  CHECK(counting.total_read() - before == first.byte_length);
+
+  // Opening plus loading one of many stories is still nowhere near the
+  // whole file — the other stories' pages were never touched.
+  CHECK(counting.total_read() < file.size() / 2);
+}
+
+TEST_CASE("the ranged reader degrades the same way the whole-string one does") {
+  const std::string good = write_sample(two_pages(), one_page());
+
+  SUBCASE("a file too short for even the footer") {
+    for (size_t n = 0; n < 8; ++n) {
+      CAPTURE(n);
+      const std::string truncated = good.substr(0, n);
+      CountingRangedSource counting(truncated);
+      StreamingEditionReader r;
+      std::string error;
+      CHECK_FALSE(r.open(counting, &error));
+      CHECK_FALSE(error.empty());
+    }
+  }
+
+  SUBCASE("a corrupt footer magic") {
+    std::string bad = good;
+    bad[bad.size() - 1] = 'X';
+    CountingRangedSource counting(bad);
+    StreamingEditionReader r;
+    std::string error;
+    CHECK_FALSE(r.open(counting, &error));
+  }
+
+  SUBCASE("an out-of-range load_story_pages is empty, not a crash") {
+    CountingRangedSource counting(good);
+    StreamingEditionReader r;
+    std::string error;
+    REQUIRE(r.open(counting, &error));
+    CHECK(r.load_story_pages(99).empty());
+  }
+}
+
 TEST_CASE("write_edition_streaming bridges a composed Edition") {
   const FontPack* fonts = pack();
   if (fonts == nullptr) return;

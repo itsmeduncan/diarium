@@ -58,57 +58,104 @@ bool StreamingEditionWriter::finish() {
 namespace {
 // u32 index_offset + u32 magic.
 constexpr size_t kFooterSize = 8;
-}  // namespace
+// magic(4) + version(2) + flags(2) + date(8) + title-length prefix(4): just
+// enough of the header to learn how long the title is, so the real header
+// read below can be sized exactly rather than guessed at.
+constexpr size_t kHeaderProbeSize = 20;
+// The six ComposeStats u32 fields that follow the title.
+constexpr size_t kHeaderStatsSize = 24;
 
-bool StreamingEditionReader::open(const std::string& file, std::string* error) {
+// Everything StreamingEditionReader::open needs to do, over whichever
+// RangedSource the two public overloads hand it — the whole-string one
+// wrapping its copy in a StringRangedSource, the lazy one using the
+// caller's own. Only ever called with locals it fills in on success, so a
+// failed re-open leaves a reader's previous state untouched.
+bool parse_stream_edition(const RangedSource& src, std::string* error,
+                          Epoch* date, std::string* title, ComposeStats* stats,
+                          std::vector<StreamIndexEntry>* index) {
   auto fail = [&](const char* why) {
     if (error != nullptr) *error = why;
     return false;
   };
 
-  if (file.size() < kFooterSize) return fail("stream edition is truncated");
+  const size_t total = src.size();
+  if (total < kFooterSize) return fail("stream edition is truncated");
 
-  const std::string footer_bytes = file.substr(file.size() - kFooterSize);
+  std::string footer_bytes;
+  if (!src.read(total - kFooterSize, kFooterSize, &footer_bytes)) {
+    return fail("stream edition is truncated");
+  }
   ByteReader footer(footer_bytes);
   const uint32_t index_offset = footer.u32();
   const uint32_t footer_magic = footer.u32();
   if (!footer.ok() || footer_magic != kEditionMagic) {
     return fail("not a saved stream edition");
   }
-  if (index_offset > file.size() - kFooterSize) {
+  if (index_offset > total - kFooterSize) {
     return fail("stream edition index is corrupt");
   }
 
-  ByteReader header(file);
-  if (header.u32() != kEditionMagic) return fail("not a saved stream edition");
-  const uint16_t version = header.u16();
+  // Probe just enough of the header to learn the title's length, so the
+  // real header read below can be sized exactly instead of guessing a
+  // prefix large enough for any title.
+  std::string probe_bytes;
+  if (!src.read(0, total < kHeaderProbeSize ? total : kHeaderProbeSize,
+               &probe_bytes)) {
+    return fail("stream edition is truncated");
+  }
+  ByteReader probe(probe_bytes);
+  if (probe.u32() != kEditionMagic) return fail("not a saved stream edition");
+  const uint16_t version = probe.u16();
   if (version != kStreamEditionVersion) {
     return fail("stream edition was written by a different build");
   }
+  probe.u16();  // flags
+  probe.i64();  // date; re-read below once the exact header is in hand
+  const uint32_t title_len = probe.u32();
+  if (!probe.ok() || title_len > total) {
+    return fail("stream edition header is corrupt");
+  }
+
+  const size_t header_len = kHeaderProbeSize + title_len + kHeaderStatsSize;
+  if (header_len > total) return fail("stream edition header is corrupt");
+  std::string header_bytes;
+  if (!src.read(0, header_len, &header_bytes)) {
+    return fail("stream edition is truncated");
+  }
+
+  ByteReader header(header_bytes);
+  header.u32();  // magic, already checked above
+  header.u16();  // version, already checked above
   header.u16();  // flags
 
-  const Epoch date = header.i64();
-  const std::string title = header.str();
+  *date = header.i64();
+  *title = header.str();
 
-  ComposeStats stats;
-  stats.items_in = header.u32();
-  stats.dropped_seen = header.u32();
-  stats.dropped_stale = header.u32();
-  stats.dropped_over_budget = header.u32();
-  stats.items_published = header.u32();
-  stats.truncated_published = header.u32();
+  stats->items_in = header.u32();
+  stats->dropped_seen = header.u32();
+  stats->dropped_stale = header.u32();
+  stats->dropped_over_budget = header.u32();
+  stats->items_published = header.u32();
+  stats->truncated_published = header.u32();
 
   if (!header.ok()) return fail("stream edition header is corrupt");
 
-  const std::string index_bytes = file.substr(index_offset);
+  // Everything from the index to the end of the file — the index proper
+  // plus the trailing footer, which the index reader below simply never
+  // consumes. Still nothing story-sized: the index sits after every
+  // story's pages.
+  std::string index_bytes;
+  if (!src.read(index_offset, total - index_offset, &index_bytes)) {
+    return fail("stream edition index is corrupt");
+  }
   ByteReader index_reader(index_bytes);
   const uint32_t story_count = index_reader.u32();
   if (!index_reader.plausible_count(story_count, 41)) {
     return fail("stream edition index is corrupt");
   }
 
-  std::vector<StreamIndexEntry> index;
-  index.reserve(story_count);
+  std::vector<StreamIndexEntry> parsed_index;
+  parsed_index.reserve(story_count);
   for (uint32_t i = 0; i < story_count && index_reader.ok(); ++i) {
     StreamIndexEntry e;
     e.ref.key = static_cast<uint64_t>(index_reader.i64());
@@ -120,21 +167,56 @@ bool StreamingEditionReader::open(const std::string& file, std::string* error) {
     e.ref.page_count = index_reader.u32();
     e.byte_offset = index_reader.u32();
     e.byte_length = index_reader.u32();
-    index.push_back(std::move(e));
+    parsed_index.push_back(std::move(e));
   }
   if (!index_reader.ok()) return fail("stream edition index is corrupt");
 
   // A story's byte range must sit inside the stories region (before the
   // index) — a range pointing past it would send a later load into the
   // index or the footer instead of page data.
-  for (const StreamIndexEntry& e : index) {
+  for (const StreamIndexEntry& e : parsed_index) {
     const uint64_t end = static_cast<uint64_t>(e.byte_offset) + e.byte_length;
     if (end > index_offset) {
       return fail("stream edition has a story pointing past its pages");
     }
   }
 
-  file_ = file;
+  *index = std::move(parsed_index);
+  return true;
+}
+
+}  // namespace
+
+bool StreamingEditionReader::open(const RangedSource& src, std::string* error) {
+  Epoch date = kNoDate;
+  std::string title;
+  ComposeStats stats;
+  std::vector<StreamIndexEntry> index;
+  if (!parse_stream_edition(src, error, &date, &title, &stats, &index)) {
+    return false;
+  }
+
+  owned_source_.reset();
+  source_ = &src;
+  date_ = date;
+  title_ = title;
+  stats_ = stats;
+  index_ = std::move(index);
+  return true;
+}
+
+bool StreamingEditionReader::open(const std::string& file, std::string* error) {
+  auto local = std::unique_ptr<RangedSource>(new StringRangedSource(file));
+  Epoch date = kNoDate;
+  std::string title;
+  ComposeStats stats;
+  std::vector<StreamIndexEntry> index;
+  if (!parse_stream_edition(*local, error, &date, &title, &stats, &index)) {
+    return false;
+  }
+
+  owned_source_ = std::move(local);
+  source_ = owned_source_.get();
   date_ = date;
   title_ = title;
   stats_ = stats;
@@ -144,14 +226,12 @@ bool StreamingEditionReader::open(const std::string& file, std::string* error) {
 
 std::vector<Page> StreamingEditionReader::load_story_pages(size_t i) const {
   std::vector<Page> pages;
-  if (i >= index_.size()) return pages;
+  if (source_ == nullptr || i >= index_.size()) return pages;
 
   const StreamIndexEntry& e = index_[i];
-  if (static_cast<uint64_t>(e.byte_offset) + e.byte_length > file_.size()) {
-    return pages;
-  }
+  std::string story_bytes;
+  if (!source_->read(e.byte_offset, e.byte_length, &story_bytes)) return pages;
 
-  const std::string story_bytes = file_.substr(e.byte_offset, e.byte_length);
   ByteReader r(story_bytes);
   pages.reserve(e.ref.page_count);
   for (uint32_t k = 0; k < e.ref.page_count && r.ok(); ++k) {
