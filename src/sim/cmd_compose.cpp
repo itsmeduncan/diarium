@@ -110,10 +110,17 @@ int cmd_compose(const std::vector<std::string>& args) {
   size_t rendered = 0;
 
   if (save) {
-    // SimStorage roots every path under ".", so an absolute or
-    // out_dir-relative --save both resolve the way a plain fopen would.
-    SimStorage storage(".");
-    std::unique_ptr<ByteSink> sink = storage.open_write(save_path);
+    // save_path is a host path, not a card path: root SimStorage at its
+    // directory and write the basename, so full() reconstructs save_path
+    // exactly. Rooting at "." instead would prepend "./" and mangle an
+    // absolute --out (e.g. CI's $RUNNER_TEMP) into a bogus cwd-relative path.
+    const std::string::size_type slash = save_path.find_last_of('/');
+    const std::string save_dir =
+        slash == std::string::npos ? "." : save_path.substr(0, slash);
+    const std::string save_name =
+        slash == std::string::npos ? save_path : save_path.substr(slash + 1);
+    SimStorage storage(save_dir);
+    std::unique_ptr<ByteSink> sink = storage.open_write(save_name);
     if (sink == nullptr) {
       std::fprintf(stderr, "compose: cannot open %s for writing\n",
                    save_path.c_str());

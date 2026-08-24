@@ -134,8 +134,17 @@ int cmd_read(const std::vector<std::string>& args) {
   const std::string load_path = flag(args, "--edition", "out/edition.rspe");
   const bool allow_load = !has_flag(args, "--recompose");
 
-  SimStorage edition_storage(".");
-  StorageRangedSource edition_ranged(&edition_storage, load_path);
+  // load_path is a host path: root SimStorage at its directory and address
+  // the basename, so an absolute --edition (e.g. CI's $RUNNER_TEMP) resolves
+  // instead of being mangled into a bogus cwd-relative path under "./".
+  const std::string::size_type load_slash = load_path.find_last_of('/');
+  const std::string load_dir =
+      load_slash == std::string::npos ? "." : load_path.substr(0, load_slash);
+  const std::string load_name = load_slash == std::string::npos
+                                    ? load_path
+                                    : load_path.substr(load_slash + 1);
+  SimStorage edition_storage(load_dir);
+  StorageRangedSource edition_ranged(&edition_storage, load_name);
   StreamingEditionReader stream;
   bool loaded_v5 = false;
   if (allow_load) {

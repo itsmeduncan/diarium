@@ -49,7 +49,11 @@ jobs:
           printf 'n\n1\nn\nb\ns\n2\nq\n' | ./bin/diarium-sim read \
             --edition "$RUNNER_TEMP/edition/edition.rspe" \
             --out "$RUNNER_TEMP/read" | tee "$RUNNER_TEMP/read.log"
-          grep -q 'no re-parse, no re-layout' "$RUNNER_TEMP/read.log"
+          # Prove it loaded the saved edition rather than recomposing. The
+          # default compose now writes v5 ("v5, streamed"); an older v4 file
+          # loads whole ("no re-parse, no re-layout"). Either proves the load;
+          # a recompose prints neither.
+          grep -qE 'v5, streamed|no re-parse, no re-layout' "$RUNNER_TEMP/read.log"
 
   # Compiling the firmware is what catches hal.h drifting away from the six
   # implementations behind it. No hardware needed to notice that.
