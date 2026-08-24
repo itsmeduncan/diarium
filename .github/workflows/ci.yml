@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  desktop:
+    name: build + test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      # The Makefile is the no-cmake path a fresh clone uses; if it rots,
+      # the README lies.
+      - name: Build via Makefile
+        run: make clean && make sim tests
+
+      - name: Portability invariant
+        run: ./tools/check-portability.sh
+
+      - name: Parse the fixture corpus
+        run: ./bin/diarium-sim parse test/fixtures/feeds/*.xml
+
+      - name: Compose an edition end to end
+        run: |
+          make fonts
+          ./bin/diarium-sim compose --fresh --out "$RUNNER_TEMP/edition"
+
+      # Reads the edition compose just saved, rather than composing again —
+      # which is the whole battery argument, so it should not rot silently.
+      - name: Drive the reader over the saved edition
+        run: |
+          printf 'n\n1\nn\nb\ns\n2\nq\n' | ./bin/diarium-sim read \
+            --edition "$RUNNER_TEMP/edition/edition.rspe" \
+            --out "$RUNNER_TEMP/read" | tee "$RUNNER_TEMP/read.log"
+          grep -q 'no re-parse, no re-layout' "$RUNNER_TEMP/read.log"
+
+  # Compiling the firmware is what catches hal.h drifting away from the six
+  # implementations behind it. No hardware needed to notice that.
+  device:
+    name: build the device firmware
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build for the Inkplate 6FLICK
+        run: cd src/device && pio run

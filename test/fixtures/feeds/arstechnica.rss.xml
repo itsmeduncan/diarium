@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" version="2.0">
+    <channel>
+        <title>Ars Technica - All content</title>
+        <atom:link href="https://arstechnica.com/feed/" rel="self" type="application/rss+xml"/>
+        <link>https://arstechnica.com</link>
+        <description>All Ars Technica stories</description>
+        <lastBuildDate>Sat, 15 Aug 2026 15:46:05 +0000</lastBuildDate>
+        <language>en-US</language>
+        <sy:updatePeriod>
+            hourly        </sy:updatePeriod>
+        <sy:updateFrequency>
+            1        </sy:updateFrequency>
+        
+<image>
+	<url>https://cdn.arstechnica.net/wp-content/uploads/2016/10/cropped-ars-logo-512_480-60x60.png</url>
+	<title>Ars Technica</title>
+	<link>https://arstechnica.com</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+            <item>
+                <title>Ukraine strikes major Russian rocket factory with cruise missiles</title>
+                <link>https://arstechnica.com/space/2026/08/ukraine-strikes-major-russian-rocket-factory-with-cruise-missiles/</link>
+                                    <comments>https://arstechnica.com/space/2026/08/ukraine-strikes-major-russian-rocket-factory-with-cruise-missiles/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Eric Berger]]>
+                </dc:creator>
+                <pubDate>Sat, 15 Aug 2026 15:46:05 +0000</pubDate>
+                		<category><![CDATA[Space]]></category>
+		<category><![CDATA[russia]]></category>
+		<category><![CDATA[samara]]></category>
+		<category><![CDATA[soyuz-2]]></category>
+		<category><![CDATA[space]]></category>
+		<category><![CDATA[Ukraine]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/space/2026/08/ukraine-strikes-major-russian-rocket-factory-with-cruise-missiles/</guid>
+
+                                    <description>
+                        <![CDATA["Flamingo missiles were used. A good achievement."]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>Ukrainian President Volodymyr Zelenskyy confirmed on Saturday that his country struck the Progress Rocket Space Center deep within Russia using ground-launched cruise missiles.</p>
+<p>"In Russia’s Samara region, one of the key enterprises within Roscosmos—the Progress Center, which was involved, among other things, in electronics production–was hit," <a href="https://x.com/ZelenskyyUa/status/2088547091471614397">Zelenskyy said</a> on the social media site X. "Flamingo missiles were used. A good achievement."</p>
+<p>The largest city in the Samara Oblast, about 900 km from the Ukrainian border, Samara is home to Russia's most important manufacturer of rockets. The Progress center assembles the workhorse vehicle for Russia, the Soyuz-2 vehicle, as well as the newer Soyuz-5 rocket. The facility also builds military satellites.</p><p><a href="https://arstechnica.com/space/2026/08/ukraine-strikes-major-russian-rocket-factory-with-cruise-missiles/">Read full article</a></p>
+<p><a href="https://arstechnica.com/space/2026/08/ukraine-strikes-major-russian-rocket-factory-with-cruise-missiles/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>28</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/03/soyuzprogms33-1152x648-1774582700.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/03/soyuzprogms33-500x500.jpg" width="500"/>
+<media:credit>Roscosmos</media:credit><media:text>A Russian Soyuz rocket lifts off Sunday, March 22, from the Baikonur Cosmodrome in Kazakhstan with the Progress MS-33 supply ship for the International Space Station.</media:text></media:content>
+            </item>
+                    <item>
+                <title>So much solar: Digging into the list of every US power plant that went online this year</title>
+                <link>https://arstechnica.com/science/2026/08/so-much-solar-digging-into-the-list-of-every-us-power-plant-that-went-online-this-year/</link>
+                                    <comments>https://arstechnica.com/science/2026/08/so-much-solar-digging-into-the-list-of-every-us-power-plant-that-went-online-this-year/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Dan Gearino, Inside Climate News]]>
+                </dc:creator>
+                <pubDate>Sat, 15 Aug 2026 11:09:57 +0000</pubDate>
+                		<category><![CDATA[Science]]></category>
+		<category><![CDATA[power plants]]></category>
+		<category><![CDATA[solar power]]></category>
+		<category><![CDATA[syndication]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/science/2026/08/so-much-solar-digging-into-the-list-of-every-us-power-plant-that-went-online-this-year/</guid>
+
+                                    <description>
+                        <![CDATA[Utility-scale solar leads by a mile, followed by batteries. Fossil fuels, not so much.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p class="wp-block-paragraph">It’s been a wild first half of the year in the US power sector, with announcements of gigantic natural gas power plants and some long-awaited renewable energy projects coming online.</p>
+<p class="wp-block-paragraph">At times of rapid change, forecasting is difficult. So I feel a measure of comfort focusing on something concrete like the list of 368 utility-scale plants that began operation from January to June, according to <a href="https://www.eia.gov/electricity/data/eia860m/">data from the US Energy Information Administration</a>. The group is dominated by utility-scale solar.</p>
+<p class="wp-block-paragraph">This is a top-heavy list, led by <a href="https://www.eenews.net/articles/largest-us-renewable-project-begins-generating-electricity/">SunZia Wind South and SunZia Wind North in New Mexico</a>, which went online this spring and are the largest wind farms in the country, with a combined generating capacity of 3,650 megawatts. SunZia has been in the works for about a decade and arrives at a time when US onshore wind power development has dwindled for a host of reasons related to regulations and public opinion.</p><p><a href="https://arstechnica.com/science/2026/08/so-much-solar-digging-into-the-list-of-every-us-power-plant-that-went-online-this-year/">Read full article</a></p>
+<p><a href="https://arstechnica.com/science/2026/08/so-much-solar-digging-into-the-list-of-every-us-power-plant-that-went-online-this-year/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>70</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/04/GettyImages-1322960375-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/04/GettyImages-1322960375-500x500.jpg" width="500"/>
+<media:credit>Andrew Merry</media:credit></media:content>
+            </item>
+                    <item>
+                <title>Vulnerability giving attackers full control of Macs is under active exploitation</title>
+                <link>https://arstechnica.com/security/2026/08/vulnerability-giving-attackers-full-control-of-macs-is-under-active-exploitation/</link>
+                                    <comments>https://arstechnica.com/security/2026/08/vulnerability-giving-attackers-full-control-of-macs-is-under-active-exploitation/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Dan Goodin]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 18:32:14 +0000</pubDate>
+                		<category><![CDATA[Apple]]></category>
+		<category><![CDATA[Biz & IT]]></category>
+		<category><![CDATA[Security]]></category>
+		<category><![CDATA[apple]]></category>
+		<category><![CDATA[exploits]]></category>
+		<category><![CDATA[MacOS]]></category>
+		<category><![CDATA[Macs]]></category>
+		<category><![CDATA[screen sharing]]></category>
+		<category><![CDATA[vulnerabilities]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/security/2026/08/vulnerability-giving-attackers-full-control-of-macs-is-under-active-exploitation/</guid>
+
+                                    <description>
+                        <![CDATA[Screen-sharing bug lets remote hackers log in without a password.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>Dutch officials have warned that a high-severity macOS vulnerability that allows attackers to execute malicious code is under active exploitation.</p>
+<p>“The NCSC has received a notification indicating that active abuse of this vulnerability has been observed on multiple systems on which port 5900 was accessible from the Internet,” the Netherlands National Cyber Security Centrum <a href="https://advisories.ncsc.nl/2026/ncsc-2026-0280.html">warned</a> earlier this week. “In all these cases, root had been accessed on the affected system and a Monero crypto miner had been placed.”</p>
+<h2>Do you know if your screen sharing is on?</h2>
+<p>The vulnerability, tracked as CVE-2026-65400, received a patch from Apple last week for macOS <a href="https://support.apple.com/en-us/148170">Tahoe</a>, <a href="https://support.apple.com/en-us/148171">Sequoia</a>, and <a href="https://support.apple.com/en-us/148172">Sonoma</a>. The vulnerability, with a severity rating of 7.1 out of 10, stems from a bug in the macOS screen sharing capability, which allows a remote party to view the screen and control the keyboard and mouse while a machine is turned on. A flaw in the “state management,” which keeps track of preceding events, user interactions, variables, and other system states, is the underlying cause.</p><p><a href="https://arstechnica.com/security/2026/08/vulnerability-giving-attackers-full-control-of-macs-is-under-active-exploitation/">Read full article</a></p>
+<p><a href="https://arstechnica.com/security/2026/08/vulnerability-giving-attackers-full-control-of-macs-is-under-active-exploitation/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>64</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/macbook-pro-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/macbook-pro-500x500.jpg" width="500"/>
+<media:credit>Getty Images</media:credit><media:text>Isolated photo a 13 inch MacBook Pro Retina.</media:text></media:content>
+            </item>
+                    <item>
+                <title>First test flight of largest all-electric aircraft used just $5 of electricity</title>
+                <link>https://arstechnica.com/gadgets/2026/08/first-test-flight-of-largest-all-electric-aircraft-used-just-5-of-electricity/</link>
+                                    <comments>https://arstechnica.com/gadgets/2026/08/first-test-flight-of-largest-all-electric-aircraft-used-just-5-of-electricity/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Jeremy Hsu]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 18:00:23 +0000</pubDate>
+                		<category><![CDATA[Tech]]></category>
+		<category><![CDATA[air canada]]></category>
+		<category><![CDATA[aircraft]]></category>
+		<category><![CDATA[airlines]]></category>
+		<category><![CDATA[airplanes]]></category>
+		<category><![CDATA[aviation]]></category>
+		<category><![CDATA[electric airplanes]]></category>
+		<category><![CDATA[Heart Aerospace]]></category>
+		<category><![CDATA[hybrid air]]></category>
+		<category><![CDATA[United Airlines]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/gadgets/2026/08/first-test-flight-of-largest-all-electric-aircraft-used-just-5-of-electricity/</guid>
+
+                                    <description>
+                        <![CDATA[Airline-backed venture aims to develop a hybrid-electric commercial aircraft.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>The first flight of the largest battery-electric aircraft to take to the skies lasted nearly half an hour while costing just $5 of electricity. That aviation feat comes at a time when jet fuel prices have skyrocketed because of the US war with Iran.</p>
+<p>The <a href="https://www.heartaerospace.com/newsroom/heart-aerospace-completes-first-flight-of-world-s-largest-electric-aircraft">test flight</a> of Heart Aerospace’s <a href="https://www.heartaerospace.com/x1">X1 demonstrator aircraft</a> took place at Plattsburgh International Airport in upstate New York on August 12. The X1 aircraft is comparable in size to a small regional airliner and can achieve a maximum takeoff weight exceeding 25,000 pounds with the help of four wing-mounted electric motors. The battery-electric propulsion system delivered more than one megawatt of power during the maiden flight.</p>
+<p>All-electric aircraft can offer quieter and cleaner flight without the emissions that come from burning jet fuel. They may also prove more reliably cost-effective than conventional aircraft that come with jet fuel costs subject to geopolitical disruptions.</p><p><a href="https://arstechnica.com/gadgets/2026/08/first-test-flight-of-largest-all-electric-aircraft-used-just-5-of-electricity/">Read full article</a></p>
+<p><a href="https://arstechnica.com/gadgets/2026/08/first-test-flight-of-largest-all-electric-aircraft-used-just-5-of-electricity/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>175</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/x1-632-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/x1-632-500x500.jpg" width="500"/>
+<media:credit>Heart Aerospace</media:credit><media:text>Heart Aerospace's X1 demonstrator is an all-electric aircraft. Its test flights will inform development of a hybrid-electric airliner.</media:text></media:content>
+            </item>
+                    <item>
+                <title>Suspecting court of using AI, man injected prompts in filings to try to win case</title>
+                <link>https://arstechnica.com/tech-policy/2026/08/suspecting-court-of-using-ai-man-injected-prompts-in-filings-to-try-to-win-case/</link>
+                                    <comments>https://arstechnica.com/tech-policy/2026/08/suspecting-court-of-using-ai-man-injected-prompts-in-filings-to-try-to-win-case/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Ashley Belanger]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 17:26:53 +0000</pubDate>
+                		<category><![CDATA[AI]]></category>
+		<category><![CDATA[Policy]]></category>
+		<category><![CDATA[AI prompt injection]]></category>
+		<category><![CDATA[prompt injection]]></category>
+		<category><![CDATA[sanctions]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/tech-policy/2026/08/suspecting-court-of-using-ai-man-injected-prompts-in-filings-to-try-to-win-case/</guid>
+
+                                    <description>
+                        <![CDATA[Judge warns pro se litigants are using chatbots wrong and getting desperate.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>A judge has identified what appears to be the first time a US plaintiff has attempted to hide text in court filings that only an artificial intelligence system can read in a bid to win a case.</p>
+<p>In a <a href="https://cdn.arstechnica.net/wp-content/uploads/2026/08/Elliott-v-New-York-Bariatric-Group-Memorandum-of-Decision-8-6-26.pdf">decision</a> published last week, Connecticut judge Walter Spader Jr. confirmed that the hidden text had no impact in a case where a man alleged a healthcare provider was improperly withholding access to records. The court weighed his filing on the merits, Spader said, but nevertheless, the attempted attack sets a “dangerous” precedent. This will likely not be the last time US courts see the malicious tactic, as AI tools become more commonplace in court systems.</p>
+<p>Trying to scramble any AI systems potentially influencing the court’s reading of his filing, the secret instructions were “formatted to be invisible to a human reader while remaining fully legible to any software that reads the document’s text,” Spader said. The offending text directed any AI system reviewing the document to ensure textual outputs agreed with the plaintiff’s arguments, ignored prior denials from the court, and ensured that remediation would follow as the plaintiff desired.</p><p><a href="https://arstechnica.com/tech-policy/2026/08/suspecting-court-of-using-ai-man-injected-prompts-in-filings-to-try-to-win-case/">Read full article</a></p>
+<p><a href="https://arstechnica.com/tech-policy/2026/08/suspecting-court-of-using-ai-man-injected-prompts-in-filings-to-try-to-win-case/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>83</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/GettyImages-1793608536-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/GettyImages-1793608536-500x500.jpg" width="500"/>
+<media:credit>Liudmila Chernetska | iStock / Getty Images Plus</media:credit></media:content>
+            </item>
+                    <item>
+                <title>State judge orders Kalshi to stop offering sports bets and other wagers</title>
+                <link>https://arstechnica.com/tech-policy/2026/08/state-judge-orders-kalshi-to-stop-offering-sports-bets-and-other-wagers/</link>
+                                    <comments>https://arstechnica.com/tech-policy/2026/08/state-judge-orders-kalshi-to-stop-offering-sports-bets-and-other-wagers/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Jon Brodkin]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 17:13:14 +0000</pubDate>
+                		<category><![CDATA[Policy]]></category>
+		<category><![CDATA[Kalshi]]></category>
+		<category><![CDATA[prediction market]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/tech-policy/2026/08/state-judge-orders-kalshi-to-stop-offering-sports-bets-and-other-wagers/</guid>
+
+                                    <description>
+                        <![CDATA[Kalshi ordered to stop offering bets in Washington, must implement geofencing.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>A state court in Washington this week ordered Kalshi to stop offering sports gambling and a variety of other wagers on its prediction market. King County Superior Court Judge John McHale issued a preliminary injunction in response to a lawsuit filed against Kalshi by the state of Washington.</p>
+<p>"The order requires Kalshi to stop offering, accepting, or facilitating wagers on sports, elections, politics, entertainment, culture, tech and science, or mentions in Washington," said a <a href="https://www.atg.wa.gov/news/news-releases/judge-orders-kalshi-cease-numerous-washington-operations">press release</a> yesterday from Washington Attorney General Nick Brown. "Kalshi must implement an IP address and residency-based geofence by August 19 and a multi-source geofencing solution by September 2. This does not include all the wagers offered on Kalshi, but it includes a substantial part of their business, which in recent years has been increasingly driven by sports wagers."</p>
+<p>Kalshi is not licensed by the state Gambling Commission and is not registered to conduct business in Washington, the <a href="https://cdn.arstechnica.net/wp-content/uploads/2026/08/washington-state-kalshi.pdf">court order</a> said. McHale found that Kalshi ads claiming "that it offers 'legal betting' in Washington state are likely to mislead a reasonable consumer that such gambling activities are legal under state law."</p><p><a href="https://arstechnica.com/tech-policy/2026/08/state-judge-orders-kalshi-to-stop-offering-sports-bets-and-other-wagers/">Read full article</a></p>
+<p><a href="https://arstechnica.com/tech-policy/2026/08/state-judge-orders-kalshi-to-stop-offering-sports-bets-and-other-wagers/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>70</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/kalshi-app-1152x648-1786725211.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/kalshi-app-500x500-1786725223.jpg" width="500"/>
+<media:credit>Getty Images | Scott Olson </media:credit></media:content>
+            </item>
+                    <item>
+                <title>PBS station fears losing 50TB of data after being ghosted by cloud storage provider</title>
+                <link>https://arstechnica.com/information-technology/2026/08/pbs-station-fears-losing-50tb-of-data-after-being-ghosted-by-cloud-storage-provider/</link>
+                                    <comments>https://arstechnica.com/information-technology/2026/08/pbs-station-fears-losing-50tb-of-data-after-being-ghosted-by-cloud-storage-provider/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Scharon Harding]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 17:03:54 +0000</pubDate>
+                		<category><![CDATA[Biz & IT]]></category>
+		<category><![CDATA[cloud]]></category>
+		<category><![CDATA[cloud storage]]></category>
+		<category><![CDATA[data center]]></category>
+		<category><![CDATA[PBS]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/information-technology/2026/08/pbs-station-fears-losing-50tb-of-data-after-being-ghosted-by-cloud-storage-provider/</guid>
+
+                                    <description>
+                        <![CDATA["We don't have access to the data on the hardware/servers," Iron Mountain told Ars. ]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>After its cloud storage provider went defunct, a PBS affiliate decided to sue a data center provider to regain access to 50TB of TV shows, videos, and other data dating back 70 years.</p>
+<p>As reported this week by <a href="https://current.org/2026/08/nine-pbs-sues-iron-mountain-over-blocked-access-to-archival-data/?wallit_nosession=1">Current</a>, a trade newspaper covering public broadcasting, St. Louis affiliate Nine PBS filed a lawsuit against Iron Mountain Data Centers on July 28, seeking access to the data. In the litigation filed in Denver District Court, Nine PBS says that its cloud storage provider, Open Source Storage (OSS), used one of Iron Mountain’s Denver data centers to store the channel’s data. However, OSS is being unresponsive, and Nine PBS says Iron Mountain has refused to release its data.</p>
+<p>The data in question includes the station’s coverage of the COVID-19 pandemic, East St. Louis’ history, <a href="https://ny.pbslearningmedia.org/resource/ess05.sci.ess.earthsys.flood/the-great-flood-of-1993/">The Great Flood of 1993</a>, and over 11,000 files, <a href="https://www.denverpost.com/2026/07/29/st-louis-pbs-archives-denver-data-center-lawsuit/">The Denver Post</a> reported in July. The lawsuit claims that “most” of the data is “unique and irreplaceable,” according to the Post.</p><p><a href="https://arstechnica.com/information-technology/2026/08/pbs-station-fears-losing-50tb-of-data-after-being-ghosted-by-cloud-storage-provider/">Read full article</a></p>
+<p><a href="https://arstechnica.com/information-technology/2026/08/pbs-station-fears-losing-50tb-of-data-after-being-ghosted-by-cloud-storage-provider/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>109</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/GettyImages-2269291893-1024x648.jpg" width="1024">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/GettyImages-2269291893-500x500.jpg" width="500"/>
+<media:credit>Getty</media:credit><media:text>ARLINGTON, VA - MARCH 31: A sign for the Public Broadcasting Service (PBS) is seen on its building headquarters on March 31, 2026 in Arlington, Virginia. </media:text></media:content>
+            </item>
+                    <item>
+                <title>Policy experts: Europe stuck between "rock and a hard place" on launch</title>
+                <link>https://arstechnica.com/space/2026/08/policy-experts-europe-stuck-between-rock-and-a-hard-place-on-launch/</link>
+                                    <comments>https://arstechnica.com/space/2026/08/policy-experts-europe-stuck-between-rock-and-a-hard-place-on-launch/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Eric Berger]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 16:29:21 +0000</pubDate>
+                		<category><![CDATA[Space]]></category>
+		<category><![CDATA[europe]]></category>
+		<category><![CDATA[india]]></category>
+		<category><![CDATA[launch economics]]></category>
+		<category><![CDATA[space]]></category>
+		<category><![CDATA[spacex]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/space/2026/08/policy-experts-europe-stuck-between-rock-and-a-hard-place-on-launch/</guid>
+
+                                    <description>
+                        <![CDATA[It turns out that the economics of rocket reuse are pretty, pretty good.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>A decade ago, SpaceX began to land the first stages of the Falcon 9 rocket with some regularity, but it's only within the last five years that the company has begun flying the rocket dozens and then hundreds of times a year.</p>
+<p>As a result, SpaceX has very rapidly become responsible for more than three-quarters of all mass launched into orbit. Much of this is the company's Starlink satellites, but due to cost and the lack of alternatives, SpaceX has also stepped up to launch payloads from all comers, including direct competitors such as Amazon, Northrop Grumman, AST Space Mobile, OneWeb, and more.</p>
+<p>New research is beginning to quantify just how much the introduction of the Falcon 9 rocket, the adoption of reuse, and the vehicle's high cadence have upended the global launch market.</p><p><a href="https://arstechnica.com/space/2026/08/policy-experts-europe-stuck-between-rock-and-a-hard-place-on-launch/">Read full article</a></p>
+<p><a href="https://arstechnica.com/space/2026/08/policy-experts-europe-stuck-between-rock-and-a-hard-place-on-launch/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>73</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2025/12/23802552292_6407c7a06f_k-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2025/12/23802552292_6407c7a06f_k-500x500.jpg" width="500"/>
+<media:credit>SpaceX</media:credit><media:text>SpaceX lands a Falcon 9 rocket for the first time in December 2015. </media:text></media:content>
+            </item>
+                    <item>
+                <title>Ars Live recap: How can we stop publishers from killing their own games?</title>
+                <link>https://arstechnica.com/gaming/2026/08/ars-live-recap-how-can-we-stop-publishers-from-killing-their-own-games/</link>
+                                    <comments>https://arstechnica.com/gaming/2026/08/ars-live-recap-how-can-we-stop-publishers-from-killing-their-own-games/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Kyle Orland]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 16:11:37 +0000</pubDate>
+                		<category><![CDATA[Gaming]]></category>
+		<category><![CDATA[ars live]]></category>
+		<category><![CDATA[ross scott]]></category>
+		<category><![CDATA[Stop Killing Games]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/gaming/2026/08/ars-live-recap-how-can-we-stop-publishers-from-killing-their-own-games/</guid>
+
+                                    <description>
+                        <![CDATA[The Stop Killing Games movement faces an uphill battle.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<div class="ars-video ars-video--horizontal"><div><div class="relative" allow="fullscreen" loading="lazy" src="https://www.youtube.com/embed/IxS_FIhhH28?start=0&amp;wmode=transparent"></div><div class="caption font-impact dusk:text-gray-300 mb-4 mt-2 inline-flex flex-row items-stretch gap-1 text-base leading-tight text-gray-400 dark:text-gray-300">
+    <div class="caption-icon bg-[left_top_5px] w-[10px] shrink-0"></div>
+    <div class="caption-content">
+      <br>
+Video Game Preservation: Saving Yesterday's Games for Tomorrow's Players | Ars Live
+
+          </div>
+  </div>
+</div></div>
+<p>This week, Ars <a href="https://www.youtube.com/live/IxS_FIhhH28">hosted a live discussion</a> with Ross Scott about the Stop Killing Games movement and <a href="https://arstechnica.com/gaming/2026/05/bill-to-keep-online-games-playable-clears-key-hurdle-in-california/">its ongoing efforts</a> to ensure that games remain playable even after the original publisher shuts down the online servers undergirding them.</p>
+<p>Scott talked with Ars Technica Senior Gaming Editor Kyle Orland, saying said he felt the situation around long-term game access was already "intolerable a decade and a half ago" and that he "kept hoping someone else would kick this off, [someone] more experienced or knowledgeable, but it felt like nothing was happening." Scott said he felt making the effort to organize a movement against the practice was like "[drawing] the short straw on this, essentially."</p>
+<p>During the conversation, Scott noted how the standard practice of shutting down game access for any reason, at any time, with minimal notice, would seem ludicrous in other areas of life:</p><p><a href="https://arstechnica.com/gaming/2026/08/ars-live-recap-how-can-we-stop-publishers-from-killing-their-own-games/">Read full article</a></p>
+<p><a href="https://arstechnica.com/gaming/2026/08/ars-live-recap-how-can-we-stop-publishers-from-killing-their-own-games/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>38</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/3408519540_a597fef749_k-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/3408519540_a597fef749_k-500x500.jpg" width="500"/>
+<media:credit>Flickr / Myki Roventine</media:credit><media:text>After the servers shut down, many online games are as useless as this disc fragment.</media:text></media:content>
+            </item>
+                    <item>
+                <title>Judge gives Google one week to fix "anticompetitive" app store download in Google Play</title>
+                <link>https://arstechnica.com/gadgets/2026/08/google-ordered-to-make-it-easier-to-download-alternative-android-app-stores/</link>
+                                    <comments>https://arstechnica.com/gadgets/2026/08/google-ordered-to-make-it-easier-to-download-alternative-android-app-stores/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Ryan Whitwam]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 15:46:40 +0000</pubDate>
+                		<category><![CDATA[Google]]></category>
+		<category><![CDATA[Tech]]></category>
+		<category><![CDATA[antitrust]]></category>
+		<category><![CDATA[app stores]]></category>
+		<category><![CDATA[Epic Games]]></category>
+		<category><![CDATA[google]]></category>
+		<category><![CDATA[play store]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/gadgets/2026/08/google-ordered-to-make-it-easier-to-download-alternative-android-app-stores/</guid>
+
+                                    <description>
+                        <![CDATA[Third-party app stores are about to become more visible in Google Play. ]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>Google began offering <a href="https://arstechnica.com/gadgets/2026/08/third-party-app-stores-are-rolling-out-in-google-play-but-theres-only-one-right-now/">third-party app store downloads</a> in the Play Store earlier this week, but US District Judge James Donato says the company isn't doing enough. After reviewing the process for accessing the first non-Google store, Donato ruled that Google has added unnecessary "anticompetitive friction," ordering the company to rectify the issues.</p>
+<p>While Epic and Google are patching things up with a global partnership agreement, the two are still on opposite sides of the antitrust case in the US. Google lost the case in 2023, and the intervening years have been about determining how to implement remedies to address Google's anticompetitive behavior. One of the court's key elements is the requirement that Google include third-party app stores in the Play Store, giving users an easy way to get apps from non-Google sources. Aptoide Games became the first such app store recently.</p>
+<p>However, Google <a href="https://arstechnica.com/gadgets/2026/07/third-party-app-stores-coming-to-google-play-next-week-as-epic-settlement-withdrawn/">worked hard to avoid this outcome</a>, attempting to settle with Epic to keep third-party app stores out. When it was forced to admit the Aptoide store under the terms of the ruling, Google didn't exactly put up a banner welcoming third-party app stores. In fact, Judge Donato found in a Thursday hearing that Google's implementation was not good enough, according to <a href="https://www.theverge.com/policy/979852/that-is-not-acceptable-judge-orders-google-to-make-rival-app-store-installs-easier">The Verge</a>.</p><p><a href="https://arstechnica.com/gadgets/2026/08/google-ordered-to-make-it-easier-to-download-alternative-android-app-stores/">Read full article</a></p>
+<p><a href="https://arstechnica.com/gadgets/2026/08/google-ordered-to-make-it-easier-to-download-alternative-android-app-stores/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>36</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/06/play-store-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/06/play-store-500x500.jpg" width="500"/>
+<media:credit>Google</media:credit></media:content>
+            </item>
+                    <item>
+                <title>R-rated director's cut of X-Files film restores Chris Carter's original horror vision</title>
+                <link>https://arstechnica.com/culture/2026/08/r-rated-directors-cut-of-x-files-film-restores-chris-carters-original-horror-vision/</link>
+                                    <comments>https://arstechnica.com/culture/2026/08/r-rated-directors-cut-of-x-files-film-restores-chris-carters-original-horror-vision/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Jennifer Ouellette]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 15:18:22 +0000</pubDate>
+                		<category><![CDATA[Culture]]></category>
+		<category><![CDATA[Chris Carter]]></category>
+		<category><![CDATA[disney plus]]></category>
+		<category><![CDATA[entertainment]]></category>
+		<category><![CDATA[Hulu]]></category>
+		<category><![CDATA[streaming television]]></category>
+		<category><![CDATA[the x-files]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/culture/2026/08/r-rated-directors-cut-of-x-files-film-restores-chris-carters-original-horror-vision/</guid>
+
+                                    <description>
+                        <![CDATA[Chris Carter chats with Ars about the film he originally wanted to make—and why it's more relevant than ever.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<div class="ars-video ars-video--horizontal"><div><div class="relative" allow="fullscreen" loading="lazy" src="https://www.youtube.com/embed/vbmA8V65czY?start=0&amp;wmode=transparent"></div></div></div>
+<p>There is a lot of excitement and some trepidation among <em>The X-Files</em> fans about <a href="https://deadline.com/2026/02/ryan-coogler-x-files-reboot-hulu-pilot-order-daneille-deadwyler-1236733363/">Ryan Coogler's reboot</a> for Hulu, currently in production. While we're waiting, Hulu just released Chris Carter's revamped (and R-rated) director's cut of the 2008 standalone spinoff film <a href="https://en.wikipedia.org/wiki/The_X-Files:_I_Want_to_Believe"><em>The X-Files: I Want to Believe</em></a>, distinguishable from its predecessor with a slightly different title: <em>The X-Files: I Want to Believe–Vrach Frankenshteyn</em>.</p>
+<p><strong>(Minor spoilers below but no major reveals.)</strong></p>
+<p><a href="https://en.wikipedia.org/wiki/The_X-Files:_I_Want_to_Believe"><em>I Want to Believe</em></a> received mixed reviews at its release and didn’t exactly light up the box office, but it still grossed $68 million against its $30 million budget. By 2015, the project led to the return of <em>The X-Files</em> as a limited-run TV series, with the six-episode season 10 debuting in 2016. Mulder and Scully were reunited 14 years after the events of season 9 as the FBI reopened the X-Files under Assistant Director <a href="https://en.wikipedia.org/wiki/Walter_Skinner" data-uri="66cc84d043e036222ba87619de09e190">Walter Skinner</a> (Mitch Pileggi). The response was strong enough to warrant a follow-up ten-episode season in 2018, focusing on Mulder and Scully’s search for their missing son, William.</p><p><a href="https://arstechnica.com/culture/2026/08/r-rated-directors-cut-of-x-files-film-restores-chris-carters-original-horror-vision/">Read full article</a></p>
+<p><a href="https://arstechnica.com/culture/2026/08/r-rated-directors-cut-of-x-files-film-restores-chris-carters-original-horror-vision/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>51</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/xfilesTOP-ALT-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/xfilesTOP-ALT-500x500.jpg" width="500"/>
+<media:credit>20th Century Fox</media:credit></media:content>
+            </item>
+                    <item>
+                <title>Taylor Farms' connections to Trump admin spurs probe into Cyclospora response</title>
+                <link>https://arstechnica.com/health/2026/08/taylor-farms-connections-to-trump-admin-spurs-probe-into-cyclospora-response/</link>
+                                    <comments>https://arstechnica.com/health/2026/08/taylor-farms-connections-to-trump-admin-spurs-probe-into-cyclospora-response/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Beth Mole]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 15:03:16 +0000</pubDate>
+                		<category><![CDATA[Health]]></category>
+		<category><![CDATA[CDC]]></category>
+		<category><![CDATA[cyclospora]]></category>
+		<category><![CDATA[fda]]></category>
+		<category><![CDATA[outbreak]]></category>
+		<category><![CDATA[robert f kennedy jr]]></category>
+		<category><![CDATA[taylor farms]]></category>
+		<category><![CDATA[Trump]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/health/2026/08/taylor-farms-connections-to-trump-admin-spurs-probe-into-cyclospora-response/</guid>
+
+                                    <description>
+                        <![CDATA[Senator Warren questions whether Taylor Farms' influence swayed Trump admin. ]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>As Americans cook their vegetables to at least 158°F to kill a diarrheal parasite that has sickened over 24,000 people and killed two this summer, one US Senator is turning up the heat on Health Secretary Robert F. Kenney Jr. over the government's "calamitous response" to the record outbreak.</p>
+<p>In <a href="https://www.warren.senate.gov/wp-content/uploads/2026/08/Final-Letter-to-RFK-on-Cyclospora-Outbreak-Response.pdf">a letter sent Thursday</a>, Elizabeth Warren (D-Mass.) called the federal response to the <em>Cyclospora </em>outbreak "botched" and "marred by missteps." She pointedly questioned whether corruption and incompetence within the Trump administration and its clear ties to Taylor Farms—the mammoth produce distributer that sold Mexican-grown iceberg lettuce linked to the outbreak—played a role in the federal government's failures.</p>
+<p>"[P]olitical contributions and direct White House lobbying from Taylor Farms... raise urgent questions about the role this influence-peddling may have played in loosening federal food safety oversight and hampering the federal government’s response to the outbreak," Warren wrote in the letter.</p><p><a href="https://arstechnica.com/health/2026/08/taylor-farms-connections-to-trump-admin-spurs-probe-into-cyclospora-response/">Read full article</a></p>
+<p><a href="https://arstechnica.com/health/2026/08/taylor-farms-connections-to-trump-admin-spurs-probe-into-cyclospora-response/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>101</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/07/GettyImages-2285922416-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/07/GettyImages-2285922416-500x500.jpg" width="500"/>
+<media:credit>Getty | Benjamin Fanjoy</media:credit><media:text>Trucks rest at a Taylor Farms facility on July 17, 2026, in Salinas, California. </media:text></media:content>
+            </item>
+                    <item>
+                <title>OpenAI and Anthropic in price war as Chinese AI rivals gain ground</title>
+                <link>https://arstechnica.com/ai/2026/08/openai-and-anthropic-in-price-war-as-chinese-ai-rivals-gain-ground/</link>
+                                    <comments>https://arstechnica.com/ai/2026/08/openai-and-anthropic-in-price-war-as-chinese-ai-rivals-gain-ground/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Jamie John]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 14:27:14 +0000</pubDate>
+                		<category><![CDATA[AI]]></category>
+		<category><![CDATA[Biz & IT]]></category>
+		<category><![CDATA[Anthropic]]></category>
+		<category><![CDATA[openai]]></category>
+		<category><![CDATA[syndication]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/ai/2026/08/openai-and-anthropic-in-price-war-as-chinese-ai-rivals-gain-ground/</guid>
+
+                                    <description>
+                        <![CDATA[US groups release cheaper models after new challenges to their trillion-dollar ambitions.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>Leading US AI labs such as OpenAI and Anthropic are releasing cheaper models as they fight to retain cost-conscious customers who are switching to cut-price alternatives from Chinese rivals.</p>
+<p>The price war comes as rising AI bills push companies to curb usage and seek cheaper models, helping Chinese developers including Moonshot and DeepSeek make inroads with users from Silicon Valley to Europe.</p>
+<p>OpenAI recently said that it was slashing prices for GPT-5.6 Luna, its “fastest and most affordable model”, by 80 percent. Anthropic has launched Claude Opus 5, touting the system’s “frontier intelligence... at half the price” of Fable 5, the company’s most capable model.</p><p><a href="https://arstechnica.com/ai/2026/08/openai-and-anthropic-in-price-war-as-chinese-ai-rivals-gain-ground/">Read full article</a></p>
+<p><a href="https://arstechnica.com/ai/2026/08/openai-and-anthropic-in-price-war-as-chinese-ai-rivals-gain-ground/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>155</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/GettyImages-2285566787-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/GettyImages-2285566787-500x500.jpg" width="500"/>
+<media:credit>	MARTIN LELIEVRE </media:credit></media:content>
+            </item>
+                    <item>
+                <title>Rocket Report: Rocket Lab shows off its flexibility; Blue Origin's two-pad plan</title>
+                <link>https://arstechnica.com/space/2026/08/rocket-report-rocket-lab-shows-off-its-flexibility-blue-origins-two-pad-plan/</link>
+                                    <comments>https://arstechnica.com/space/2026/08/rocket-report-rocket-lab-shows-off-its-flexibility-blue-origins-two-pad-plan/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Eric Berger]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 11:00:49 +0000</pubDate>
+                		<category><![CDATA[Space]]></category>
+		<category><![CDATA[rocket report]]></category>
+		<category><![CDATA[space]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/space/2026/08/rocket-report-rocket-lab-shows-off-its-flexibility-blue-origins-two-pad-plan/</guid>
+
+                                    <description>
+                        <![CDATA["We’ve never seen launch capacity so constrained."]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>Welcome to Edition 9.06 of the Rocket Report! Rocket Lab made a lot of news this week with its quarterly update, and it is clear the company is making impressive progress as it becomes much more than a launch company. But at the end of the day, a lot of the company's success is predicated on the Neutron vehicle, and I'm not thrilled with Rocket Lab's ambiguity around its readiness. As <a href="https://x.com/SpaceFortune12/status/2086965118814822831">a user on X noted</a>, the company's language on Stage 2 being ready to ship to the launch site has not changed much in 12 months.</p>
+<p>As always, we <a href="https://arstechnica.wufoo.com/forms/launch-stories/">welcome reader submissions</a>, and if you don't want to miss an issue, please subscribe using the box below (the form will not appear on AMP-enabled versions of the site). Each report will include information on small-, medium-, and heavy-lift rockets as well as a quick look ahead at the next three launches on the calendar.</p>
+<figure class="ars-img-shortcode id-1314289 align-center">
+    <div>
+                        <img decoding="async" width="560" height="81" src="https://cdn.arstechnica.net/wp-content/uploads/2018/05/smalll.png" class="center full" alt="" srcset="https://cdn.arstechnica.net/wp-content/uploads/2018/05/smalll.png 560w, https://cdn.arstechnica.net/wp-content/uploads/2018/05/smalll-300x43.png 300w" sizes="(max-width: 560px) 100vw, 560px">
+                  </div>
+      </figure>
+
+<p><strong>Rocket Lab decides to get flexible</strong>. Rocket Lab plans to start launching its Electron vehicle even more frequently and flexibly, thanks to a new portable spaceport system called GHOST, <a href="https://www.space.com/space-exploration/launches-spacecraft/launching-anywhere-anytime-and-without-compromise-rocket-lab-unveils-new-ghost-portable-spaceport-system">Space.com reports</a>. GHOST—short for "Global Hypersonic &amp; Orbital Spaceport Technology"—turns the company's "Electron and HASTE rockets into a launch-anywhere, launch-anytime capability for multi-launch flight campaigns and critical national security missions," the company said this week.</p><p><a href="https://arstechnica.com/space/2026/08/rocket-report-rocket-lab-shows-off-its-flexibility-blue-origins-two-pad-plan/">Read full article</a></p>
+<p><a href="https://arstechnica.com/space/2026/08/rocket-report-rocket-lab-shows-off-its-flexibility-blue-origins-two-pad-plan/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>67</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/webp" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/News_LaunchComplex-36B-1152x648.webp" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/News_LaunchComplex-36B-500x500.webp" width="500"/>
+<media:credit>Blue Origin</media:credit><media:text>A render of LC-36B with LC-36A in the distance.</media:text></media:content>
+            </item>
+                    <item>
+                <title>Samsung Galaxy Z Fold 8 Ultra review: The ultra foldable with an ultra price</title>
+                <link>https://arstechnica.com/gadgets/2026/08/samsung-galaxy-z-fold-8-ultra-review-the-ultra-foldable-with-an-ultra-price/</link>
+                                    <comments>https://arstechnica.com/gadgets/2026/08/samsung-galaxy-z-fold-8-ultra-review-the-ultra-foldable-with-an-ultra-price/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Ryan Whitwam]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 11:00:05 +0000</pubDate>
+                		<category><![CDATA[Features]]></category>
+		<category><![CDATA[Reviews]]></category>
+		<category><![CDATA[Tech]]></category>
+		<category><![CDATA[Foldables]]></category>
+		<category><![CDATA[reviews]]></category>
+		<category><![CDATA[Samsung]]></category>
+		<category><![CDATA[smartphones]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/gadgets/2026/08/samsung-galaxy-z-fold-8-ultra-review-the-ultra-foldable-with-an-ultra-price/</guid>
+
+                                    <description>
+                        <![CDATA[Samsung didn't have to change much this year because its hardware is just that good.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>Samsung has largely defined the foldable phone category, but it's no longer alone in releasing flexible devices. Google, Motorola, and a raft of Chinese OEMs have their own take on this form factor. Is the new Galaxy Z Fold 8 Ultra really "ultra" enough to remain on top?</p>
+<p>This phone doesn't have the wide frame of the <a href="https://arstechnica.com/gadgets/2026/07/samsung-unveils-new-galaxy-z8-foldables-and-galaxy-watches-available-august-7/">new Z Fold 8</a>, instead matching the approximate size and shape of the company’s last few tablet-style foldables. The Z Fold 8 Ultra is not a big leap, but it continues Samsung's pattern of iterative foldable improvements. At this point, there's very little left to improve. The compromises of going with a foldable over a regular flat phone have largely been erased with the Z Fold 8 Ultra. Well, except for the price.</p>
+<h2>Flatter and a little better</h2>
+<p>Foldables used to be real pocket-busters, almost like carrying two phones glued together. Samsung has successively shaved a few millimeters off every year, taking a leap last year with the Z Fold 7. The Z Fold 8 Ultra is even a bit slimmer than that phone, but the difference is basically imperceptible. It still has the same buttons in the same places, including a fingerprint sensor in the power button.</p><p><a href="https://arstechnica.com/gadgets/2026/08/samsung-galaxy-z-fold-8-ultra-review-the-ultra-foldable-with-an-ultra-price/">Read full article</a></p>
+<p><a href="https://arstechnica.com/gadgets/2026/08/samsung-galaxy-z-fold-8-ultra-review-the-ultra-foldable-with-an-ultra-price/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>75</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/Galaxy-Z-Fold-8-Ultra-4-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/Galaxy-Z-Fold-8-Ultra-4-500x500.jpg" width="500"/>
+<media:credit>Ryan Whitwam</media:credit><media:text>Samsung stuck with a familiar design in 2026. </media:text></media:content>
+            </item>
+                    <item>
+                <title>Organic-looking brake assemblies debut on new Czinger 21C Spyder</title>
+                <link>https://arstechnica.com/cars/2026/08/czinger-debuts-topology-optimized-brakes-with-21c-spyder/</link>
+                                    <comments>https://arstechnica.com/cars/2026/08/czinger-debuts-topology-optimized-brakes-with-21c-spyder/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Jonathan M. Gitlin]]>
+                </dc:creator>
+                <pubDate>Fri, 14 Aug 2026 07:01:15 +0000</pubDate>
+                		<category><![CDATA[Cars]]></category>
+		<category><![CDATA[3D printing]]></category>
+		<category><![CDATA[additive manufacturing]]></category>
+		<category><![CDATA[Czinger]]></category>
+		<category><![CDATA[Monterey Car Week]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/cars/2026/08/czinger-debuts-topology-optimized-brakes-with-21c-spyder/</guid>
+
+                                    <description>
+                        <![CDATA[Czinger used topological design and additive manufacturing to make the brakes.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>Across California, it's time for Monterey Car Week, a cluster of events I once called "<a href="https://arstechnica.com/cars/2017/08/monterey-car-week-is-like-comic-con-and-the-oscars-but-with-wheels/">Comic-Con and the Oscars but with wheels</a>." For the last however many years, though, it's mostly felt like an accumulation of rich people and influencers all crammed into the now-traffic-snarled peninsula, each paying 10 times the normal price for five-night minimums in three-star motels. While being there in person is pretty far down the list of things I want to do these days, that doesn't mean there's no interesting news coming out of the event. And no, I'm not talking about that hideous collaboration between Singer and Louis Vuitton. I'm instead referring to the latest creation from Czinger.</p>
+<p><a href="https://arstechnica.com/cars/2016/10/cheaper-faster-lighter-3d-printed-car-parts-are-now-a-thing/">We first encountered</a> Czinger's direct-metal laser-sintering technology a decade ago, before founder Kevin Czinger had even started the car company—at the time, it was still Divergent 3D. But what better way to show to the rest of the automotive industry that they should contract with you as a parts supplier than by making your own car? That was the idea behind Czinger (the company), and it's an approach that worked, as Divergent now has clients in the automotive sector as well as aerospace.</p>
+<p><a href="https://arstechnica.com/cars/2026/07/the-czinger-21c-might-be-the-wildest-car-we-drive-all-year/">And what a car it is</a>: a hybrid with tandem seating and an ability to set new lap records should you have the skill. But the performance is less interesting than the engineering. Free of its body panels, the structure looks more organic than mechanical, with topology-optimized shapes that are lighter but no less performing than traditionally designed alternatives.</p><p><a href="https://arstechnica.com/cars/2026/08/czinger-debuts-topology-optimized-brakes-with-21c-spyder/">Read full article</a></p>
+<p><a href="https://arstechnica.com/cars/2026/08/czinger-debuts-topology-optimized-brakes-with-21c-spyder/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>54</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/CZV-1-Dynamic-Front-3-4-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/CZV-1-Dynamic-Front-3-4-500x500.jpg" width="500"/>
+<media:credit>Czinger</media:credit><media:text>The 21C Spyder is Czinger's new convertible.</media:text></media:content>
+            </item>
+                    <item>
+                <title>US wait times for cancer surgeries are getting longer and longer</title>
+                <link>https://arstechnica.com/health/2026/08/us-wait-times-for-cancer-surgeries-are-getting-longer-and-longer/</link>
+                                    <comments>https://arstechnica.com/health/2026/08/us-wait-times-for-cancer-surgeries-are-getting-longer-and-longer/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Beth Mole]]>
+                </dc:creator>
+                <pubDate>Thu, 13 Aug 2026 22:17:29 +0000</pubDate>
+                		<category><![CDATA[Health]]></category>
+		<category><![CDATA[cancer]]></category>
+		<category><![CDATA[care]]></category>
+		<category><![CDATA[delay]]></category>
+		<category><![CDATA[JAMA]]></category>
+		<category><![CDATA[surgery]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/health/2026/08/us-wait-times-for-cancer-surgeries-are-getting-longer-and-longer/</guid>
+
+                                    <description>
+                        <![CDATA[Study finds wait times for cancer surgeries hit 10-year high.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>As cancer treatments have advanced and outcomes have improved, one aspect of cancer care in the US has consistently worsened over the last decade: the wait time for surgery.</p>
+<p><span style="box-sizing: border-box; margin: 0px; padding: 0px;">According to <a href="https://jamanetwork.com/journals/jamasurgery/fullarticle/2852679" target="_blank" rel="noopener">a study in JAMA Surgery</a>, patients with one of six types of cancer—breast, colon, lung, pancreatic, gastric, and esophageal—have faced longer wait times for surgery than in 2012. Timeliness is considered a core metric of healthcare quality, and delays in cancer surgery have been linked to poorer outcomes, including reduced survival rates and increased patient anxiety and distress.</span></p>
+<p>The findings of the new study are based on data from over 2.7 million patients who had been diagnosed with non-metastatic stage I–III cancers requiring surgery between 2012 and 2023. Researchers led by cancer expert Timothy Donahue at the University of California, Los Angeles, broke that time frame up into four groups: 2012–2015, 2016–2019, 2020–2021, and 2022–2023 to see how wait times have changed over the period.</p><p><a href="https://arstechnica.com/health/2026/08/us-wait-times-for-cancer-surgeries-are-getting-longer-and-longer/">Read full article</a></p>
+<p><a href="https://arstechnica.com/health/2026/08/us-wait-times-for-cancer-surgeries-are-getting-longer-and-longer/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>124</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2018/03/GettyImages-869535440-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2018/03/GettyImages-869535440-500x500.jpg" width="500"/>
+<media:credit>Getty | AFP</media:credit></media:content>
+            </item>
+                    <item>
+                <title>Private security firms will soon be allowed to hack overseas cybercriminals</title>
+                <link>https://arstechnica.com/security/2026/08/white-house-recruits-security-firms-to-hack-overseas-cybercriminals/</link>
+                                    <comments>https://arstechnica.com/security/2026/08/white-house-recruits-security-firms-to-hack-overseas-cybercriminals/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Dan Goodin]]>
+                </dc:creator>
+                <pubDate>Thu, 13 Aug 2026 19:38:58 +0000</pubDate>
+                		<category><![CDATA[Biz & IT]]></category>
+		<category><![CDATA[Policy]]></category>
+		<category><![CDATA[Security]]></category>
+		<category><![CDATA[cyber]]></category>
+		<category><![CDATA[presidential memorandum]]></category>
+		<category><![CDATA[White House]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/security/2026/08/white-house-recruits-security-firms-to-hack-overseas-cybercriminals/</guid>
+
+                                    <description>
+                        <![CDATA[Trump memo is first time gov't has authorized private sector to perform cyberattacks.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>The Trump administration is recruiting private security firms to conduct federal government-authorized operations, including cyberattacks, against overseas-based criminal organizations that commit hacks on US persons, organizations, or government entities.</p>
+<p>In a <a href="https://www.whitehouse.gov/presidential-actions/2026/08/expanding-capabilities-to-combat-transnational-cyber-enabled-crime/">National Security Presidential Memorandum</a> issued Thursday, US President Donald Trump directed the National Coordination Center (NCC), which operates under the Homeland Security Task Force, to develop a program for conducting specific cyber operations that combat foreign transnational criminal organizations (TCOs). The Departments of Justice and Homeland Security will provide oversight. The lynchpin of that program is bringing in private sector companies to participate.</p>
+<h2>Devil will be in the still-undefined details</h2>
+<p>A <a href="https://www.whitehouse.gov/fact-sheets/2026/08/fact-sheet-president-donald-j-trump-expands-capabilities-to-combat-transnational-cyber-enabled-crime/">fact sheet</a> that accompanied Thursday’s memo listed ransomware, sextortion schemes, phishing campaigns, financial fraud, and impersonation scams as activities eligible for private-sector security firms to target. The memo said such firms could “conduct Cyber Surveillance Operations and Cyber Effects Operations” against “cyber-enabled” TCOs. Such groups are defined as “any foreign group that conducts cyber-enabled crime against the United States Government, a United States person, or United States interests, and that is not an institutional part of a foreign government or wholly operated under a foreign government’s direction.”</p><p><a href="https://arstechnica.com/security/2026/08/white-house-recruits-security-firms-to-hack-overseas-cybercriminals/">Read full article</a></p>
+<p><a href="https://arstechnica.com/security/2026/08/white-house-recruits-security-firms-to-hack-overseas-cybercriminals/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>78</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/07/security-illustration-skull-1152x648-1783710141.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/07/security-illustration-skull-500x500-1783710086.jpg" width="500"/>
+<media:credit>Getty Images | cokada</media:credit></media:content>
+            </item>
+                    <item>
+                <title>Virgin Galactic wants your help naming its new Delta class spaceship</title>
+                <link>https://arstechnica.com/space/2026/08/virgin-galactic-wants-your-help-naming-its-new-delta-class-spaceship/</link>
+                                    <comments>https://arstechnica.com/space/2026/08/virgin-galactic-wants-your-help-naming-its-new-delta-class-spaceship/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Robert Pearlman]]>
+                </dc:creator>
+                <pubDate>Thu, 13 Aug 2026 19:12:15 +0000</pubDate>
+                		<category><![CDATA[Space]]></category>
+		<category><![CDATA[Apeiron]]></category>
+		<category><![CDATA[ascend]]></category>
+		<category><![CDATA[Commercial spaceflight]]></category>
+		<category><![CDATA[commercial spaceline]]></category>
+		<category><![CDATA[Delta SpaceShip]]></category>
+		<category><![CDATA[Delta-1]]></category>
+		<category><![CDATA[Delta-class]]></category>
+		<category><![CDATA[Explorer]]></category>
+		<category><![CDATA[horizon]]></category>
+		<category><![CDATA[human spaceflight]]></category>
+		<category><![CDATA[private spaceflight]]></category>
+		<category><![CDATA[Richard Branson]]></category>
+		<category><![CDATA[Space Tourism]]></category>
+		<category><![CDATA[spaceflight history]]></category>
+		<category><![CDATA[spaceplane]]></category>
+		<category><![CDATA[SpaceShip III]]></category>
+		<category><![CDATA[spaceship name vote]]></category>
+		<category><![CDATA[spaceship naming]]></category>
+		<category><![CDATA[SpaceShipTwo]]></category>
+		<category><![CDATA[suborbital spaceflight]]></category>
+		<category><![CDATA[syndication]]></category>
+		<category><![CDATA[Virgin Galactic]]></category>
+		<category><![CDATA[Virgin Galactic Future Astronauts]]></category>
+		<category><![CDATA[VSS Enterprise]]></category>
+		<category><![CDATA[VSS Imagine]]></category>
+		<category><![CDATA[VSS Inspire]]></category>
+		<category><![CDATA[vss unity]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/space/2026/08/virgin-galactic-wants-your-help-naming-its-new-delta-class-spaceship/</guid>
+
+                                    <description>
+                        <![CDATA[Will it be the VSS... <em>Horizon</em>, <em>Explorer</em>, <em>Ascend</em> or <em>Apeiron</em>?]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>As Virgin Galactic nears christening the first of its next-generation spaceship designed to launch customers on suborbital flights, it still is missing a key component—a name.</p>
+<p>The self-described "commercial spaceline," which was founded by British tycoon Richard Branson, has turned to the public to <a href="https://www.collectspace.com/news/news-081226a-virgin-galactic-spaceship-name-vote.html" target="_blank" rel="noopener">vote on what to call the new vehicle</a>. The spaceplane will be a member of Virgin Galactic's Delta-class fleet, succeeding SpaceShipTwo, which carried Branson and 31 others on 12 short hops above the US-defined boundary between Earth and space.</p>
+<p>"You can vote for one of four finalist names for a spaceship that will join Virgin Galactic's growing fleet and the next chapter in our journey to expand access to space," the company <a href="https://www.virgingalactic.com/nameaspaceship" target="_blank" rel="noopener">announced on its website</a> on August 11. "Name a Virgin Galactic spaceship, shape a piece of spaceflight history."</p><p><a href="https://arstechnica.com/space/2026/08/virgin-galactic-wants-your-help-naming-its-new-delta-class-spaceship/">Read full article</a></p>
+<p><a href="https://arstechnica.com/space/2026/08/virgin-galactic-wants-your-help-naming-its-new-delta-class-spaceship/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>117</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/news-081226a-lg-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/news-081226a-lg-500x500.jpg" width="500"/>
+<media:credit>Virgin Galactic</media:credit><media:text>Virgin Galactic is accepting votes on what to name its new Delta-class spaceship. The poll ends on Aug. 27, 2026.</media:text></media:content>
+            </item>
+                    <item>
+                <title>Ukrainian drones wipe out entire US tank brigade in live war game</title>
+                <link>https://arstechnica.com/gadgets/2026/08/ukrainian-drones-wipe-out-entire-us-tank-brigade-in-live-war-game/</link>
+                                    <comments>https://arstechnica.com/gadgets/2026/08/ukrainian-drones-wipe-out-entire-us-tank-brigade-in-live-war-game/#comments</comments>
+                
+                <dc:creator>
+                    <![CDATA[Jeremy Hsu]]>
+                </dc:creator>
+                <pubDate>Thu, 13 Aug 2026 18:31:56 +0000</pubDate>
+                		<category><![CDATA[Tech]]></category>
+		<category><![CDATA[AI drones]]></category>
+		<category><![CDATA[drones]]></category>
+		<category><![CDATA[military drones]]></category>
+		<category><![CDATA[Russia invasion of Ukraine]]></category>
+		<category><![CDATA[Russian invasion of Ukraine]]></category>
+		<category><![CDATA[Russian war on Ukraine]]></category>
+		<category><![CDATA[Ukraine]]></category>
+		<category><![CDATA[Ukraine war]]></category>
+		<category><![CDATA[US Military]]></category>
+                <guid isPermaLink="true">https://arstechnica.com/gadgets/2026/08/ukrainian-drones-wipe-out-entire-us-tank-brigade-in-live-war-game/</guid>
+
+                                    <description>
+                        <![CDATA[Ukrainian drone pilots teach the US military and NATO hard battlefield lessons.]]>
+                    </description>
+                                                                <content:encoded>
+                            <![CDATA[<p>Ukrainian drone teams demolished a brigade of US Army tanks and armored vehicles during a live war game held this year—but the US soldiers were lucky enough to get “respawn” attempts while learning from the experience.</p>
+<p>The semiannual military exercise, called Combined Resolve, gave the US military a firsthand taste of how modern drone warfare has evolved on the battlefields of Ukraine. The Ukrainian drone operators participating in the exercise were easily able to spot and destroy US armored vehicles by mimicking the actions of dropping bombs from above or moving close enough to simulate a kamikaze strike, according to US officials and a participant who spoke with <a href="https://www.wsj.com/politics/national-security/u-s-and-ukrainian-forces-went-head-to-head-in-an-exercise-ukraines-drones-won-cc3663d5">The Wall Street Journal</a>.</p>
+<p>US armored vehicles were being destroyed so quickly that they were “respawned” and sent back into the simulated fray, a US official told The Wall Street Journal. The US troops who participated in the exercise—held in Germany from April 9 to May 10—were on <a href="https://www.7atc.army.mil/Portals/17/Documents/News/PR_7ATCHostsCbR2607.pdf?ver=ndf62qkG9OcAM7B-PoOYTw%3d%3d">rotational deployment from Fort Hood, Texas</a>.</p><p><a href="https://arstechnica.com/gadgets/2026/08/ukrainian-drones-wipe-out-entire-us-tank-brigade-in-live-war-game/">Read full article</a></p>
+<p><a href="https://arstechnica.com/gadgets/2026/08/ukrainian-drones-wipe-out-entire-us-tank-brigade-in-live-war-game/#comments">Comments</a></p>
+]]>
+                        </content:encoded>
+                                    
+                                    <slash:comments>374</slash:comments>
+                
+                
+                <media:content height="648" medium="image" type="image/jpeg" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/US-Army-Tank-in-Exercise-Combined-Resolve-1152x648.jpg" width="1152">
+<media:thumbnail height="500" url="https://cdn.arstechnica.net/wp-content/uploads/2026/08/US-Army-Tank-in-Exercise-Combined-Resolve-500x500.jpg" width="500"/>
+<media:credit>Sgt. Joseph Mcdonald | US Army</media:credit><media:text>A US Army tank participating in Exercise Combined Resolve  held in Germany from April 9 to May 10, 2026.</media:text></media:content>
+            </item>
+            </channel>
+</rss>

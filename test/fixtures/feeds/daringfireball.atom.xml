@@ -1,0 +1,2126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>Daring Fireball</title>
+<subtitle>By John Gruber</subtitle>
+<link rel="alternate" type="text/html" href="https://daringfireball.net/" />
+<link rel="self" type="application/atom+xml" href="https://daringfireball.net/feeds/main" />
+<id>https://daringfireball.net/feeds/main</id>
+
+
+<updated>2026-08-14T20:07:59Z</updated><rights>Copyright © 2026, John Gruber</rights><entry>
+    
+    <link rel="alternate" type="text/html" href="https://daringfireball.net/2026/08/iphone_camera_lens_scratch_resistance" />
+	<link rel="shorturl" href="http://df4.us/xh3" />
+	<id>tag:daringfireball.net,2026://1.43383</id>
+	<published>2026-08-14T17:16:15Z</published>
+	<updated>2026-08-14T20:07:59Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<summary type="text">The exposed lens covers are made of sapphire, not glass, and are thus incredibly scratch resistant. And even if, somehow, do you pick up a scratch on a lens cover, it almost certainly won’t affect image quality at all.</summary>
+	<content type="html" xml:base="https://daringfireball.net/" xml:lang="en"><![CDATA[
+<p>Following up on <a href="https://daringfireball.net/linked/2026/08/13/ceramic-shield-2-is-the-real-deal">my post yesterday about modern iPhones and scratch resistance</a>, and my personal habits of (a) almost never using an iPhone case, and (b) never setting the iPhone face down except on soft (cloth) surfaces.</p>
+
+<p>I should have anticipated this, because I’ve had this conversation with real-world normies repeatedly in recent years, but I got a <a href="https://mastodon.social/@irace/117085815636856963">bunch</a> of <a href="https://mastodon.social/@febuiles/117089438630870060">questions</a> from people who say they’re wary of ever putting their iPhone down on its <em>back</em> because they’re worried about scratching the camera lenses. That’s not a silly thing to worry about. It looks like those lenses are glass; glass scratches; and it sure seems like a scratched camera lens might forever ruin all the photos and videos you take with the camera.</p>
+
+<p>There are a couple misconceptions here though. First, the glassy flat circles exposed on the back of your phone aren’t the camera lenses. Those are covers over the lenses, which are smaller, spherical (not flat), and recessed. You can look through the covers and see the actual spherical lenses inside. The exposed lens covers are made of sapphire, not glass, and are thus incredibly scratch-resistant. They’re by far the most scratch-resistant parts of the phone. I’ve never once found even a tiny scratch on any of my iPhone camera lens covers, and I’ve never taken any particular care to avoid scratching them. I mean, I don’t drag the lenses face-down on surfaces. I’m not <em>trying</em> to scratch them. But I set my phones down on hard surfaces lenses-down all the time and they never seem to pick up even fine scratches.</p>
+
+<p>Zack “JerryRigEverything” Nelson is <a href="https://www.youtube.com/JerryRigEverything">the guy on YouTube</a> who makes videos where he scratches the hell out of products to see how durable they are. (And he bends them, burns them, and abuses them in other gruesomely creative ways.) In his iPhone 17 Pro video, <a href="https://youtu.be/KrOBzFwVzwA?t=250">starting around the 4:10 mark</a>, he tries scratching the sapphire lens covers with a sharp razor blade. No effect. Sapphire is far more likely to shatter than scratch, because it’s so hard. (You may recall that a decade ago Apple pursued using sapphire for the <em>displays</em> of iPhones but <a href="https://daringfireball.net/linked/2014/10/06/gt-advanced">it didn’t work out</a>.) Don’t try scratching your lenses with a diamond hardness pick and you’ll be fine.</p>
+
+<p>Also, believe it or not, a fine scratch on the lens cover will almost certainly not affect image quality <em>at all</em>. Try sticking a strand of hair (which is probably much thicker than a typical scratch) to the surface of your iPhone 1× main camera lens. Take a picture. Clean the hair off the lens. Retake the same picture. You almost certainly won’t see <em>any difference at all</em>. <a href="https://www.dpreview.com/videos/4128862298/dpreview-tv-how-much-do-scratches-dust-and-fingerprints-affect-lens-image-quality/">Here’s a great video from DPReview back in 2020</a> showing just how much dust or scratching you need to put on the outside of a lens to degrade image quality. It’s counterintuitive but the surface of the lens is not where light is focused — the sensor, inside the camera, is.</p>
+
+    ]]></content>
+  <title>★ You Don’t Need to Worry About Scratching Your iPhone Camera Lenses</title></entry><entry>
+	<title>Google’s ‘Material 3’ Design Write-Up Is 93.3 Percent Embarrassing</title>
+	<link rel="alternate" type="text/html" href="https://design.google/library/expressive-material-design-google-research" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xh2" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/14/google-design-93-percent" />
+	<id>tag:daringfireball.net,2026:/linked//6.43382</id>
+	<published>2026-08-14T16:33:55Z</published>
+	<updated>2026-08-14T17:40:41Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>This page from Google Design on their “Material 3” UI language came to my attention after <a href="https://daringfireball.net/linked/2026/08/12/google-design-pants-pissed">my snarky post</a> about the ungainly new to-do app <a href="https://x.com/googledesign/status/2087195277094695096">they bizarrely bragged</a> about on Twitter/X this week. I don’t think this “Material 3” page is new — I think it’s a few years old — but I’d never seen it before.</p>
+
+<p>First, it’s crazy that (in desktop browsers with a mouse cursor) they change the I-beam cursor for text selection to ... a circle. I guess it looks kind of fun but the whole point of the I-beam cursor is to enable precise character selection. They changed that to something that makes precise selection as difficult as possible. It’d be better to just use an arrow pointer than to replace the I-beam with a goddamn circle. This, from the UI design team.</p>
+
+<p>Second, this paragraph made me honestly wonder if I was reading a spoof, a years-old unfunny April Fool’s “prank”. But as far as I can tell this is totally straight, not a prank:</p>
+
+<blockquote>
+  <p>These factors can be quantified in users’ responses to new M3
+Expressive designs. We found a 32% increase in subculture
+perception, which indicates that expressive design makes a brand
+feel more relevant and “in-the-know.” We also saw a 34% boost in
+modernity, making a brand feel fresh and forward-thinking. On top
+of that, there was a 30% jump in rebelliousness, suggesting that
+expressive design positions a brand as bold, innovative, and
+willing to break from convention.</p>
+</blockquote>
+
+<p>Nothing says rebellious and “in-the-know” like assigning precise percentages to “rebelliousness”, “modernity”, and “subculture perception”.</p>
+
+<p><strong>Update:</strong> Believe it or not there is <a href="https://www.youtube.com/watch?v=AySXu8x-RnA">video of the Google Design team putting this research together</a>. Worth a watch.</p>
+
+<div>
+<a  title="Permanent link to ‘Google’s ‘Material 3’ Design Write-Up Is 93.3 Percent Embarrassing’"  href="https://daringfireball.net/linked/2026/08/14/google-design-93-percent">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Ceramic Shield 2 Is the Real Deal</title>
+	<link rel="alternate" type="text/html" href="https://www.tomsguide.com/phones/iphones/iphone-17-and-iphone-air-durability-testing-heres-how-the-new-iphones-stand-up-to-bending-scratching-and-dropping" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xh1" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/13/ceramic-shield-2-is-the-real-deal" />
+	<id>tag:daringfireball.net,2026:/linked//6.43381</id>
+	<published>2026-08-13T15:46:41Z</published>
+	<updated>2026-08-13T15:46:42Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Philip Michaels, writing last September for Tom’s Guide:</p>
+
+<blockquote>
+  <p><a href="https://www.youtube.com/watch?v=i9HXGAOtn2A">iPhone 17 torture test videos done by JerryRigEverything</a>
+indicate that Ceramic Shield 2 certainly resists scratching, with
+scratch testing leaving only light scratches at level 7 on the
+Mohs scale of hardness. Scratches typically show up on glass at
+levels 5 or 6 on that scale.</p>
+
+<p>“Ceramic Shield 2 is indeed the best we’ve ever seen,”
+JerryRigEverything remarks in the <a href="https://www.youtube.com/watch?v=KrOBzFwVzwA">iPhone 17 Pro testing
+video</a>.</p>
+
+<p>That backs up <a href="https://www.tomsguide.com/phones/iphones/apples-iphone-durability-test-clips-show-how-it-made-sure-the-iphone-air-and-iphone-17-series-are-built-to-last">Apple’s own Ceramic Shield 2 video</a>, in which
+a mineral tip can be seen rubbing against a Ceramic Shield
+2-coated display. There’s residue left on the screen, but it’s
+material from that tip, as it wipes away fairly easily.</p>
+</blockquote>
+
+<p>I <a href="https://daringfireball.net/linked/2026/08/12/stern-pixel-hilight">mentioned yesterday</a> that I try never to place my iPhones face down, to avoid scratches, and that my nearly year-old iPhone 17 Pro seemingly has not one visible scratch on the front glass. Not even a single micro abrasion I can see, even when tilting it with the display off to hunt for them. Surely Apple’s Ceramic Shield 2, which is intended to provide best-ever scratch resistance, is a factor too — and likely the biggest factor. Apple at its best.</p>
+
+<div>
+<a  title="Permanent link to ‘Ceramic Shield 2 Is the Real Deal’"  href="https://daringfireball.net/linked/2026/08/13/ceramic-shield-2-is-the-real-deal">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Google Design Pisses Its Pants on Twitter/X</title>
+	<link rel="alternate" type="text/html" href="https://x.com/googledesign/status/2087195277094695096" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xh0" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/google-design-pants-pissed" />
+	<id>tag:daringfireball.net,2026:/linked//6.43380</id>
+	<published>2026-08-13T01:03:45Z</published>
+	<updated>2026-08-14T16:07:56Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>A few years ago I’d have looked at this post and maybe leaned toward the idea that a precocious 8th grader somewhere hacked into the @GoogleDesign Twitter account and tried to pass off their little to-do app as having come from Google’s design team. But this is apparently real. I almost hope it’s AI slop and that there aren’t any human designers there who think anything in this app has appropriate proportions or is aesthetically pleasing.</p>
+
+<p>(<a href="https://xcancel.com/googledesign/status/2087195277094695096">Here’s an XCancel link</a> for the x.com averse. You can just change any x.com/* URL to xcancel.com/*. But, alas, the XCancel mirror of the original tweet loses the animation showing the UI in motion — for some, but not all, users.)</p>
+
+<div>
+<a  title="Permanent link to ‘Google Design Pisses Its Pants on Twitter/X’"  href="https://daringfireball.net/linked/2026/08/12/google-design-pants-pissed">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Joanna Stern on the Pixel 11 ‘HiLight’ Notification Light</title>
+	<link rel="alternate" type="text/html" href="https://thenewthings.com/p/the-new-pixel-feature-i-want-on-my-iphone?gift_content=e9bf3ebd-db33-4ee5-91b0-84d7acac3263" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgz" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/stern-pixel-hilight" />
+	<id>tag:daringfireball.net,2026:/linked//6.43379</id>
+	<published>2026-08-12T21:23:30Z</published>
+	<updated>2026-08-13T18:05:11Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Joanna Stern, writing at The New Things (gift link):</p>
+
+<blockquote>
+  <p>I used to love the blinking notification light on my BlackBerry,
+and later my Droid 2. It was a simple way to know I had a message
+without actually looking at my messages. Then BlackBerry let you
+customize the color, and it was a rainbow dream.</p>
+
+<p>Google’s HiLight takes it a step further by letting you assign
+different colors to VIP contacts. So when your phone is face
+down, you can tell who’s trying to reach you without picking it
+up. It looks cool. The big bummer? At launch, it only works for
+phone calls.</p>
+
+<p>Google told me it’s “continuing to invest in this technology” and
+that messaging notifications are coming. Still, it’s odd they
+aren’t there at launch, especially since Google found plenty of
+colors for Gemini. The ring changes hue depending on whether the
+AI is listening, thinking or responding.</p>
+</blockquote>
+
+<p>I have no interest in this because a few years ago I stopped ever putting my iPhone on any surface face down. I don’t use a case, so setting the phone face down is a good way to pick up scratches. I stopped doing that, ever, and now I’ve got a nearly year-old iPhone 17 Pro that seemingly doesn’t have even a <em>micro</em> abrasion on the display glass. </p>
+
+<p>And it seems downright goofy that it’s launching with support only for phone calls. Google can’t even launch a blinking light right on these Pixel phones.</p>
+
+<div>
+<a  title="Permanent link to ‘Joanna Stern on the Pixel 11 ‘HiLight’ Notification Light’"  href="https://daringfireball.net/linked/2026/08/12/stern-pixel-hilight">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Google Introduces ‘Camera Looks’ With Pixel 11 Phones</title>
+	<link rel="alternate" type="text/html" href="https://www.theverge.com/tech/978084/google-camera-looks-interview-computational-photography" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgy" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/google-introduces-camera-looks" />
+	<id>tag:daringfireball.net,2026:/linked//6.43378</id>
+	<published>2026-08-12T20:58:15Z</published>
+	<updated>2026-08-12T21:04:07Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>David Imel, The Verge:</p>
+
+<blockquote>
+  <p>But in our current moment, the photos people are drawn to are not
+flawless — and that’s created a real problem for the people
+making smartphone cameras. “The gap between what two random people
+want from their camera is growing dramatically,” says Isaac
+Reynolds, who leads the Pixel camera team at Google. Some people
+want a perfectly optimized photo, Reynolds says. “But there’s a
+growing number of people who want something that they feel is more
+authentic or traditional, by their definition.”</p>
+
+<p>That’s what Reynolds and the Pixel team are setting out to solve
+with Camera Looks, a total rethink of how the camera captures and
+styles an image on the Pixel 11 series. The phones include a new
+suite of processing tools aimed at giving people much more
+control over the camera’s output. At first glance, they look a
+lot like filters, with names like Black Tie, Classic, and most
+strikingly, Digi, in reference to the growing trend of buying
+cheap digital cameras from the early aughts. But unlike a filter,
+which generally applies editing tweaks after the processing
+happens, Camera Looks is changing how image data is processed at
+the sensor level.</p>
+</blockquote>
+
+<p>This sounds a lot like Apple’s “Photographic Styles” in the iPhone 13 and later, but with the addition of some control over grain and sharpness. I love grain, and the thing I like least about Apple’s built-in photo processing is the way it attempts to eliminate all noise. I like digital cameras that embrace noise and try to make it pleasing, rather than over-processing to try to pretend these tiny sensors aren’t inherently noisy. So I say kudos to Google for loosening up on “everyone gets the over-sharpened, over-smoothed look”.</p>
+
+<p>But, that said, what’s made me happy over the last year is shooting almost all my photos with third-party apps — in particular, <a href="https://halide.cam/">Halide</a>, <a href="https://notbor.ing/product/camera">Not Boring Camera</a>, and <a href="https://analoguecapture.com/">Analogue</a> — that give me low-level control over processing through LUTs (or in Halide’s parlance, “looks”). These apps give me the looks I want just through point-and-shoot photography. No need to process images after shooting. But because they (optionally) shoot RAW, I <em>can</em> reprocess in post without losing any original sensor data. I can shoot in black-and-white and subsequently change my mind and reprocess with a color look later. These apps enable honest film-look photography without looking at all gimmicky, and without baking any sort of filtering into the image data in my camera roll. It’s the best of both worlds. It’s also way, way fussier than the built-in Camera app should be.</p>
+
+<p>Anyway, all this Pixel announcement news today has me thinking that these days, I never hear much about Pixel cameras or image processing. In the early years of the Pixel lineup, there was a common view that Pixel phones were the best camera phones in the world. I never believed that, but I did think they were an interesting alternative, taking different but equally valid philosophical choices than Apple. Apple has always insisted on instant processing. You snap the shutter and the iPhone saves your image instantly. Pixel cameras often undertook seconds-long processing. That enabled features the iPhone couldn’t offer.</p>
+
+<p>I think it’s pretty easy to pinpoint when things changed for Pixel — <a href="https://www.theverge.com/2020/7/20/21331331/google-pixel-camera-app-lead-adobe-marc-levoy?scrolla=5eb6d68b7fedc32c19ef33b4">when Marc Levoy left Google for Adobe in 2020</a> (where he now leads the team making <a href="https://research.adobe.com/articles/indigo/indigo.html">the very intriguing Indigo camera app</a>, that is exclusively available for iPhone and which offers a slew of innovative computational photography features).</p>
+
+<p>When Levoy was leading Google’s camera photography team, there was a credible argument that Pixel phones were the best <em>still</em> camera phones in the world. (They were never even close on video.) Ever since, I never hear about them except in the middle of August each year, when Google announces new Pixel hardware. See you in 12 months.</p>
+
+<div>
+<a  title="Permanent link to ‘Google Introduces ‘Camera Looks’ With Pixel 11 Phones’"  href="https://daringfireball.net/linked/2026/08/12/google-introduces-camera-looks">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>TechCrunch on Google’s Pixel 11 Lineup</title>
+	<link rel="alternate" type="text/html" href="https://techcrunch.com/2026/08/12/pixel-11-has-few-hardware-changes-and-more-gemini/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgx" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/techcrunch-pixel-11-lineup" />
+	<id>tag:daringfireball.net,2026:/linked//6.43377</id>
+	<published>2026-08-12T19:45:58Z</published>
+	<updated>2026-08-12T19:45:59Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Ivan Mehta, TechCrunch:</p>
+
+<blockquote>
+  <p>With this year’s Pixel 11 series launch, Google is thinking more
+agentic AI to complete your tasks. With Gemini, U.S.-based users
+will be able to order groceries, book rides, or get coffee, for
+instance. Plus, Gemini can call businesses on users’ behalf for
+table reservations or appointments. Google said that users can
+take over or stop tasks at any point in time and also review
+transcripts for AI-operated calls.</p>
+
+<p>Over the next few weeks, <a href="https://blog.google/innovation-and-ai/products/gemini-app/new-connected-apps-services-gemini-august-2026/">a new slate of connected apps</a> will
+be able to work with Gemini to get things done, including Granola,
+Otter.ai, Wix, Fever, Get Your Guide, Localiza, OpenTable (U.K.),
+Ticketmaster, iHeartRadio, Pandora, Angi, Thumbtack, and Zocdoc.</p>
+</blockquote>
+
+<p>I’ve never heard of most of those apps, or, if I have heard of them, I thought they went defunct years ago. The one app amongst those I do use, OpenTable, apparently only supports this Gemini integration in the U.K.?</p>
+
+<p>Another knockout year for the Pixel phones and Android.</p>
+
+<div>
+<a  title="Permanent link to ‘TechCrunch on Google’s Pixel 11 Lineup’"  href="https://daringfireball.net/linked/2026/08/12/techcrunch-pixel-11-lineup">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Hands-On With Google Pixel 11 Pro Fold</title>
+	<link rel="alternate" type="text/html" href="https://www.engadget.com/2235294/google-pixel-11-pro-fold-hands-on/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgw" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/pixel-11-pro-fold" />
+	<id>tag:daringfireball.net,2026:/linked//6.43376</id>
+	<published>2026-08-12T19:40:51Z</published>
+	<updated>2026-08-12T19:59:35Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Sam Rutherford, writing for Engadget:</p>
+
+<blockquote>
+  <p>Granted, the P11 Pro Fold still includes IP68 dust and water
+resistance, which is better than what you get on the Z Fold 8 line
+(IP48). But after making an absolute tank of a foldable phone with
+last year’s model, I said Google really needed to cut weight and
+thickness this generation, and it just hasn’t. Instead, it seems
+like Google has leaned even more into the Pro Fold’s sturdiness
+with a new glass fibre material for its rear panel that the
+company says is nearly impossible to crack. This is great in
+theory, but obviously I wasn’t in a position to smash one of
+Google’s demo units in order to test that claim.</p>
+</blockquote>
+
+<p>I have never seen anyone, anywhere, with a folding Pixel phone. Pretty sure <a href="https://www.engadget.com/2235151/this-is-the-1900-google-pixel-11-pro-fold/">I won’t this year either</a>.</p>
+
+<p>I played with a Pixel 10 Fold or whatever its name was last year at <a href="https://store.google.com/magazine/google-store-boston-newbury-street?hl=en-US&amp;pli=1">the Google Store</a> on Newbury street in Boston, which store felt like a small library or museum. The Pixel Fold display was so plasticky that I had a moment where I wondered if the display units were fake props, like at Ikea. But no, it was the real thing. And it cost $1,800 to start.</p>
+
+<div>
+<a  title="Permanent link to ‘Hands-On With Google Pixel 11 Pro Fold’"  href="https://daringfireball.net/linked/2026/08/12/pixel-11-pro-fold">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Google’s Pixel Watch 5</title>
+	<link rel="alternate" type="text/html" href="https://www.theverge.com/tech/978094/pixel-watch-5-hands-on-made-by-google-gemini-wearables-smartwatch" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgv" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/pixel-watch-5" />
+	<id>tag:daringfireball.net,2026:/linked//6.43375</id>
+	<published>2026-08-12T19:38:03Z</published>
+	<updated>2026-08-12T19:38:04Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Victoria Song, The Verge:</p>
+
+<blockquote>
+  <p>The $399 Google Pixel Watch 5 isn’t about the hardware. Sure,
+there’s a new satin pyrite case finish, a few new strap colors,
+and a Steph Curry Special Edition. Under the hood, there’s a
+slightly faster Qualcomm processor and an itty-bitty battery bump.
+There’s a $50 price hike from last year, too, because the Pixel
+Watch 5 isn’t immune to RAMageddon — none of us are. Otherwise,
+no one would blame you for looking at this watch and thinking
+absolutely nothing’s changed. That’s because the big updates this
+year are all software-based.</p>
+</blockquote>
+
+<p>I have never seen anyone in real life wearing a Pixel Watch. (I’ve only seen a handful of people using Pixel phones, and every single one of them was at a tech event of some sort.)</p>
+
+<blockquote>
+  <p>You can also use AI to generate watchfaces. I created a watchface
+featuring “fat cats and an elegant font.” It didn’t <em>quite</em> do
+that. The fat cats weren’t characters, so much as pleasantly
+plump, cat-shaped clock numbers. It’s a gimmicky way to shoehorn
+the Nano Banana model onto the watch… but if that’s your thing,
+it works.</p>
+</blockquote>
+
+<p>Well I’m sure now I’ll see plenty of people wearing Pixel Watches.</p>
+
+<div>
+<a  title="Permanent link to ‘Google’s Pixel Watch 5’"  href="https://daringfireball.net/linked/2026/08/12/pixel-watch-5">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Amazon Is Spiting Customers With Unhelpful Order Confirmation Emails</title>
+	<link rel="alternate" type="text/html" href="https://www.theverge.com/ai-artificial-intelligence/977733/amazon-order-emails-google-gmail-ai-agents-data" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgu" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/amazon-spite" />
+	<id>tag:daringfireball.net,2026:/linked//6.43374</id>
+	<published>2026-08-12T18:51:01Z</published>
+	<updated>2026-08-14T15:56:05Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Mia Sato, The Verge:</p>
+
+<blockquote>
+  <p>Earlier this summer, Amazon customers began noticing that emails
+related to their online orders looked sparse: Order confirmation
+emails didn’t name specific items anymore, and instead listed only
+item categories.</p>
+
+<p>“Your Beauty item is confirmed!” an email about my retainer
+cleaning tablets read. Shoppers have posted other iterations of
+the redacted emails as well: “<a href="https://x.com/QuinnyPig/status/2080475069411946720">Ordered: 1 Hardware item</a>,”
+“<a href="https://www.reddit.com/r/amazonprime/comments/1ust16q/amazon_email_stopped_showing_specific_items/">Your Drugstore, Shoes, and other items are here!</a>” and “<a href="https://www.reddit.com/r/enshittification/comments/1v3bsm6/amazon_emails_no_longer_tell_you_what_theyre/">1
+Nutrition &amp; Wellness, 1 Wireless Accessories</a>,” for example.
+The emails have clip art-style illustrations of general product
+categories, and a shopper has to exit their email and go to Amazon
+to see what item it’s actually referring to.</p>
+
+<p>Complaints about the vague emails appear to have started in July;
+orders placed as recently as June contain thumbnails and names of
+the exact item purchased. [...]</p>
+
+<p>“As customers shop with us more frequently, including on their
+phones, and use the ‘Your Orders’ page in the Amazon app to get
+real-time, consolidated order details and delivery status, we’ve
+simplified several order-related emails to direct customers to our
+app and website for the latest information on their orders,”
+spokesperson Maxine Tagay said in an email. “This also reduces
+customer information shared outside the Amazon app and website to
+further improve customer privacy.”</p>
+</blockquote>
+
+<p>That statement from Amazon is <em>almost</em> honest, if you squint at it and ignore the bit about it having anything to do with “simplification”. If you order a Torx screwdriver, what’s <em>simple</em> is getting a confirmation email with the exact name, brand, and photo of the item you ordered, not “a hardware item”. The honest part is “reduces customer information shared outside the Amazon app”.</p>
+
+<p>The fact is, a <em>lot</em> of people use apps like Gmail for email. In fact, a lot of people use Gmail in particular. There’s a good chance you do. When you use Gmail, Google learns everything in your email. Amazon sees this as a competitive problem for them, not a privacy problem for users. Everyone who uses Gmail basically knows that Google “knows” what’s in their email, and they’re voluntarily agreeing to that. Amazon just doesn’t like that any of its competitors — perhaps especially Google — can glean so much information about what people are buying from Amazon. So Amazon, in an act of competitive spite that corrupts its relationship with its own customers, is limiting all useful purchase information to channels that <em>it</em> controls — its website and its own apps.</p>
+
+<p>If customers relied solely on the “Your Orders” page at Amazon, they wouldn’t need to send any emails at all. The obvious fact is, people go to Amazon when they want to buy something. They don’t come back until they want to buy something else. They enjoy getting confirmation and shipping notifications in email because they check their email regularly.</p>
+
+<div>
+<a  title="Permanent link to ‘Amazon Is Spiting Customers With Unhelpful Order Confirmation Emails’"  href="https://daringfireball.net/linked/2026/08/12/amazon-spite">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>App Store Scam of the Week: ‘TabControl Extension’ for Safari</title>
+	<link rel="alternate" type="text/html" href="https://lapcatsoftware.com/articles/2026/8/4.html" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgt" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/app-store-scam-tabcontrol" />
+	<id>tag:daringfireball.net,2026:/linked//6.43373</id>
+	<published>2026-08-12T15:06:05Z</published>
+	<updated>2026-08-12T15:06:18Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Jeff Johnson:</p>
+
+<blockquote>
+  <p>These purported reviews, all but one of which is 5 stars, are all
+in English. Yet none of them is in the US App Store. I also looked
+at other English-speaking countries such as <a href="https://apps.apple.com/au/app/tabcontrol-extension/id6756828264">Australia</a> and
+<a href="https://apps.apple.com/ca/app/tabcontrol-extension/id6756828264">Canada</a> but found no reviews. Also suspicious is that the name
+of every reviewer was a first name followed by an initial for the
+last name. If you’ve ever looked through App Store user reviews,
+it’s unusual to find this naming format. In most cases, the name
+on App Store user reviews is a uniquely chosen username, with no
+space character, often suffixed by a number.</p>
+
+<p>The final and most conclusive evidence that these reviews are
+fake, totally invented out of thin air by the developer (or more
+likely, by an LLM), is that the dates on the reviews, such as “Mar
+12,” predate the release of TabControl Extension in the App Store!</p>
+</blockquote>
+
+<p>God only knows what this obvious AI slop scam is doing with the data from users’ Safari tabs. It’s currently the 12th or 13th most popular Safari extension in the App Store.</p>
+
+<div>
+<a  title="Permanent link to ‘App Store Scam of the Week: ‘TabControl Extension’ for Safari’"  href="https://daringfireball.net/linked/2026/08/12/app-store-scam-tabcontrol">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Reed Jobs Tells a Neuroscience Story</title>
+	<link rel="alternate" type="text/html" href="https://x.com/sabrinahalper/status/2086964813788258588?s=46" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgs" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/reed-jobs" />
+	<id>tag:daringfireball.net,2026:/linked//6.43372</id>
+	<published>2026-08-12T14:48:04Z</published>
+	<updated>2026-08-12T14:48:04Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Watch this. No words needed, everyone can feel it. Genes are a hell of a thing.</p>
+
+<div>
+<a  title="Permanent link to ‘Reed Jobs Tells a Neuroscience Story’"  href="https://daringfireball.net/linked/2026/08/12/reed-jobs">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Nature Is Healing</title>
+	<link rel="alternate" type="text/html" href="https://mastodon.social/@BasicAppleGuy/117073366339407186" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgr" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/12/nature-is-healing" />
+	<id>tag:daringfireball.net,2026:/linked//6.43371</id>
+	<published>2026-08-12T14:43:11Z</published>
+	<updated>2026-08-12T14:44:42Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Basic Apple Guy:</p>
+
+<blockquote>
+  <p>Apple just dropped the hardest icon glow-up for the new Chess icon
+in macOS 27 Beta 5.</p>
+</blockquote>
+
+<p><a href="https://daringfireball.net/misc/2026/08/chess-icon-27-beta-5.png" class="noborder">
+<img
+    src = "https://daringfireball.net/misc/2026/08/chess-icon-27-beta-5.png"
+    alt = "Comparison of the Chess app icons in MacOS 27 Golden Gate: betas 1/2, betas 3/4, and an all new-icon for beta 5. The earlier ones show a flat brown knight. The new one in beta 5 shows a fully-articulated 3D silvery knight. The new one looks great. The previous ones look like shit."
+    width = 500
+/></a></p>
+
+<p>This is not just a tweak or small improvement. This is the difference between total shit and a really nice icon.</p>
+
+<div>
+<a  title="Permanent link to ‘Nature Is Healing’"  href="https://daringfireball.net/linked/2026/08/12/nature-is-healing">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>The Economist: ‘How to Spot AI Writing’</title>
+	<link rel="alternate" type="text/html" href="https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing?giftId=NzBlNTc2OGItMDgxNS00N2EzLWE4NmUtZDgzZmE4Y2FkM2Mw" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgq" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/11/economist-ai-writing" />
+	<id>tag:daringfireball.net,2026:/linked//6.43370</id>
+	<published>2026-08-11T21:37:06Z</published>
+	<updated>2026-08-12T19:17:28Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>The Economist (‘twas a gift link, but alas, I guess gift views have been used up — here’s <a href="https://archive.ph/20260811223012/https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing">an archive link</a> in case the gift link is vexing you):</p>
+
+<blockquote>
+  <p>You can discover AI’s hallmarks by comparing the writing of man
+and machine. To do this you need a baseline that is distinctive
+and familiar. The Economist turned to prose that we’re sure is
+human and that readers will recognise: our own. We designed a
+study to ask top LLMs — OpenAI’s ChatGPT, Anthropic’s Claude,
+Google’s Gemini and xAI’s Grok — to write versions of our articles
+without consulting the web. (As a prompt, we gave them the
+AI-generated summaries that we have experimentally added to some
+of our articles.)</p>
+
+<p>This gave us a corpus of human and AI creations and we compared
+them across 55,940 sentences and 1.2m words. To make sure we were
+detecting AI quirks rather than our own, we also checked the AI
+texts against journalism from CNN, the New York Times and the
+Washington Post. Excerpts from hit novels published between 1950
+and 2022 offered another test.</p>
+
+<p>Our findings are surprising. AI prose is distinguishable by word
+and punctuation choice as well as sentence and paragraph
+structure. But its hallmarks are not what you might expect, partly
+because its writing style has changed with software updates. That
+does not mean that LLMs are great writers: their prose lacks
+lucidity and elegance and is often formulaic. So those aspiring to
+be impressive (human) storytellers should avoid the following
+peculiarities in their own prose.</p>
+</blockquote>
+
+<p>On point for <a href="https://daringfireball.net/linked/2026/08/11/anthropic-claude-watermarks">today</a>.</p>
+
+<p>Some specific findings:</p>
+
+<blockquote>
+  <p>Much of this language could be described as what George Orwell
+called “pretentious diction”. He railed against writers who “dress
+up simple statements” with complicated words and jargon to sound
+clever. Such pontificating penmen, Orwell observed, also believe
+that “Latin or Greek words are grander than Saxon ones”. (Bots
+agree: more Latinate suffixes crop up in their writing than in
+human texts.)</p>
+
+<p>Then look at punctuation. Many believe LLMs stuff their prose with
+em-dashes, but that is not true after the most recent updates.
+Today only Claude uses more em-dashes than human writers, with
+ChatGPT using markedly fewer than any other writer in our study.
+Humans rejoice — and start using dashes again.</p>
+
+<p>A better way to spot AI-generated writing would be to look for
+texts without much punctuation at all. LLMS are very Joycean about
+it: they use fewer commas and semicolons than humans (and hardly
+any parentheses). They use less punctuation in part because they
+write longer sentences — “and” is their most overused word — and
+in part because they do not quote experts.</p>
+</blockquote>
+
+<div>
+<a  title="Permanent link to ‘The Economist: ‘How to Spot AI Writing’’"  href="https://daringfireball.net/linked/2026/08/11/economist-ai-writing">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Alex Micek on BMW’s iDrive ‘Special Surprises’</title>
+	<link rel="alternate" type="text/html" href="https://tumbledry.org/2026/08/07/idrive_ads" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgp" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/11/micek-bmw" />
+	<id>tag:daringfireball.net,2026:/linked//6.43369</id>
+	<published>2026-08-11T19:56:13Z</published>
+	<updated>2026-08-11T19:56:13Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Alex Micek:</p>
+
+<blockquote>
+  <p>In the future, I will feel angry if my car strands me on the side of the road.<br>
+I will feel angry if the motor brushes fail expectedly.<br>
+I will feel angry if it leaks water.</p>
+
+<p>By contrast, I don’t feel anger when the car tricks me into seeing
+an advertisement. Instead, I feel a deep, smothering, let-down at
+the promise of futurism. Bottomless despair is probably
+inappropriate; a symptom of the misanthropy I should grow out of.
+But. In the meantime, I feel helpless, discouraged, deeply <em>sad</em>.</p>
+</blockquote>
+
+<p>Such a good take. I should not let 19 years pass <a href="https://daringfireball.net/linked/2007/08/22/prius-top-speed">again</a> between linking to his writing.</p>
+
+<div>
+<a  title="Permanent link to ‘Alex Micek on BMW’s iDrive ‘Special Surprises’’"  href="https://daringfireball.net/linked/2026/08/11/micek-bmw">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>BMW Probably Paid Sony for the Spider-Man Dashboard Ads, Not the Other Way Around</title>
+	<link rel="alternate" type="text/html" href="https://www.press.bmwgroup.com/global/article/detail/T0459622EN/bmw-brings-modern-mobility-to-the-sony-pictures-film-%E2%80%9Cspider-man%E2%84%A2:-brand-new-day%E2%80%9D?language=en" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgo" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/11/bmw-spider-man-who-paid-who" />
+	<id>tag:daringfireball.net,2026:/linked//6.43368</id>
+	<published>2026-08-11T19:46:49Z</published>
+	<updated>2026-08-11T20:38:16Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>This didn’t occur to me but should have — BMW paid Sony to place BMWs throughout the new <em>Spider-Man: Brand New Day</em> movie. They’re not just in the movie but part of the story. So it’s probably the case not that Sony paid BMW to put Spider-Man animations in the dashboards of every late model BMW on the road, but that BMW offered to do it as part of the promotional deal they paid Sony. So BMW probably <em>paid</em> Sony for something that ultimately infuriated a bunch of BMW’s own customers. Geniuses.</p>
+
+<div>
+<a  title="Permanent link to ‘BMW Probably Paid Sony for the Spider-Man Dashboard Ads, Not the Other Way Around’"  href="https://daringfireball.net/linked/2026/08/11/bmw-spider-man-who-paid-who">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Mark Zuckerberg Posts 6,500-Word AI Essay</title>
+	<link rel="alternate" type="text/html" href="https://www.meta.com/thefutureisforeveryone/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgn" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/11/zuckerberg-essay" />
+	<id>tag:daringfireball.net,2026:/linked//6.43367</id>
+	<published>2026-08-11T19:36:36Z</published>
+	<updated>2026-08-11T19:37:53Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p><a href="https://daringfireball.net/linked/2026/07/30/zuck-ai-for-everyone">Two weeks ago</a> Zuckerberg published a 1,000-word essay, “<a href="https://www.wsj.com/opinion/the-ai-future-is-for-everyone-a0c24e20?st=foa4Pe">The AI Future Is for Everyone</a>”. This week he published an expanded 6,500-word version of the essay on Meta’s website. Somehow it almost says nothing more than the original. This tidbit, however, struck me as notable:</p>
+
+<blockquote>
+  <p>For example, in Richland Parish, Louisiana, where Meta is building
+a large data center, teachers received a $50,000 bonus this year
+because of the increased tax revenue from our investment. The
+superintendent told us that teachers are now moving there from
+across the country and he believes it will become one of the
+nation’s best school districts.</p>
+
+<p>Unlike the concern about knowledge work displacement, there is a
+shortage of skilled tradespeople like carpenters, electricians,
+and construction workers to support the demand for infrastructure
+buildout. Meta has created America’s Workforce Academy to provide
+free training for skilled tradespeople and guaranteed high-paying
+jobs in the areas we’re building data centers.</p>
+</blockquote>
+
+<p>Those $50K bonuses to public-school teachers <a href="https://www.nytimes.com/2026/06/23/us/louisana-teachers-bonus-meta-tax-revenue.html?unlocked_article_code=1.4lA.WA0a.H9T0e98nc0AU">are real</a>, and they’re more than most of those teachers’ annual salaries. That’s <a href="https://daringfireball.net/linked/2026/05/18/alaska-permanent-fund">the sort of thing</a> that could turn public sentiment on data center construction around. <a href="https://news.gallup.com/poll/709772/americans-oppose-data-centers-area.aspx">But it hasn’t turned around yet</a>.</p>
+
+<div>
+<a  title="Permanent link to ‘Mark Zuckerberg Posts 6,500-Word AI Essay’"  href="https://daringfireball.net/linked/2026/08/11/zuckerberg-essay">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>The Talk Show: ‘Getting the Snack Right’</title>
+	<link rel="alternate" type="text/html" href="https://daringfireball.net/thetalkshow/2026/08/10/ep-454" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgm" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/11/the-talk-show-454" />
+	<id>tag:daringfireball.net,2026:/linked//6.43366</id>
+	<published>2026-08-11T19:00:00Z</published>
+	<updated>2026-08-11T19:00:01Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Chance Miller returns to the show. Topics include iOS 27’s progress over summer, live baseball in Vision Pro, the RAM crisis, Apple’s trade secret lawsuit against OpenAI and io, and the EU/DMA situation.</p>
+
+<p><audio
+    src = "https://traffic.libsyn.com/secure/daringfireball/thetalkshow-454-chance-miller.mp3"
+    controls
+    preload = "none"
+/></p>
+
+<p><strong>Sponsored by:</strong></p>
+
+<ul>
+<li><a href="https://squarespace.com/talkshow">Squarespace</a>: Save 10% off your first purchase of a website or domain using code <strong>TALKSHOW</strong>.</li>
+<li><a href="https://factormeals.com/talkshow50off">Factor</a>: Healthy eating, made easy. Get 50% off and one free breakfast item per box for one year, with code <strong>talkshow50off</strong>.</li>
+<li><a href="https://notion.com/talkshow">Notion</a>: The collaborative AI workspace where teams and
+agents work side by side, with a Developer Platform teams can build on.</li>
+</ul>
+
+<div>
+<a  title="Permanent link to ‘The Talk Show: ‘Getting the Snack Right’’"  href="https://daringfireball.net/linked/2026/08/11/the-talk-show-454">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Netflix Has Peaked</title>
+	<link rel="alternate" type="text/html" href="https://sharptext.net/2026/is-netflix-washed-now/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgl" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/11/netflix-has-peaked" />
+	<id>tag:daringfireball.net,2026:/linked//6.43365</id>
+	<published>2026-08-11T18:54:53Z</published>
+	<updated>2026-08-11T20:17:15Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Andrew Sharp, writing at Sharp Text last month after Netflix’s earnings, asking “<a href="https://sharptext.net/2026/is-netflix-washed-now/">Is Netflix Washed Now?</a>”:</p>
+
+<blockquote>
+  <p>I offer this observation as a swirl of heightened anxiety
+surrounds the company, so let me clarify one thing up front: I’m
+not predicting imminent doom. Netflix content reaches a staggering
+<a href="https://www.bloomberg.com/news/newsletters/2026-07-12/netflix-combats-questions-about-slowing-growth?cmpid=screentime&amp;utm_campaign=screentime&amp;utm_medium=email&amp;utm_source=newsletter&amp;utm_term=260712&amp;utm_content=6453">85% of American viewers</a> and has <a href="https://thehill.com/homenews/media/5697585-netflix-booming-subscription-business/">325 million subscribers
+globally</a>. Growth is <a href="https://www.bloomberg.com/news/articles/2026-04-16/netflix-revenue-beats-estimates-as-hastings-steps-down">slowing</a>, but that’s the law of
+large numbers. If practically everyone in America and much of the
+world is already subscribed to some version of Netflix, and churn
+rates are still low, then any concern is relative. Going forward:
+cable is still dying, and even if the biggest premium distribution
+platform in the world can’t make great content of its own, it can
+still license movies, TV and sports rights. Netflix can then
+spread those costs across hundreds of millions of subscribers and
+a steadily growing ads business, seeing more engagement in a week
+than Apple TV sees in a year.</p>
+
+<p>So no, the company’s not doomed today or destined for collapse
+tomorrow. Instead, I think what’s interesting to consider is that
+Netflix has almost certainly peaked. As a cultural force, as a
+business success story, and as an entertainment death star
+destined to swallow Hollywood whole, the arrows are all pointing
+the wrong direction.</p>
+</blockquote>
+
+<p>Sometimes the problem with a company isn’t that it isn’t a good business, but merely that it isn’t <em>as</em> good a business as it holds itself up to be. A billion-dollar business ought to be a good thing, but it’s a disaster if the company is valued by investors as a trillion-dollar business. That’s Netflix.</p>
+
+<p>To me it’s backwards that Netflix is valued at $300 billion, <a href="https://companiesmarketcap.com/">roughly the 50th most valued company in the world</a>, and Disney is valued at $180 billion, roughly 120th. Netflix has a streaming video service and owns some IP, like <em>Stranger Things</em> and <em>Squid Game</em>. Disney owns two streaming video services (Disney+ and Hulu), and owns some IP. Little stuff like Mickey Mouse, <em>Star Wars</em>, <em>Marvel</em>, the Disney princesses, and everything from Pixar. Netflix has started dabbling in sports; Disney owns ESPN. Disney owns the world’s biggest and best theme parks and an entire cruise ship line.</p>
+
+<p>It’s true that Netflix’s streaming service is by far the biggest in the world, and likely will remain so for the foreseeable future. But Disney+ combined with Hulu is clearly in second place globally.</p>
+
+<p>For the most recent 12 months:</p>
+
+<p><table class="table-F0A58456-C897-4AD9-A289-6E1AF664FBB5" width=300>
+<style>
+.table-F0A58456-C897-4AD9-A289-6E1AF664FBB5 th:nth-child(1) { text-align: left }
+.table-F0A58456-C897-4AD9-A289-6E1AF664FBB5 td:nth-child(1) { text-align: left }
+.table-F0A58456-C897-4AD9-A289-6E1AF664FBB5 th:nth-child(2) { text-align: center }
+.table-F0A58456-C897-4AD9-A289-6E1AF664FBB5 td:nth-child(2) { text-align: center }
+.table-F0A58456-C897-4AD9-A289-6E1AF664FBB5 th:nth-child(3) { text-align: center }
+.table-F0A58456-C897-4AD9-A289-6E1AF664FBB5 td:nth-child(3) { text-align: center }
+</style>
+<thead>
+<th></th><th>Disney</th><th>Netflix</th>
+</thead>
+<tbody>
+<tr>
+<td>Revenue</td><td>$97 B</td><td>$48 B</td>
+</tr>
+<tr>
+<td>Net Profit</td><td>$11 B</td><td>$14 B</td>
+</tr>
+<tr>
+<td>Net Margin</td><td>11.5%</td><td>28%</td>
+</tr>
+<tr>
+<td></td><td></td><td></td>
+</tr>
+</tbody>
+</table></p>
+
+<p>Netflix is generating slightly more profit on half the revenue. With its theme parks, resorts, and cruise ships, big parts of Disney are effectively hardware, not software — so it’s almost inevitable its margins will be lower than a pure software play like Netflix. But those “hardware” businesses diversify Disney. How confident are you that Netflix will remain the undisputed leader in streaming 10 years from now, or 25? I’d bet good money that Walt Disney World will be the world’s biggest, best, and most profitable theme park <em>50 years from now</em>. And it’s a joke to compare the value and longevity of the two companies’ IP.</p>
+
+<p>I don’t know that Disney is undervalued by the market, but I sure think Netflix is overvalued. And as for quality, I’ve watched a bit more Netflix original content this summer than I had of late. David Attenborough’s <em><a href="https://www.netflix.com/title/81674730">A Gorilla Story</a></em> was a splendid documentary, but nature documentaries don’t pay the bills. A few other things I watched (or at least watched part of) were <a href="https://www.netflix.com/title/82016571">absolute dreck</a>. Not high-quality fun trash like <em><a href="https://www.netflix.com/title/81115994">Tiger King</a></em> but amateur-hour I’m-worried-I-lost-a-few-IQ-points-by-watching-it trash. We pay $27/month for Netflix premium and I can say unequivocally that it’s not worth it. I continue paying for it because I’m willing to overpay for it the same way I am for beverages at a hotel — it’s money I’m willing to squander, knowing full well I’m squandering it.</p>
+
+<p>It feels to me like Mr. Market is getting increasingly skeptical whether Netflix justifies its valuation, and Netflix is getting a little squirrelly and desperate trying to come up with an answer. Simple question: what’s their moat? It sure isn’t content quality.</p>
+
+<div>
+<a  title="Permanent link to ‘Netflix Has Peaked’"  href="https://daringfireball.net/linked/2026/08/11/netflix-has-peaked">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Anthropic Posts ‘How Claude Marks AI-Generated Content’ Without Explaining How Claude Marks AI-Generated Content</title>
+	<link rel="alternate" type="text/html" href="https://support.claude.com/en/articles/16266773-how-claude-marks-ai-generated-content" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgk" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/11/anthropic-claude-watermarks" />
+	<id>tag:daringfireball.net,2026:/linked//6.43364</id>
+	<published>2026-08-11T17:59:22Z</published>
+	<updated>2026-08-11T21:19:23Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Anthropic support page:</p>
+
+<blockquote>
+  <p>Anthropic has signed the EU AI Act’s Article 50(2) Code of
+Practice on Transparency of AI-Generated Content, as a provider of
+both generative AI models and generative AI systems. This article
+describes how we’re planning to put those commitments into
+practice, how marking works, and what its limitations are. We’ll
+update this article and publish more detailed technical guidance
+as it becomes available.</p>
+</blockquote>
+
+<p>Regarding generated plain text output:</p>
+
+<blockquote>
+  <p>When a supported Claude model generates text, it weaves an
+imperceptible watermark directly into the text itself. You won’t
+see it, and it doesn’t change the meaning, quality, or readability
+of Claude’s response.</p>
+
+<p>Because the watermark is part of the text, it will travel with the
+text when it’s copied and pasted elsewhere, and may persist
+through some editing. Watermarking will be applied at the model
+level, which means it will be present no matter which Claude
+product or surface the text comes from. [...]</p>
+
+<p>We’re also working to enable users and other third parties to
+detect Claude’s embedded watermarks and provenance metadata.
+Detection checks whether a piece of text or a file carries a
+supported Claude mark. If a supported mark is found, it indicates
+that the content may have been processed by Claude.</p>
+
+<p>We’ll share details on detection mechanisms in forthcoming
+technical documentation.</p>
+</blockquote>
+
+<p>Anthropic is claiming this is for compliance with an EU law but that “Marking will apply to output from supported models wherever Claude is offered, worldwide.”</p>
+
+<p>This is infuriatingly opaque. I won’t speak to the “signed provenance metadata” they say they’ll be embedding in generated <em>files</em> like PDFs, SVGs, PNGs, and JPEGs. That’s important but it’s complex. Plain text is simple. A string of text is just one character followed by another. At first I presumed that Claude is going to start “embedding” invisible characters/byte sequences between visible characters — which would unavoidably cause immediate problems.</p>
+
+<p>Let’s say I have Claude generate the phrase “Hello world”. (Two words is surely too short to bother with “AI generated” detection — I’m using a two-word phrase here for simplicity in the example.) Claude creates the string of characters “<em>Hello«invisible characters that comprise a “watermark” here</em>» world”. I paste this on the web. Humans who look at it will see “Hello world” but the invisible characters are there. Character-count-limited social media platforms will show that the string contains more than the 11 visible characters in “Hello world”.</p>
+
+<p>If the “watermark” is not comprised of invisible characters but rather visible ones, how in the world does this jibe with their claim that it’s “imperceptible”? <a href="https://www.reddit.com/r/ClaudeAI/comments/1vky8at/claude_will_watermark_generated_content_thank_you/">This Reddit thread</a> claims that’s how it will work — “It’s a form of steganography where the model subtly biases its word choice to create a statistical pattern that can be detected later.” How in the world can that be squared with “it doesn’t change the meaning, quality, or readability”? And any sort of semantic detection like this is going to cause false-positive problems.</p>
+
+<p>If I ask a tool to generate text or suggest text for me, I expect that tool to generate the best possible word choices it can. Not corrupt its output for the sake of watermarking. If they go through with this, this ought to be poison to the Claude brand.</p>
+
+<p>What happens if you copy my text and quote it in something you write, by hand? Now you’ve got a watermark in <em>your</em> prose, invisible characters or something, that implicates that your prose is AI-generated? Even though you didn’t use AI and just copy and pasted text from me? Madness.</p>
+
+<p>They obviously need to explain exactly what they’re embedding in text if anyone is actually going to detect it, but if they explain it, anyone can simply remove it. And what happens, for example, if someone just OCRs Claude-generated text rather than selects and copies it? This is all <a href="https://www.reddit.com/r/ClaudeAI/comments/1vky8at/claude_will_watermark_generated_content_thank_you/">so stupid</a>. I have never been happier that I’ve never actually used Claude for anything.</p>
+
+<div>
+<a  title="Permanent link to ‘Anthropic Posts ‘How Claude Marks AI-Generated Content’ Without Explaining How Claude Marks AI-Generated Content’"  href="https://daringfireball.net/linked/2026/08/11/anthropic-claude-watermarks">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	
+	<link rel="alternate" type="text/html" href="https://drata.com/daring" />
+	<link rel="shorturl" href="http://df4.us/xgj" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/feeds/sponsors/2026/08/drata_6" />
+	<id>tag:daringfireball.net,2026:/feeds/sponsors//11.43363</id>
+	<author><name>Daring Fireball Department of Commerce</name></author>
+	<published>2026-08-10T22:25:00Z</published>
+	<updated>2026-08-10T22:25:00Z</updated>
+	<content type="html" xml:base="https://daringfireball.net/feeds/sponsors/" xml:lang="en"><![CDATA[
+<p>Leverage autonomous AI agents to automate compliance, manage internal and third-party risk, and continuously prove your security posture. </p>
+
+<div>
+<a  title="Permanent link to ‘Drata’"  href="https://daringfireball.net/feeds/sponsors/2026/08/drata_6">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+	<title>[Sponsor] Drata</title></entry><entry>
+	<title>What’s New in iOS 27 Beta 5</title>
+	<link rel="alternate" type="text/html" href="https://9to5mac.com/2026/08/10/heres-whats-new-with-ios-27-beta-5/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgi" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/10/ios-27-beta-5" />
+	<id>tag:daringfireball.net,2026:/linked//6.43362</id>
+	<published>2026-08-10T21:54:25Z</published>
+	<updated>2026-08-10T21:54:25Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Zac Hall at 9to5Mac has a good rundown of new features and changes in beta 5. Some app icons got tweaks (the Siri app in particular looks much cooler now), and a bunch of the existing American and British Siri speaking voices now have the Pace and Expressivity adjustment sliders.</p>
+
+<p>Also interesting: the OS 27 releases were stuck at beta 4 for 22 days. That’s a week longer than usual. Will Hains (<a href="https://daringfireball.net/linked/2018/06/19/kotoba">my Kotoba friend</a>) maintains a wonderful single-page website tracking <a href="https://willhains.com/iOS-version-history">iOS version release date history</a>. For these summer “next big version” comparisons, it’s best to filter by “*.0” releases. Do that at Hains’s website and you can see a fairly clear pattern: betas 1 through 4 typically last about two weeks each; then starting with beta 5, Apple switches to a roughly weekly schedule until the end of the beta cycle. I wouldn’t read anything into that other than to expect beta 6 next week and beta 7 the week after that.</p>
+
+<div>
+<a  title="Permanent link to ‘What’s New in iOS 27 Beta 5’"  href="https://daringfireball.net/linked/2026/08/10/ios-27-beta-5">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>‘Friday Night Baseball’ Will Start Broadcasting Games Live, in Apple Immersive, on Vision Pro</title>
+	<link rel="alternate" type="text/html" href="https://www.apple.com/newsroom/2026/08/apple-mlb-announce-september-friday-night-baseball-schedule/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgh" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/10/friday-night-baseball-immersive-live-vision-pro" />
+	<id>tag:daringfireball.net,2026:/linked//6.43361</id>
+	<published>2026-08-10T20:47:43Z</published>
+	<updated>2026-08-10T20:48:12Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Apple Newsroom:</p>
+
+<blockquote>
+  <p>For the first time, baseball fans can take in all the action of
+“Friday Night Baseball” live in Apple Immersive on Apple Vision
+Pro, leveraging 3D video recorded in 8K with a 180-degree field of
+view. On August 28, viewers with Vision Pro will experience the
+iconic Red Sox vs. Yankees rivalry from unique camera angles that
+place viewers right in the game, immersed in the drama of each
+at-bat, the celebrations in the dugout after a big hit, close
+plays at the outfield wall, and more.</p>
+
+<p>The experience features bespoke commentary from Paul Severino
+(play-by-play), Xavier Scruggs (analyst), and Michelle Margaux
+(sideline reporter); dedicated replays; and an immersive graphics
+package that includes team lineups and stats floating in the
+viewer’s space. During breaks in the action, the broadcast remains
+live, immersing viewers in the stadium experience from all angles
+as ambisonic microphones capture sounds in Spatial Audio.</p>
+</blockquote>
+
+<p>Hot damn, they even picked the best rivalry in sports to kick it off.</p>
+
+<div>
+<a  title="Permanent link to ‘‘Friday Night Baseball’ Will Start Broadcasting Games Live, in Apple Immersive, on Vision Pro’"  href="https://daringfireball.net/linked/2026/08/10/friday-night-baseball-immersive-live-vision-pro">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Michael Tsai on My Retraction of the Astrology/Astronomy App Store Rejection Story</title>
+	<link rel="alternate" type="text/html" href="https://mjtsai.com/blog/2026/08/07/dark-hours-rejected-from-the-app-store/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgg" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/10/tsai-app-store-retraction" />
+	<id>tag:daringfireball.net,2026:/linked//6.43360</id>
+	<published>2026-08-10T20:18:48Z</published>
+	<updated>2026-08-10T20:18:49Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Michael Tsai:</p>
+
+<blockquote>
+  <p>I’m really unhappy about this, both for my role in spreading a
+false story and because I think it will hurt the cause of
+reforming App Review. I know there <em>are</em> many crazy rejections and
+have experienced some first-hand. This story was believable
+because of that well-known history and because Godier didn’t seem
+like a nobody trying to get attention — he was the developer of
+another highly regarded app. But now people are going to point to
+true developer stories and accuse them of being fakes, too.</p>
+</blockquote>
+
+<p>Same.</p>
+
+<div>
+<a  title="Permanent link to ‘Michael Tsai on My Retraction of the Astrology/Astronomy App Store Rejection Story’"  href="https://daringfireball.net/linked/2026/08/10/tsai-app-store-retraction">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>‘The Problem With Vibe-Coded Flattery’</title>
+	<link rel="alternate" type="text/html" href="https://tedium.co/2026/08/09/vibe-coding-insincerity/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgf" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/10/the-problem-with-vibe-coded-flattery" />
+	<id>tag:daringfireball.net,2026:/linked//6.43359</id>
+	<published>2026-08-10T16:42:01Z</published>
+	<updated>2026-08-10T16:49:00Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Ernie Smith at Tedium:</p>
+
+<blockquote>
+  <p>I’m seeing email after email suggesting these users built a thing
+they’re truly passionate about. But if we can’t trust that this
+passion is real, legit, and from the heart, we’re in trouble.</p>
+
+<p>Take a step back. Is this thing you built a reflection of you?</p>
+</blockquote>
+
+<p>I think it’s fun and exciting that I’m getting a lot more emails about a lot more new apps. But a fair chunk of those emails are themselves clearly written by an AI chatbot. It’s so obvious. Those go straight in the trash.</p>
+
+<div>
+<a  title="Permanent link to ‘‘The Problem With Vibe-Coded Flattery’’"  href="https://daringfireball.net/linked/2026/08/10/the-problem-with-vibe-coded-flattery">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>The NYT and WSJ on Apple, China, and the RAM Crisis</title>
+	<link rel="alternate" type="text/html" href="https://www.nytimes.com/2026/08/10/technology/memory-chip-shortage-ai.html?unlocked_article_code=1.4VA.49f7.Qj8S541DkkOz" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xge" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/10/the-nyt-and-wsj-on-apple-china-and-the-ram-crisis" />
+	<id>tag:daringfireball.net,2026:/linked//6.43358</id>
+	<published>2026-08-10T15:21:29Z</published>
+	<updated>2026-08-10T15:34:51Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Kalley Huang, reporting from San Francisco, and Ana Swanson, from Washington, <a href="https://www.nytimes.com/2026/08/10/technology/memory-chip-shortage-ai.html?unlocked_article_code=1.4VA.49f7.Qj8S541DkkOz">for The New York Times</a> (gift link):</p>
+
+<blockquote>
+  <p>Apple, which has cited the memory chip shortage for recent price
+increases, is working with other consumer electronics companies to
+push for permission to buy memory chips from China, which faces
+certain restrictions, seven people said.</p>
+
+<p>Apple was in talks in 2022 to buy memory chips from Yangtze Memory
+Technologies Corporation, or YMTC, but those efforts fizzled under
+pressure from U.S. lawmakers.</p>
+
+<p>Many officials appear unsympathetic to Apple’s desire to buy
+Chinese chips, because the company has promised for years to move
+more of its supply chain to the United States but has made only
+small steps toward that goal, four people said. Other critics of
+the plan said that China was also experiencing a similar chip
+crunch, and had proved itself to be a risky supplier when it
+restricted its mineral exports last year.</p>
+</blockquote>
+
+<p>Raffaele Huang and Rolfe Winkler, <a href="https://www.wsj.com/tech/apple-tests-chinese-memory-chips-as-supply-squeeze-bites-d292bb97?st=RwyNAQ">reporting for The Wall Street Journal</a> (also a gift link):</p>
+
+<blockquote>
+  <p>Apple has been testing memory chips from China’s CXMT across
+product lines including iPhones and MacBooks, according to people
+familiar with the matter, as the U.S. company addresses a memory
+crunch during the artificial-intelligence boom.</p>
+
+<p>Apple has held early talks with CXMT about supplying components
+with the goal of using them in some devices sold in China, the
+people said. Apple hopes to win the White House’s blessing to do
+business with the Chinese company. [...]</p>
+
+<p>Apple often tailors components to its devices to maximize
+performance. Using standard CXMT memory chips could force Apple to
+redesign certain parts of its products. Industry analysts also say
+CXMT’s technology still trails its foreign competitors, in part
+because the company’s access to the most sophisticated chip-making
+equipment is restricted.</p>
+
+<p>At present, CXMT wouldn’t be a panacea for Apple. The Chinese
+company has maxed out its production capacity this year, leaving
+little room for new international clients, the people familiar
+with the matter said.</p>
+</blockquote>
+
+<p>The gist of both reports is that <a href="https://daringfireball.net/linked/2026/06/27/apple-faced-bipartisan-opposition-to-chinese-ram">just like in 2022</a>, Apple might not get permission from the U.S. government to use Chinese RAM, even for devices sold in China. And, even if they do secure permission, it might not actually help much with the supply crunch.</p>
+
+<div>
+<a  title="Permanent link to ‘The NYT and WSJ on Apple, China, and the RAM Crisis’"  href="https://daringfireball.net/linked/2026/08/10/the-nyt-and-wsj-on-apple-china-and-the-ram-crisis">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>WorkOS: Connect Your Agents to Your API</title>
+	<link rel="alternate" type="text/html" href="https://workos.com/blog/mcp-vs-rest?utm_source=daringfireball&amp;utm_medium=newsletter&amp;utm_campaign=q32026" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgd" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/09/workos" />
+	<id>tag:daringfireball.net,2026:/linked//6.43357</id>
+	<published>2026-08-09T23:54:18Z</published>
+	<updated>2026-08-09T23:54:18Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>My thanks to WorkOS for, once again, sponsoring DF last week. What’s the best way to connect AI agents to your API? REST is great for human developers; <a href="https://workos.com/guide/model-context-protocol?utm_source=daringfireball&amp;utm_medium=newsletter&amp;utm_campaign=q32026&amp;utm_content=body_guide">MCP serves the agents</a>. Many teams treat REST and MCP as competing standards, and through choice or necessity, pick one. But they ought not be considered rivals. They’re separate layers. Most MCP servers just call REST internally to do the real work. The best ones don’t convert every endpoint into a tool, they focus on what the agents are actually trying to accomplish.</p>
+
+<p>That layered approach also means shipping OAuth 2.1 with scoped tokens. <a href="https://workos.com/docs/authkit/mcp?utm_source=daringfireball&amp;utm_medium=newsletter&amp;utm_campaign=q32026&amp;utm_content=body_authkit">WorkOS AuthKit already speaks that spec</a>, so you skip building an auth provider on top. <a href="https://workos.com/blog/mcp-vs-rest?utm_source=daringfireball&amp;utm_medium=newsletter&amp;utm_campaign=q32026">Check out WorkOS’s breakdown on MCP vs. REST</a>.</p>
+
+<div>
+<a  title="Permanent link to ‘WorkOS: Connect Your Agents to Your API’"  href="https://daringfireball.net/linked/2026/08/09/workos">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+    
+    <link rel="alternate" type="text/html" href="https://daringfireball.net/2026/08/retraction_app_store_rejection_of_the_week" />
+	<link rel="shorturl" href="http://df4.us/xgc" />
+	<id>tag:daringfireball.net,2026://1.43356</id>
+	<published>2026-08-09T03:16:24Z</published>
+	<updated>2026-08-09T21:16:22Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<summary type="text">My disdain for astrology is so utter, and my esteem for Godier’s previous work so high, that it simply never occurred to me that he might have actually made and submitted to the App Store an astrology app, let alone that he’d then feign surprise and frustration that an astrology app was rejected for being an astrology app.</summary>
+	<content type="html" xml:base="https://daringfireball.net/" xml:lang="en"><![CDATA[
+<p>Yesterday I published an article titled “App Store Rejection of the Week: Dark Hours”. I have retracted it. Its premise was so fundamentally wrong that there’s no point merely correcting or editing it. Even the title, as I explain below, was inaccurate. Although the original is now retracted, I’m not memory-holing it. The text of the original story is available, for transparency and accountability, <a href="https://daringfireball.net/misc/2026/08/app_store_rejection_of_the_week_dark_hours.text">in plain text</a> (Markdown, natch) and <a href="https://daringfireball.net/misc/2026/08/App_Store_Rejection_of_the_Week_-_Dark_Hours.pdf">PDF</a> (preserving original presentation). Both of those versions include a preface at the top linking to this retraction. <a href="https://daringfireball.net/2026/08/app_store_rejection_of_the_week_dark_hours">The URL</a> for the original story now redirects to this one that you are currently reading.</p>
+
+<p>To the best of my recollection, this is the first post I’ve retracted in the 24 years I’ve been writing Daring Fireball. I hope it’s the last. I was misled, both overtly and through omissions, in several ways, but what I publish is my responsibility, and I apologize for the error.</p>
+
+<p>Terry Godier first came to my attention in February, when <a href="https://daringfireball.net/linked/2026/02/25/godier-phantom-obligation">I linked to</a> his excellent interactive essay on RSS feed reader design, “<a href="https://www.terrygodier.com/phantom-obligation">Phantom Obligation</a>”, which essay introduced <a href="https://www.terrygodier.com/current">Current</a>, Godier’s new RSS reader that he made to exemplify the ideas from his essay. Current is, deservedly, a bit of a breakout hit. (E.g., David Pierce, at The Verge, <a href="https://www.theverge.com/tech/899602/best-phone-android-ios-app-store?view_token=eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IkpKUk05aEQ3ZHYiLCJwIjoiL3RlY2gvODk5NjAyL2Jlc3QtcGhvbmUtYW5kcm9pZC1pb3MtYXBwLXN0b3JlIiwiZXhwIjoxNzc2MDMzMDU5LCJpYXQiOjE3NzU2MDEwNTl9.c8VIrq4Kl5DbAbr8ujYsehwxWVKN7dvXMV7yYkqADu0">put it on a very short list</a> of iOS-exclusive indie apps that keep him from switching to Android.) In March <a href="https://daringfireball.net/linked/2026/03/16/the-last-quiet-thing">I linked to another</a> interactive essay from Godier, “<a href="https://www.terrygodier.com/the-last-quiet-thing">The Last Quiet Thing</a>”, and again <a href="https://daringfireball.net/linked/2026/04/16/app-store-reviews-are-busted">in April to a post</a> regarding the App Store’s 5-star review system. I struck up an iMessage correspondence with Godier around when I first linked to his work.</p>
+
+<p>Yesterday Godier posted “<a href="https://blog.terrygodier.com/2026/08/07/browsers-have-standards-the-app.html">Browsers Have Standards, the App Store Has Judgment</a>”. As originally published, that post contained these two paragraphs:</p>
+
+<blockquote>
+  <p>A while ago I tried to submit an iOS app for <a href="https://darkhours.io/">Dark Hours</a>, my
+astronomy website for normal people. It was rejected on the
+grounds that it was astrology.</p>
+
+<p>It has no tarot function, no horoscopes, and nothing that I, or
+anyone else I’ve asked, would associate with astrology.</p>
+</blockquote>
+
+<p>Those paragraphs, at this writing (August 8, 11:00 pm ET), have been deleted and replaced by this:</p>
+
+<blockquote>
+  <p>Note: the original version of this post had a section here about an
+astronomy app I am working on that began as an astrology app and
+was rejected after having the astrology content removed. App store [<em>sic</em>]
+review reached out to me and let me know that they had apparently
+never been given the updated build and that the app should be fine
+to submit now.</p>
+</blockquote>
+
+<p>You can now see the problem that has led me to fully retract my original post, given that my post was entirely predicated on the premise that Godier’s original description of the rejected app was true — that the app “has no tarot function, no horoscopes, and nothing that I, or anyone else I’ve asked, would associate with astrology.” The truth is, the app, as originally submitted by Godier to the App Store (under the name “Asterly”, not “Dark Hours”), was entirely dedicated to astrology, not astronomy, and did in fact include a “Tarot card of the day” feature amongst other occultist horseshit.</p>
+
+<p>The grounds of Apple’s original App Store rejection of the app, and the rejection’s upholding by the App Review Board, were correct.<sup id="fnr1-2026-08-08"><a href="#fn1-2026-08-08">1</a></sup> I wrongly took Godier at his word, both in his public blog post and in private iMessage correspondence yesterday, that the rejection wasn’t just merely debatable, but completely and rather preposterously ungrounded. Whether Godier ever submitted a build of “Asterly” to the App Store that contained no occult horseshit and only the hard-science astronomy features that were present in his “Dark Hours” website that was available for the last week, I don’t know. But I have no reason to believe that he did.</p>
+
+<p>My <a href="https://daringfireball.net/linked/2024/04/11/astrology-astronomy-eclipse">disdain for astrology</a> is so utter, and my esteem for Godier’s previous work so high, that it simply never occurred to me that he might have actually made and submitted to the App Store an astrology app, let alone that he’d then feign surprise and frustration that an astrology app was rejected for being an astrology app. I showed him a draft of my post before publication, to make sure I had the story straight, and he offered not a word of caution, only gratitude for my drawing attention to the matter.</p>
+
+<p>It gets messier. Godier’s astrology app that he submitted to the App Store back in January was named “Asterly”. That was still the name when the App Review Board upheld its rejection in April. According to Godier, frustrated by the App Store’s rejection, he ported the astronomy version to the web, <a href="https://bsky.app/profile/terrygodier.com/post/3ms2lm4kcfc2j">launching it last week</a> under the name “Dark Hours” at the domain <code>darkhours.io</code>. (This is why it was incorrect for me, in the very title of my post, to claim that Apple had rejected an app named “Dark Hours”. They rejected an app named “Asterly” and had never seen an app from Godier named “Dark Hours”.) Yesterday, after I linked to Godier’s post and <a href="https://news.ycombinator.com/item?id=49214863">Hacker News then linked to my post</a>, Godier’s “Dark Hours” (with a space) <a href="https://bsky.app/profile/mmmeh.bsky.social/post/3msjump44fs2h">came to the attention</a> (and justifiable surprise) of Miguel Beher, creator of an open-source “astrophotography and dark-sky planner” project named DarkHours (no space). <a href="https://github.com/mbeher2200/DarkHours">Beher’s GitHub project</a> contains the source code, and the actual web app is <a href="https://darkhours.app/">freely available at the domain <code>darkhours.app</code></a>. In an uncomfortable exchange between Beher and Godier on Bluesky, Beher pointed out that Godier’s Dark Hours had the same bug as Beher’s that <a href="https://bsky.app/profile/mmmeh.bsky.social/post/3mslc3b3u4c2l">routed people to “random fields in Mexico”</a>. Earlier today, Godier <a href="https://blog.terrygodier.com/2026/08/09/mea-culpa-dark-hours.html">took his web app down</a> and redirected his <code>darkhours.io</code> domain to Beher’s <code>darkhours.app</code>.</p>
+
+<p>At the end of my now-retracted post yesterday, assuming I had righteously and rightly skewered Apple for an egregiously erroneous App Store review rejection, I wrote:</p>
+
+<blockquote>
+  <p>Mistakes happen. But in a functioning system mistakes get
+corrected, and mistakes as obvious as this one get corrected
+almost instantly and include a quick apology for the conflation.</p>
+</blockquote>
+
+<p>Obviously it was <em>I</em> who was mistaken. <em>This</em> article is my correction, and I apologize to <a href="https://news.ycombinator.com/item?id=49214863">all</a> who read and believed my now-retracted post, and to the reviewers at the App Store whose competence (if not literacy) I besmirched. I am deeply sorry about that. Won’t happen again.</p>
+
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1-2026-08-08">
+<p>Regardless of one’s opinion regarding pseudoscience and occultist horseshit — pro, con, or indifferent — one might reasonably think it wrong for Apple to disallow or discourage such apps from the App Store. In fact, there exist plenty of such apps in the App Store, and Apple has even run “<a href="https://apps.apple.com/us/story/id1681180517">Best Astrology Apps</a>” editorial features. Apple’s stance is basically that the App Store has enough of these apps (and I suspect they’re a common source of scams, given that by their very nature they target the gullible). <a href="https://developer.apple.com/app-store/review/guidelines/">Guideline 4.3(b) states</a> (emphasis added):</p>
+
+<blockquote>
+  <p>Certain kinds of apps, such as dating, flashlight, sound effects,
+wallpaper, simple timers, and <i>fortune telling</i>, are well established
+on the App Store and we will not accept new submissions unless they
+offer a meaningfully different or improved experience. We may
+remove these apps from the App Store going forward if they are not
+updated, improved, or do not attract customers. Other kinds of
+apps, such as drinking games, Kama Sutra, fart, and burp apps, are
+mediocre, low-quality, or low-effort and do not add value to the
+App Store.</p>
+</blockquote>
+
+<p>That serial comma, ever useful, gives hope to anyone hard at work on a “fart and burp” app.&nbsp;<a href="#fnr1-2026-08-08"  class="footnoteBackLink"  title="Jump back to footnote 1 in the text.">&#x21A9;&#xFE0E;</a></p>
+</li>
+</ol>
+</div>
+
+    ]]></content>
+  <title>★ Retraction: The App Store Rejection of the Week That Was, in Fact, a Correct Rejection</title></entry><entry>
+	<title>Corrupt Minds Think Alike</title>
+	<link rel="alternate" type="text/html" href="https://www.nytimes.com/2026/08/06/business/fifa-world-cup-privatization.html?unlocked_article_code=1.3VA.4zqH.Pul7X9bQ2kv0&amp;smid=bs-share" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xgb" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/08/corrupt-minds-think-alike" />
+	<id>tag:daringfireball.net,2026:/linked//6.43355</id>
+	<published>2026-08-08T20:32:11Z</published>
+	<updated>2026-08-08T20:32:12Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Tariq Panja, reporting for The New York Times:</p>
+
+<blockquote>
+  <p>The five men should have been in a celebratory mood. FIFA had just
+pulled off a World Cup that broke records on a number of fronts.
+Its spectacular culmination, the final, was a day away from
+kickoff.</p>
+
+<p>But their mood was anything but jubilant. The men, a group of top
+directors known as the FIFA bureau of the management board, had
+been summoned to a hastily organized meeting at the Waldorf
+Astoria hotel in Manhattan, according to three people familiar
+with the discussions speaking on condition of anonymity because
+the talks were private. The directors had until midnight to sign
+off on a plan that threatened to change soccer forever and would
+almost certainly lead to a major schism among the sport’s leaders.</p>
+
+<p>The project purported to sell a 20 percent stake in FIFA to a
+group of investors led by Joshua Kushner, the brother of President
+Trump’s son-in-law Jared Kushner. Such a move would put into
+private hands a portion of the World Cup, an event that has been
+run and controlled by FIFA, a nonprofit in Zurich, for 96 years.</p>
+</blockquote>
+
+<p>I don’t know what’s dumber — this stupid corrupt scheme to privatize the World Cup, or me, for not assuming from the start that the Trump family was involved in it somehow.</p>
+
+<div>
+<a  title="Permanent link to ‘Corrupt Minds Think Alike’"  href="https://daringfireball.net/linked/2026/08/08/corrupt-minds-think-alike">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Maybe ‘Steal Underpants by Blowing a Fortune on AI Tokens’ Is, in Fact, Not a Good Business Plan</title>
+	<link rel="alternate" type="text/html" href="https://www.404media.co/the-tokenpocalypse-is-here-companies-are-scrambling-to-stop-spending-so-much-on-ai/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xga" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/08/accenture-stealing-underpants-ai-markdown" />
+	<id>tag:daringfireball.net,2026:/linked//6.43354</id>
+	<published>2026-08-08T19:31:52Z</published>
+	<updated>2026-08-08T19:31:52Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Joseph Cox, writing for 404 Media (paywalled, sans gift links, alas):</p>
+
+<blockquote>
+  <p>Consulting giant Accenture is trying to figure out how to stop
+non-technical workers from blowing through companies’ AI token
+budget on trivial tasks like converting PDFs to presentation
+slides, according to leaked audio obtained by 404 Media. Across
+the industry Accenture is seeing “soaring token spend,” according
+to the audio. [...] It also undercuts the narrative that
+superpowered engineers generating mountains of code are behind the
+AI boom. In many cases it is non-technical staff burning through
+tokens for non-specialized tasks. [...]</p>
+
+<p>At one point in the meeting, Kwak and Eduardo Salamanca de
+Diego, senior manager of product management at the company’s
+Center for Advanced AI, start presenting about what is described
+as “token ops.”</p>
+
+<p>Kwak says he knows people aren’t using slides these days, but
+he has some. As he appears to be preparing to present, Stuart
+Henderson, Accenture’s client group lead, interrupts. He
+jokes he hopes Kwak didn’t just convert a PDF into images and
+then into Markdown files. “I’m learning that’s one of the big
+token chewers,” Henderson says. “Turning PDFs into Markdown:
+is that right?”</p>
+
+<p>That’s when Kwak says that’s what Accenture’s own data shows.</p>
+</blockquote>
+
+<p>My impression of consulting giants like Accenture (McKinsey, Bain, Deloitte, KPMG...) has always been that they are very good at <em>looking</em> smart but in fact very bad at actually <em>being</em> smart. The idea that they’re spending serious money on AI tokens to turn PDFs and <a href="https://www.edwardtufte.com/book/the-cognitive-style-of-powerpoint-pitching-out-corrupts-within-ebook/">PowerPoint decks</a> into Markdown only makes me think I’ve overestimated the median intelligence of the people who work there. I really thought Markdown couldn’t get more successful but this takes the cake. I love it that my little baby is helping burn these companies’ cash. This is so stupid it hurts to think about.</p>
+
+<p>Markdown is something you <em>start with</em> because it’s easy to write and universally readable. You write Markdown and use that to make slides — like, say, with <a href="https://ia.net/presenter">iA Presenter</a> — not the other way around.</p>
+
+<p>(<a href="https://simonwillison.net/2026/Aug/7/pdfs-are-terrible/">Via Simon Willison</a>.)</p>
+
+<div>
+<a  title="Permanent link to ‘Maybe ‘Steal Underpants by Blowing a Fortune on AI Tokens’ Is, in Fact, Not a Good Business Plan’"  href="https://daringfireball.net/linked/2026/08/08/accenture-stealing-underpants-ai-markdown">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Simon Willison on Blogging</title>
+	<link rel="alternate" type="text/html" href="https://writethatblog.substack.com/p/simon-willison-on-technical-blogging" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg9" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/simon-willison-on-blogging" />
+	<id>tag:daringfireball.net,2026:/linked//6.43353</id>
+	<published>2026-08-07T20:36:58Z</published>
+	<updated>2026-08-07T20:36:59Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Simon Willison, with Cynthia Dunlop for her tech blogger interview series (from back in January, but he just got around <a href="https://simonwillison.net/2026/Aug/6/simon-willison-on-technical-blogging/">to linking to it</a> so I just got around to seeing it):</p>
+
+<blockquote>
+  <p><em>Any lessons learned that you want to share with the community?</em></p>
+
+<p>My number one tip for blogging is to lower your standards! Aim to
+hit publish while you are still actively unhappy with what you
+have written, because the only alternative is a huge folder full
+of drafts and never publishing anything at all.</p>
+
+<p>Nobody will ever know how perfect the thing you <em>intended</em> to write
+would have been. The flaws you see in your writing are invisible
+to everyone else.</p>
+</blockquote>
+
+<p>This is excellent advice. Me, I try to get into the mindset of playing live music, not recording a studio album. Except when I’m writing a piece where I really want it to be an album. Those aren’t <em>rare</em>, per se, but they’re <em>occasional</em>. If I tried to make every post a hall-of-famer I’d never get anything out.</p>
+
+<p>I’m aiming for professionalism. I’m performing live in front of an audience — not just jamming in my garage or bedroom, fucking around. So I’m careful and concentrate. I want to hit every note, in time. But at my best I’m moving from song to song.</p>
+
+<p>But that leads to Dunlop’s next question for Willison:</p>
+
+<blockquote>
+  <p><em>Your advice for people just getting started with blogging?</em></p>
+
+<p>Just start. It’s so easy to get caught in the trap of obsessing
+over the design of your blog, and planning for content that you
+never actually get around to writing. As long as each entry has a
+date on it and a permanent URL, it counts as a blog. I think
+adding an Atom or RSS feed is important too, but you can get
+started without one — don’t treat that as a blocker.</p>
+
+<p>Don’t worry if nobody reads it. People are unlikely to stumble on
+your blog organically, but what matters is not the quantity but
+the quality of your readers. If the only person who reads your
+blog is a hiring manager that you send a link to, and that gets
+you an interview, your blog has already paid itself off many
+times over.</p>
+</blockquote>
+
+<p>That’s the hard part about getting started, or at least it was for me. When you already have an audience it’s easier to take it seriously, to concentrate, to focus, to <em>strive</em> for perfection even though you will fall short. If you’re playing music in an empty room it’s harder to do that, to play the same way you would with an audience of dozens, hundreds, or thousands of people in front of you.</p>
+
+<p>But just imagine they’re there. They will be if you keep it up. That’s one of my bits of advice to new bloggers: I firmly believe all blogs eventually get the audience they deserve, <em>if</em> they keep going. Write for the audience you want, not the audience you have.</p>
+
+<div>
+<a  title="Permanent link to ‘Simon Willison on Blogging’"  href="https://daringfireball.net/linked/2026/08/07/simon-willison-on-blogging">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Google Earth Retracts AI Tool for Making Fake Satellite Images After It Was Immediately Abused Upon Release</title>
+	<link rel="alternate" type="text/html" href="https://arstechnica.com/ai/2026/07/google-earth-releases-swiftly-retracts-ai-feature-to-make-fake-satellite-images/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg8" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/google-earth-ai-shitposts" />
+	<id>tag:daringfireball.net,2026:/linked//6.43352</id>
+	<published>2026-08-07T19:43:23Z</published>
+	<updated>2026-08-07T19:43:23Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Jeremy Hsu, Ars Technica:</p>
+
+<blockquote>
+  <p>Google briefly allowed anyone to create AI-modified versions of
+satellite imagery available in Google Earth — before quickly
+reversing its decision as people shared examples of AI-generated
+pictures that illustrated the potential for misinformation and
+disinformation.</p>
+</blockquote>
+
+<p><a href="https://daringfireball.net/linked/2026/08/07/leadership-shake-up-at-google-deepmind">Momentum</a>!</p>
+
+<div>
+<a  title="Permanent link to ‘Google Earth Retracts AI Tool for Making Fake Satellite Images After It Was Immediately Abused Upon Release’"  href="https://daringfireball.net/linked/2026/08/07/google-earth-ai-shitposts">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Some New Data Centers Are Necessary</title>
+	<link rel="alternate" type="text/html" href="https://www.newyorker.com/cartoon/a62045" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg7" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/some-new-data-centers-are-necessary" />
+	<id>tag:daringfireball.net,2026:/linked//6.43351</id>
+	<published>2026-08-07T19:39:15Z</published>
+	<updated>2026-08-07T19:39:16Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>A bunch of mine are stored here.</p>
+
+<div>
+<a  title="Permanent link to ‘Some New Data Centers Are Necessary’"  href="https://daringfireball.net/linked/2026/08/07/some-new-data-centers-are-necessary">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>An AI Model From Meta Also Hacked Another Company During Testing</title>
+	<link rel="alternate" type="text/html" href="https://simonwillison.net/2026/Aug/6/an-ai-model-from-meta/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg6" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/meta-ai-cyberattack" />
+	<id>tag:daringfireball.net,2026:/linked//6.43350</id>
+	<published>2026-08-07T18:13:55Z</published>
+	<updated>2026-08-07T18:13:56Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Simon Willison:</p>
+
+<blockquote>
+  <p>So that’s Anthropic, OpenAI, and Meta. Google Gemini really needs
+to catch up on accidentally cyberattacking other companies.</p>
+</blockquote>
+
+<p>I’m surprised Willison hasn’t heard about <a href="https://daringfireball.net/linked/2026/08/07/leadership-shake-up-at-google-deepmind">how much <em>momentum</em> Gemini has</a>.</p>
+
+<div>
+<a  title="Permanent link to ‘An AI Model From Meta Also Hacked Another Company During Testing’"  href="https://daringfireball.net/linked/2026/08/07/meta-ai-cyberattack">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Meta: Introducing Muse Code and Muse Spark 1.2</title>
+	<link rel="alternate" type="text/html" href="https://research.meta.ai/blog/introducing-muse-code-and-muse-spark-1-2" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg5" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/meta-ai-muse-code" />
+	<id>tag:daringfireball.net,2026:/linked//6.43349</id>
+	<published>2026-08-07T18:05:03Z</published>
+	<updated>2026-08-07T18:48:48Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Meta AI:</p>
+
+<blockquote>
+  <p>We’re excited to release Muse Code (beta), a terminal coding agent
+powered by Muse Spark 1.2, our newest model. This marks our next
+step toward the frontier, with larger and much more capable models
+on the way. [...]</p>
+
+<p>Muse Code takes on complex software engineering tasks across large
+repositories: planning changes, writing code, and validating the
+results. It can coordinate multiple persistent subagents for each
+task, solving difficult problems faster, more accurately, and with
+less intervention.</p>
+</blockquote>
+
+<p>Terminal-only (so far), so it avoids the whole native-app-versus-Electron-shit-sandwich debate. They’ve embedded some fun interactive examples of Spark’s output right in the web page.</p>
+
+<p><a href="https://simonwillison.net/2026/Aug/5/muse-code-and-muse-spark-12/#atom-everything">Simon Willison</a>:</p>
+
+<blockquote>
+  <p>An interesting twist on pricing is that the model <a href="https://developer.meta.com/ai/models/muse-spark/">is offered</a>
+as two different model IDs. <code>muse-spark-1.2</code> is priced at
+$1.25/million input and $4.25/million output — close to Gemini
+3.6 Flash ($1.50/$7.50) — but if you agree to let Meta use your
+data “to improve our products” you can use
+<code>muse-spark-1.2-contributor</code> which is $0.10/$0.20 — a huge
+discount, closer to GPT-5.6 Luna ($0.20/$1.20) and Gemini 3.1
+Flash-Lite ($0.25/$1.50).</p>
+</blockquote>
+
+<p>That’s over a 10× discount in exchange for giving your data to Meta. I can see the appeal if you don’t care about the privacy of your data and code, like, say, if you’re using Muse Spark to generate code for a throwaway project, or for something that’s open source anyway. But I wonder if Meta has considered that this offer might spook would-be users who absolutely do not want to grant Meta the rights to their data. One would hope that the two systems have a strong firewall between them. But given <a href="https://daringfireball.net/linked/2026/07/09/meta-instagram-ai-defaults">Meta’s well-established contempt for the sanctity of user data</a>, it’s not at all unreasonable to suspect that the difference here is like reserving a no-smoking seat in an airplane <a href="https://en.wikipedia.org/wiki/Inflight_smoking">with a smoking section</a>.</p>
+
+<div>
+<a  title="Permanent link to ‘Meta: Introducing Muse Code and Muse Spark 1.2’"  href="https://daringfireball.net/linked/2026/08/07/meta-ai-muse-code">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>App Store Review Times Are Failing to Meet the AI-Driven Influx of Submissions</title>
+	<link rel="alternate" type="text/html" href="https://macaw.social/@mergesort/117055390966724799" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg4" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/app-store-review-times-plinky" />
+	<id>tag:daringfireball.net,2026:/linked//6.43348</id>
+	<published>2026-08-07T17:45:22Z</published>
+	<updated>2026-08-10T21:56:36Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Joe Fabisevich, on Mastodon:</p>
+
+<blockquote>
+  <p>I submitted Plinky 6.0.4 for review last week. The macOS app was
+approved in 4 hours, the iOS app is still waiting for review. Sure
+do love to distribute software this way.</p>
+</blockquote>
+
+<p>He’s not an outlier; I see comments like this from App Store developers everywhere I look.</p>
+
+<p>(<a href="https://www.plinky.app/">Plinky</a>, by the way, is an intriguing link-bookmarking app that syncs across iOS and MacOS. It’s not for me, but the nature of my work is such that I have very unusual bookmarking needs. Plinky offers a bunch of convenient ways to stash new bookmarks with  low friction. It’s a labor of love — it’s totally obvious that Fabisevich himself is the number one user of Plinky, and that’s almost always true of the very best apps.)</p>
+
+<div>
+<a  title="Permanent link to ‘App Store Review Times Are Failing to Meet the AI-Driven Influx of Submissions’"  href="https://daringfireball.net/linked/2026/08/07/app-store-review-times-plinky">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Leadership Shake-Up at Google DeepMind</title>
+	<link rel="alternate" type="text/html" href="https://blog.google/company-news/inside-google/message-ceo/next-chapter-ai-momentum/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg3" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/leadership-shake-up-at-google-deepmind" />
+	<id>tag:daringfireball.net,2026:/linked//6.43347</id>
+	<published>2026-08-07T17:23:17Z</published>
+	<updated>2026-08-07T20:16:56Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Demis Hassabis, CEO of Google DeepMind, the company’s artificial intelligence research lab:</p>
+
+<blockquote>
+  <p>We have arrived at a pivotal moment in human history. I’ve been
+working towards AGI my whole life and now, like many of you, I
+feel it is close at hand. It’s critical that we collectively get
+the next steps right to ensure this all goes well for humanity and
+we usher in an incredible new age of discovery and wonder.</p>
+
+<p>With this backdrop, I’ve decided that now is the right time for me
+to hand over my day-to-day operational responsibilities at GDM, so
+that I have the time and space to focus on the big picture and
+help influence what is to come to the best of my ability. I will
+be taking on a new strategic role as Chair of GDM and Chief
+Scientist of Alphabet, and I’m excited to announce that Koray will
+be stepping up to lead GDM as SVP of Google DeepMind, in addition
+to his role as Chief AI Architect of Google.</p>
+</blockquote>
+
+<p>Google published Hassabis’s letter alongside a letter from Sundar Pichai, and all of this is happening alongside four longtime Google leaders <a href="https://daringfireball.net/linked/2026/08/07/levy-discovery-loop">leaving to form a new AI-focused company</a>. The headline of Google’s dual-memo announcement was “The Next Chapter of Our AI Momentum”, and Pichai uses the same word in 10 percent of his 30 sentences (emphasis added):</p>
+
+<blockquote>
+  <p>And you saw the incredible <em>momentum</em> at earnings across all our
+businesses, including Search, YouTube, and Cloud. […]</p>
+
+<p>Google DeepMind: We are building strong <em>momentum</em>: Flash is in high
+demand, our Cyber model is live, and Gemma models have surpassed
+900M+ downloads. […]</p>
+
+<p>With today’s changes we’re going to keep driving our <em>momentum</em>.
+Onwards!</p>
+</blockquote>
+
+<p>Methinks he doth protest too much. If Google really had the momentum in AI that Pichai is declaring, I suspect Gemini might have suggested he’s overusing the word.</p>
+
+<div>
+<a  title="Permanent link to ‘Leadership Shake-Up at Google DeepMind’"  href="https://daringfireball.net/linked/2026/08/07/leadership-shake-up-at-google-deepmind">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>‘Google’s Top AI Brains Are Leaving to Launch Discovery Loop’</title>
+	<link rel="alternate" type="text/html" href="https://www.wired.com/story/jeff-dean-google-discovery-loop-startup/?ref=spyglass.org" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg2" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/levy-discovery-loop" />
+	<id>tag:daringfireball.net,2026:/linked//6.43346</id>
+	<published>2026-08-07T17:05:02Z</published>
+	<updated>2026-08-07T17:06:05Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Steven Levy, writing for Wired:</p>
+
+<blockquote>
+  <p>Today it’s official: After almost 27 years, Dean is leaving
+Google, along with Ghemawat and two other top-tier AI scientists,
+to found a company called <a href="https://www.discoveryloop.com">Discovery Loop</a>.</p>
+
+<p>Even though Google will take a stake in the new company, it’s a
+devastating blow to the search giant as it attempts to keep pace
+in the frantic AI model competition. It’s bad enough that Dean and
+Ghemawat, who were among the company’s first hires, are leaving — that’s like Mick Jagger and Keith Richards ditching the Rolling
+Stones to start a new band. Worse, the other cofounders are also
+supernovas in the AI firmament: <a href="https://research.google.com/pubs/OriolVinyals.html?ref=ruder.io">Oriol Vinyals</a>, VP of research
+at DeepMind and a technical lead for Gemini, and <a href="https://www.historyofdatascience.com/quoc-v-le-fast-furious-and-automatic/">Quoc Le</a>, a
+cofounder of Google Brain and the key scientist behind Google’s
+<a href="https://arxiv.org/abs/2003.03384">AutoML-Zero,</a> a project that uses machine learning algorithms
+to autonomously build AI products.</p>
+
+<p>In an interview I did with the cofounders just before launch, Dean
+tells me the idea came up only a few weeks ago. He was quickly
+joined by the other three, who are not only long-time colleagues
+but friends who vacation together. “We were working on different
+things, but we were all starting to see the possibility of AI
+being able to automate scientific and engineering loops,” he says.</p>
+</blockquote>
+
+<p>I think the Jagger/Richards analogy is strained, to say the least, but the tectonic plates have shifted this week over in Googleland. This might be to Google what io is to Apple — something that ought to have happened within rather than requiring departures of legendary talent.</p>
+
+<div>
+<a  title="Permanent link to ‘‘Google’s Top AI Brains Are Leaving to Launch Discovery Loop’’"  href="https://daringfireball.net/linked/2026/08/07/levy-discovery-loop">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Meta Ordered to Pay $942 Million in New Mexico Child-Safety Lawsuit</title>
+	<link rel="alternate" type="text/html" href="https://www.wsj.com/tech/meta-ordered-to-pay-942-million-to-address-harm-to-kids-from-social-media-8ba5aab7?st=WwRP65" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xg0" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/07/meta-ordered-to-pay-942-million-in-new-mexico-child-safety-lawsuit" />
+	<id>tag:daringfireball.net,2026:/linked//6.43344</id>
+	<published>2026-08-07T15:00:46Z</published>
+	<updated>2026-08-07T15:00:47Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Meghan Bobrowsky and Erin Mulvaney, reporting for The Wall Street Journal (gift link):</p>
+
+<blockquote>
+  <p>A New Mexico judge ordered Meta Platforms to pay more than $900
+million and limit the time young people in the state can spend on
+its apps, significantly increasing the cost of the landmark child
+safety verdict against the Facebook and Instagram parent.</p>
+
+<p>The judge said Thursday that Meta must create a new $567 million
+abatement fund in addition to paying $375 million in civil
+penalties that a jury previously ordered. The company must also
+enact certain safety features such as limiting the amount of time
+underage users in the state spend on Facebook and Instagram,
+hiding by default the number of “likes” on photos for such people
+and disclosing to users there the risks of its platforms.</p>
+
+<p>The creation of the fund, aimed at rectifying harms caused by the
+Facebook parent’s social-media apps, was “necessary, due to the
+wide-ranging impacts of the harm and the complex nature of the
+remedy,” state Judge Bryan Biedscheid said. The dollar-amount of
+the abatement fund was slightly smaller than the $779.5 million
+attorneys for the state sought.</p>
+
+<p>Meta said it disagreed with the ruling and planned to appeal.</p>
+</blockquote>
+
+<p>You don’t say.</p>
+
+<blockquote>
+  <p>The next trial, brought by four state attorneys general, begins
+jury selection in Oakland, Calif., next week. Meta said in a court
+filing that the states in that case are asking for more than $1
+trillion in damages.</p>
+</blockquote>
+
+<p>The case they just lost, with a judgment of about $1 billion, was for New Mexico alone. If this isn’t overturned, and then sets nationwide precedent, we’re talking real money. <a href="https://en.wikipedia.org/wiki/Tobacco_Master_Settlement_Agreement">The tobacco companies survived</a>, but this seems like that. Investors seem unconcerned — Meta’s stock is up 1.5% so far this morning.</p>
+
+<div>
+<a  title="Permanent link to ‘Meta Ordered to Pay $942 Million in New Mexico Child-Safety Lawsuit’"  href="https://daringfireball.net/linked/2026/08/07/meta-ordered-to-pay-942-million-in-new-mexico-child-safety-lawsuit">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Gurman on OpenAI’s Device: ‘A Doughnut-Shaped Speaker That Costs Over $300’</title>
+	<link rel="alternate" type="text/html" href="https://www.bloomberg.com/news/articles/2026-08-06/what-is-openai-s-device-a-doughnut-shaped-speaker-that-costs-over-300?accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzb3VyY2UiOiJTdWJzY3JpYmVyR2lmdGVkQXJ0aWNsZSIsImlhdCI6MTc4NjA0NjY3NSwiZXhwIjoxNzg2NjUxNDc1LCJhcnRpY2xlSWQiOiJUSjlNQ01UOU5KTFUwMCIsImJjb25uZWN0SWQiOiJDNEVEQ0FFMUZBMDU0MEJFQTI0QTlGMjExQzFFOTA4MCJ9.pj0oCNz7Ez90rn67tMWib-ed2PxcUAhAG2-hlVQ_DRg&amp;leadSource=article-gifting" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xfz" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/06/gurman-openai-device" />
+	<id>tag:daringfireball.net,2026:/linked//6.43343</id>
+	<published>2026-08-06T23:47:32Z</published>
+	<updated>2026-08-06T23:48:27Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Mark Gurman, reporting for Bloomberg (gift link):</p>
+
+<blockquote>
+  <p>OpenAI expects users to rely on the smart speaker throughout the
+day. It will work similarly to the company’s ChatGPT voice mode on
+smartphone apps, but with more advanced models for humanlike
+interactivity. The device is designed to learn more about a user
+over time, letting it tailor conversations and act more like a
+real person.</p>
+
+<p>The circle-shaped device will include parts that move on their
+own, according to the people. That will help show when it’s
+responding and interacting with the user. The goal is to make the
+object feel more alive than today’s stationary speaker products.
+The product will have speaker grills and microphones for fielding
+commands and conversing with users. The battery-powered item will
+be designed to work in different positions — in a user’s hand,
+say, or placed on a nightstand or kitchen counter.</p>
+
+<p>OpenAI is also planning to include lights on the device to
+demonstrate when it’s listening and make interactions feel more
+personal. A camera system and other sensors, meanwhile, will
+perceive the surrounding environment and feed visual information
+into the AI.</p>
+</blockquote>
+
+<p>This doesn’t sound like a “smart speaker” with lights, moving parts, cameras, and other sensors. It sounds like a robot companion, and a robot companion obviously needs a speaker, amongst its other essential features. It’s like calling R2-D2 “a smart speaker” — it wouldn’t be wrong but it’s missing the point. (You could technically call the iPhone “a smart speaker”.) What the io device seems to be missing is autonomous movement. So you need to carry it around like a mogwai, rather than it following you around or going places on its own. I couldn’t give two shits about an OpenAI “smart speaker” if the point is just to play music and podcasts, but a handheld cross between R2-D2 and C-3PO, <em>that</em> could be fucking cool.</p>
+
+<p>It’s a pet, it sounds like. A revolutionary pet, if they pull it off. And people love their pets.</p>
+
+<div>
+<a  title="Permanent link to ‘Gurman on OpenAI’s Device: ‘A Doughnut-Shaped Speaker That Costs Over $300’’"  href="https://daringfireball.net/linked/2026/08/06/gurman-openai-device">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>OpenAI Files 28-Page Motion to Dismiss Apple’s Lawsuit (PDF Link)</title>
+	<link rel="alternate" type="text/html" href="https://storage.courtlistener.com/recap/gov.uscourts.cand.474095/gov.uscourts.cand.474095.59.0.pdf" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xfy" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/06/openai-files-motion-to-dismiss" />
+	<id>tag:daringfireball.net,2026:/linked//6.43342</id>
+	<published>2026-08-06T21:13:04Z</published>
+	<updated>2026-08-06T21:14:35Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>This is more like it. No mealymouthing or wishy-washiness here. This is a strident defense. I’ll quote just one line for now:</p>
+
+<blockquote>
+  <p>Apple offers nothing because it has nothing because there is
+nothing. Its Complaint cannot and does not state a
+misappropriation claim against Defendant Tan.</p>
+</blockquote>
+
+<p>I’ll post more thoughts later, but if you’re following this lawsuit, you should read OpenAI’s motion yourself. It’s cogently written, not mired in legalese. Legalese is generally a sign of shitty lawyers. The law is meant to be practiced by lawyers, but understood by everyone. The law is not a priesthood; motions in a lawsuit are not holy texts reserved for the sainted few. What boggles my mind is that almost <em>none</em> of the outlets <a href="https://www.techmeme.com/260806/p7#a260806p7">reporting on this today</a> linked to OpenAI’s actual motion. (Kudos to Jess Weatherbed of The Verge, <a href="https://www.theverge.com/tech/976042/openai-apple-trade-secrets-lawsuit-dismissal-request">who did</a>.) Summaries are necessary and commentary is good, but for chrissake link to the source document.</p>
+
+<div>
+<a  title="Permanent link to ‘OpenAI Files 28-Page Motion to Dismiss Apple’s Lawsuit (PDF Link)’"  href="https://daringfireball.net/linked/2026/08/06/openai-files-motion-to-dismiss">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Brendan Leonard: ‘Do It 14,000 Times Slower With This One Trick’</title>
+	<link rel="alternate" type="text/html" href="https://semi-rad.com/2026/08/do-it-14000-times-slower-with-this-one-trick/" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xfx" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/06/do-it-14000-times-slower" />
+	<id>tag:daringfireball.net,2026:/linked//6.43341</id>
+	<published>2026-08-06T20:23:52Z</published>
+	<updated>2026-08-06T20:23:53Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>This comic from Brendan Leonard is a fine companion to yesterday’s items (<a href="https://daringfireball.net/linked/2026/08/05/altman-notopoulos-parenting">here</a> and <a href="https://daringfireball.net/linked/2026/08/05/please-use-ai">here</a>) on pausing to consider if our use of AI is helping us focus our time on what we love to do, or, instead, robbing us of the things that make us human. The bit about making a sandwich hit close enough to home for me to make me laugh aloud.</p>
+
+<div>
+<a  title="Permanent link to ‘Brendan Leonard: ‘Do It 14,000 Times Slower With This One Trick’’"  href="https://daringfireball.net/linked/2026/08/06/do-it-14000-times-slower">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+	<title>Add a Shortcut to Control Center to Open the Current App’s Preferences in the Settings App</title>
+	<link rel="alternate" type="text/html" href="https://x.com/SnazzyLabs/status/1969247088488624253?s=20" />
+	<link rel="shorturl" type="text/html" href="http://df4.us/xfw" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/linked/2026/08/06/shortcut-control-center-current-app-settings" />
+	<id>tag:daringfireball.net,2026:/linked//6.43340</id>
+	<published>2026-08-06T17:36:22Z</published>
+	<updated>2026-08-06T20:32:12Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<content type="html" xml:base="https://daringfireball.net/linked/" xml:lang="en"><![CDATA[
+<p>Regarding my <a href="https://daringfireball.net/linked/2026/08/06/stopthescript-is-a-dickover-killer">earlier complaint</a> about it being a slog to open Safari’s preferences in the Settings app on iOS, a few readers pointed me to this tweet last year from Quinn Nelson, showing how to build (or <a href="https://www.icloud.com/shortcuts/5d69e334840d4493a32db5ab330c712b">download from iCloud</a>) a simple Shortcuts shortcut that you can add to Control Center to open the current app’s preferences in Settings. Works great.</p>
+
+<p><strong>Update:</strong> <a href="https://mastodon.social/@stephenrobles/117049907923574037">Stephen Robles</a>:</p>
+
+<blockquote>
+  <p>I made a few riffs off that one as well:</p>
+
+<ul>
+<li><a href="https://shortcut.bot/46qt0sY">Jump to current app notification settings</a></li>
+<li><a href="https://shortcut.bot/4rH7AAp">Current app storage</a></li>
+<li><a href="https://shortcut.bot/4u1MJbA">Open current app in App Store</a></li>
+</ul>
+</blockquote>
+
+<div>
+<a  title="Permanent link to ‘Add a Shortcut to Control Center to Open the Current App’s Preferences in the Settings App’"  href="https://daringfireball.net/linked/2026/08/06/shortcut-control-center-current-app-settings">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+  </entry><entry>
+    
+    <link rel="alternate" type="text/html" href="https://daringfireball.net/2026/08/openai_apple_is_getting_this_wrong" />
+	<link rel="shorturl" href="http://df4.us/xfk" />
+	<id>tag:daringfireball.net,2026://1.43328</id>
+	<published>2026-08-04T22:51:19Z</published>
+	<updated>2026-08-05T19:21:30Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<summary type="text">A blog post is an unusual way to respond to a high-stakes lawsuit, but OpenAI is an unusual company. A few snippets from their post, and some commentary.</summary>
+	<content type="html" xml:base="https://daringfireball.net/" xml:lang="en"><![CDATA[
+<p><a href="https://openai.com/index/apple-is-getting-this-wrong/">OpenAI published an unbylined blog post</a> overnight, responding in public — but not yet in court — to Apple’s new motion for a preliminary injunction. It’s an unusual move to respond to a high-stakes legal filing with a blog post, but OpenAI is an unusual company. A few snippets from their post, and some commentary:</p>
+
+<blockquote>
+  <p>Apple had claimed that they contacted OpenAI in February and that
+we didn’t respond. They now admit that their outside lawyers
+emailed the wrong person after confusing two Asian last names — only after we brought this to their attention.</p>
+</blockquote>
+
+<p>OpenAI is <a href="https://daringfireball.net/linked/2026/07/16/apple-lawyer-name-mixup">hanging on</a> to the fact that Apple’s outside counsel, Gabriel Gross, sent one email to the wrong address, and quickly emailed an apology. In OpenAI’s phrasing, it sounds like Apple’s attorney sent the entire initial letter of concern to the wrong person, and that’s why OpenAI never responded — because it wasn’t sent to the correct person (OpenAI general counsel Che Chang). That’s not what happened. The initial blockbuster “hey we think you guys are stealing our trade secrets and we want to talk to you about it” letter <em>was</em> sent to Che Chang. And Che Chang never did respond to Apple’s lawyers. That a mistaken email thanking Che Chang for a phone call that never happened (because that email was intended for another OpenAI employee) was also sent is irrelevant. I don’t understand why OpenAI is continuing to focus on this inconsequential mistake. (<a href="https://storage.courtlistener.com/recap/gov.uscourts.cand.474095/gov.uscourts.cand.474095.38.0.pdf">Apple’s motion</a> for a preliminary injunction includes the full text of the mistaken email and subsequent apology.)</p>
+
+<blockquote>
+  <p>Apple accuses Chang Liu of accessing Apple confidential
+information after leaving the company, but only now admits that
+Apple employees reached out to him and asked for his help to
+locate this information (you can read the messages <a href="https://openai.com/index/apple-is-getting-this-wrong/#messages">here</a>).
+Apple now tries to shift the blame to “residual access”, but they
+also don’t disclose that this is a common issue with Apple which
+is caused by them failing to properly manage system access when
+people leave. What that means in practice is that former employees
+who are trying to do the right thing when they leave still have
+access to Apple files — despite not wanting them or even being
+aware of them.</p>
+</blockquote>
+
+<p>OpenAI is seemingly alluding to Apple’s unusual use of iCloud Drive, tied to employees’ personal Apple Account IDs, <a href="https://daringfireball.net/linked/2026/08/03/the-information-apple-employees-icloud">that I (coincidentally?) wrote about yesterday</a>. Apple’s motion for injunction, however, addresses this very point. From page 3 of the motion:</p>
+
+<blockquote>
+  <p>Mr. Liu resigned on Thursday, January 22, 2026, and provided
+notice that he would start at OpenAI the following Tuesday. On his
+last day, he failed to respond to Apple’s attempt to schedule his
+exit interview or sign his confidentiality reminder.</p>
+
+<p>In the days following his departure, Mr. Liu seemed initially
+cooperative and aware of his obligations to Apple. He worked with
+others on his former Apple team to return certain Apple
+information remaining on his personal iCloud account to
+Apple.<sup>1</sup> He also continued to converse with former
+co-workers, for example, to answer questions about his earlier
+work and where certain information was stored. But these
+interactions and exchanges cannot explain the repeated,
+unauthorized downloading of voluminous technical files from
+Apple’s cloud-based storage discussed below, which Mr. Liu
+performed on multiple occasions from February to April 2026 while
+employed by OpenAI.</p>
+</blockquote>
+
+<p>That footnote reads:</p>
+
+<blockquote>
+  <p><sup>1</sup> While Apple seeks discovery into what Apple
+confidential information Mr. Liu accessed from his personal
+storage accounts (including iCloud) and devices after his
+departure, the specific unauthorized downloads referenced in the
+complaint and at the heart of this motion are not based on iCloud
+activity, but instead relate to Apple’s third-party cloud storage.</p>
+</blockquote>
+
+<p>Nowhere in any of Apple’s filings (<a href="https://www.courtlistener.com/docket/73602437/apple-inc-v-liu/">here’s the Court Listener index page</a> for all the documents filed in the case) does it say who the third-party cloud storage provider is, but I’m almost certain it’s Box, which I know is widely used throughout Apple.</p>
+
+<p>The iMessage transcripts that OpenAI provides at the bottom of their post do not contradict Apple’s claims at all. Apple’s motion states that Liu helped former colleagues find certain documents that were in iCloud; that’s what OpenAI’s transcript shows. But that’s not in dispute. Apple also claims that Liu accessed confidential information, presumably in Box and definitely not in iCloud Drive, on five different occasions, up until 27 April 2026, over three months after he left Apple. These chat transcripts offer no explanation for that. The chat transcripts explain iCloud Drive access that Apple itself says is not in dispute, and do not explain the 37 documents Liu downloaded from the third-party cloud provider (Box?) that Apple says are at the heart of naming him in the lawsuit. <a href="https://storage.courtlistener.com/recap/gov.uscourts.cand.474095/gov.uscourts.cand.474095.45.0_4.pdf">Here is Apple’s declaration from digital forensic specialist Daniel Roffman</a>, documenting Liu’s access to confidential files post-employment (albeit with significant redactions).</p>
+
+<p>I do not understand why OpenAI is treating this as a PR problem instead of as a legal problem. Dan Moren, <a href="https://sixcolors.com/link/2026/08/openai-apple-is-getting-this-wrong/">linking to it from Six Colors</a>, is of similar mind, writing:</p>
+
+<blockquote>
+  <p>What kept running through my head while reading this was the old
+legal chestnut: “If you have the facts on your side, pound the
+facts. If you have the law on your side, pound the law. If you
+have neither on your side, pound the table.”</p>
+</blockquote>
+
+<p>Thus far this feels like table-pounding from OpenAI to me. Their blog post does, however, move the ball from “<a href="https://daringfireball.net/linked/2026/07/10/openai-pusateri-statement">we have no interest</a>” in Apple’s trade secrets to “we don’t have them”, (emphasis added):</p>
+
+<blockquote>
+  <p>Apple also accuses Tang Tan of trying to get and use their trade
+secrets. However, Tang has always been clear with the team that
+we do not want, and must not use, any confidential information
+from other companies. Tang served Apple for more than 24 years
+and was widely known as one of the most innovative leaders at the
+company. [...]</p>
+
+<p>Apple’s request for a preliminary injunction is both based on
+false information and completely unnecessary <em>because we do not
+have, nor want, any of their trade secrets</em>. We’re much more
+interested in building innovative products and technologies that
+push the frontier.</p>
+</blockquote>
+
+<p>To me, the most interesting response from OpenAI wasn’t their blog post. It was an email released by Apple, as “<a href="https://storage.courtlistener.com/recap/gov.uscourts.cand.474095/gov.uscourts.cand.474095.47.6_4.pdf">Exhibit F</a>” to one of their expert declarations submitted to the court last night. OpenAI has retained the renowned law firm Quinn Emanuel as outside counsel, and this exhibit is a long email from Quinn Emanuel attorney Patrick Curran to Apple’s attorneys. From that email, dated Monday July 20, Curran writes:</p>
+
+<blockquote>
+  <p>You also ask that we “revisit” the specific points proposed in
+your July 15 letter. It appears that you want to move backwards.
+As noted, we already discussed these during our meet and confer
+but Apple was unable to respond to basic questions my colleagues
+raised about these requests. For example, your letter proposes
+that OpenAI “[p]roduce witnesses to testify at deposition” but
+Apple was unable to identify who those witnesses would be.
+Similarly, Apple was unsure when we asked if it was actually
+proposing that hundreds of OpenAI employees fill out
+“questionnaires” even if Apple has no basis to allege (and is
+indeed not alleging) that such employees have any connection to
+this litigation. The seven sections in your letter are broadly
+worded and remain vague and general. This is not what a forensic
+protocol looks like and we’re sure you understand that you will
+not get this as relief from the court. You first need to
+(preliminarily) identify the TS you are suing for, and your email
+states that you “appreciate the need” to do so. Any protocol will
+be informed by such identification. A forensic protocol cannot be
+based on general terms like “Apple confidential information”; you
+need to tell us what you’re looking for, and it sounds like you
+understand that and are prepared to do so. The efficient way
+forward is therefore to tackle these issues as part of the
+negotiation of a proper, detailed forensic protocol. If you
+instead prefer to move for a PI because OpenAI did not agree off
+the bat to subject hundreds of employees to “questionnaires” about
+“Apple confidential information” generally, that is unfortunate — and inconsistent with what I understand both our clients have
+requested. If you choose this path instead of working with us, we
+look forward to filing an opposition that sets the record
+straight.</p>
+</blockquote>
+
+<p>Apple, obviously, did choose this path (“PI” = preliminary injunction), and I too look forward to OpenAI’s setting the record straight, especially if they do so in plainspoken language like Curran’s in this email. Curran continues:</p>
+
+<blockquote>
+  <p>Finally, although I know OpenAI would like to resolve this
+amicably, as their counsel I have to tell you what I think you
+already know — this case lacks merit. You have not articulated
+any basis to support a preliminary injunction. Your complaint is
+predicated on a misrepresentation of facts and allegations that
+are speculative at best. It fails to even remotely identify any
+trade secrets. You are attacking ordinary business practices (used
+widely across the industry). You are complaining about situations
+that you have caused, including through your own procedures and
+decisions. We stand ready to oppose any preliminary injunction
+motion and tell the world what really happened here to set the
+record straight. We made clear we would prefer to quickly and
+collaboratively address any legitimate concerns that your client
+has, but that is not well-served by repeated threats.</p>
+</blockquote>
+
+<p>This email is a far better response than what OpenAI published on their blog.</p>
+
+    ]]></content>
+  <title>★ OpenAI Responds to Apple’s Lawsuit and Motion for Preliminary Injunction: ‘Apple Is Getting This Wrong’</title></entry><entry>
+	
+	<link rel="alternate" type="text/html" href="https://workos.com/blog/mcp-vs-rest?utm_source=daringfireball&amp;utm_medium=newsletter&amp;utm_campaign=q32026" />
+	<link rel="shorturl" href="http://df4.us/xff" />
+	<link rel="related" type="text/html" href="https://daringfireball.net/feeds/sponsors/2026/08/mcp_vs_rest_the_right_way_to_c" />
+	<id>tag:daringfireball.net,2026:/feeds/sponsors//11.43323</id>
+	<author><name>Daring Fireball Department of Commerce</name></author>
+	<published>2026-08-03T22:26:01Z</published>
+	<updated>2026-08-03T22:26:01Z</updated>
+	<content type="html" xml:base="https://daringfireball.net/feeds/sponsors/" xml:lang="en"><![CDATA[
+<p>REST serves the developers building against your API. <a href="https://workos.com/guide/model-context-protocol?utm_source=daringfireball&amp;utm_medium=newsletter&amp;utm_campaign=q32026&amp;utm_content=body_guide">MCP serves the agents</a> now trying to use it. Most teams treat these as competing standards and have to pick one.</p>
+
+<p>They’re not rivals, they’re layers: most MCP servers just call REST internally to do the real work. The best ones don’t convert every endpoint into a tool, they design around what the agent’s trying to accomplish.</p>
+
+<p>Shipping that server also means shipping OAuth 2.1 with scoped tokens. <a href="https://workos.com/docs/authkit/mcp?utm_source=daringfireball&amp;utm_medium=newsletter&amp;utm_campaign=q32026&amp;utm_content=body_authkit">WorkOS AuthKit already speaks that spec</a>, so you skip building an auth provider on top.</p>
+
+<p><a href="https://workos.com/blog/mcp-vs-rest?utm_source=daringfireball&amp;utm_medium=newsletter&amp;utm_campaign=q32026">Read the breakdown →</a></p>
+
+<div>
+<a  title="Permanent link to ‘MCP vs. REST: The Right Way to Connect Agents to Your API’"  href="https://daringfireball.net/feeds/sponsors/2026/08/mcp_vs_rest_the_right_way_to_c">&nbsp;★&nbsp;</a>
+</div>
+
+	]]></content>
+	<title>[Sponsor] MCP vs. REST: The Right Way to Connect Agents to Your API</title></entry><entry>
+    
+    <link rel="alternate" type="text/html" href="https://daringfireball.net/2026/08/followup_big_three_carrier_requirement" />
+	<link rel="shorturl" href="http://df4.us/xfb" />
+	<id>tag:daringfireball.net,2026://1.43319</id>
+	<published>2026-08-03T17:19:34Z</published>
+	<updated>2026-08-03T17:19:35Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<summary type="text">For many years now, part of the co-marketing agreements between Apple and the Big Three is Apple agreeing to require a postpaid account with a Big Three carrier for all “special” iPhone financing deals, including the old iPhone Upgrade Program and the new Apple Upgrade leasing.</summary>
+	<content type="html" xml:base="https://daringfireball.net/" xml:lang="en"><![CDATA[
+<p>Following up from last week, <a href="https://daringfireball.net/linked/2026/07/30/apple-upgrade-vs-iphone-upgrade-program">when I asked</a>:</p>
+
+<blockquote>
+  <p>When you lease an iPhone through Apple Upgrade, you need a
+cellular account on one of the big three U.S. carriers: AT&amp;T,
+T-Mobile, or Verizon. That kind of stinks, and I’m not quite sure
+I understand why. You’re leasing the iPhone through Apple and
+Klarna, not the carrier, so I don’t know why Apple cares. If you
+know why, <a href="https://daringfireball.net/contact/">shoot me a message</a> and explain it. Is it just a
+simplistic credit-risk evaluation, where prepaid plan-holders and
+MVNO users in general are viewed suspiciously?</p>
+</blockquote>
+
+<p>I got a slew of messages about this. Credit-risk assessment is seemingly part of it. There’s a lot of fraud in iPhone purchases specifically and cell phone service generally. The big three carriers do a significant amount of risk assessment before letting you open a new postpaid account; that you have an active account with one of them is a signal that you’re not trying to lease an iPhone using phony credentials in order to sell it.</p>
+
+<p>But the bigger reason is the complex nature of the contracts between Apple and each of the big three carriers. A reader who worked on the carrier team at Apple for a long time (but left a few years ago) wrote:</p>
+
+<blockquote>
+  <p>In response to your question on why Apple would only offer iPhone
+on the “Big 3” for the new Upgrade Program: Every year, the
+Carrier Teams at Apple negotiate a deal/program (hundreds of
+millions of dollars) with each of those Big 3. In return for those
+dollars, Apple will make concessions exactly like this (or
+similar.) This is also why, for example, their logos appear more
+prominently or are the only ones called out on signage,
+commercials, etc… Although they really aren’t threatened by MVNO’s
+(the ones they don’t own) or regional carriers, it’s more like
+Apple is selling it as part of a package deal that’s exclusively
+offered to its biggest and best “tier 1” partners. It also acts as
+a carrot to perpetually try to motivate smaller partners into
+behavior Apple wants.</p>
+</blockquote>
+
+<p>This might change — some of the bigger MVNOs are trying to work their way into “tier 1” (or maybe create a new “tier 1.5”). But for many years now, part of the co-marketing agreements between Apple and the Big Three is Apple agreeing to require a postpaid account with a Big Three carrier for all “special” iPhone financing deals, including the old iPhone Upgrade Program and the new Apple Upgrade leasing.</p>
+
+<p>One interesting exception is that Boost Mobile is included alongside the Big Three for Apple Card Monthly Installments (ACMI), a program that offers 0% APR on certain products if you pay for them using an Apple Card. <a href="https://support.apple.com/en-us/104950">From the ACMI small print</a>:</p>
+
+<blockquote>
+  <p>In order to buy an iPhone with ACMI, you must select one of the
+following carriers (prepaid carrier plans are not supported):
+AT&amp;T, Boost Mobile, T-Mobile, or Verizon. An iPhone purchased with
+ACMI is always unlocked, so you can switch carriers at any time,
+subject to your carrier’s terms.</p>
+</blockquote>
+
+<p>So perhaps some of the bigger MVNO carriers might work their way into Apple Upgrade — but if they do, it sounds like they’ll need to pay Apple for the privilege.</p>
+
+<p>With regard to fraud, a former Apple Store retail employee wrote:</p>
+
+<blockquote>
+  <p>I left in 2019, but I’d estimate on some days a double digit
+percentage of in-person phone sales were fraudulent.</p>
+
+<p>This behavior absolutely exploded when you started to be able to
+do carrier financing in the store. They had stolen the identity
+of a legit account holder, come into the store with the info
+needed to access the account. They always wanted the highest end
+phone, and would pay the sales tax due at time of sale in cash.
+Never wanted any accessories. Never wanted to open the box or set
+up the phone.</p>
+
+<p>As bad as it was with the activation requirement, it would be way
+worse without it. I believe it’s gotten a lot better, and the
+carriers have more advanced systems in place to detect and deter
+this behavior now. But ultimately, the carriers ate the cost for
+millions of dollars in devices they never got paid for.</p>
+</blockquote>
+
+<p>I suspect that reader is correct that Apple, in collaboration with the carriers, has cracked down on this.</p>
+
+    ]]></content>
+  <title>★ Why Apple Requires a Cellular Account Through a Big Three Carrier to Lease an iPhone</title></entry><entry>
+    
+    <link rel="alternate" type="text/html" href="https://daringfireball.net/2026/07/temu_is_a_comically_bad_app" />
+	<link rel="shorturl" href="http://df4.us/xf2" />
+	<id>tag:daringfireball.net,2026://1.43310</id>
+	<published>2026-07-31T18:27:50Z</published>
+	<updated>2026-07-31T18:27:50Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<summary type="text">Shop like a billionaire.</summary>
+	<content type="html" xml:base="https://daringfireball.net/" xml:lang="en"><![CDATA[
+<p><a href="https://social.panic.com/@cabel/116987028774035194">Cabel Sasser on Mastodon</a>:</p>
+
+<blockquote>
+  <p>the temu app will be studied for generations.</p>
+
+<p>i opened the app, and recorded this unedited, nearly two minute,
+launch sequence. it somehow just gets funnier and more absurd</p>
+</blockquote>
+
+<p>I agree with this sentiment, right down to the fact that Temu doesn’t deserve capital letters.</p>
+
+<p>I placed an order from Temu back in August 2023. At the time Temu was the #1 app in the App Store. I surmised it was some sort of crap store, but wanted to see for myself. It is in fact not merely a crap store but a spectacular crap store — like if a souvenir shop on a Jersey shore boardwalk were the size of a football stadium. Thousands of items, many of them rip-offs, at absurdly low prices. I bought (<a href="https://daringfireball.net/misc/2026/07/temu-order-7-items-aug-2023.png">screenshot</a>):</p>
+
+<ul>
+<li>Two Apple Watch straps. One of them knocking off Apple’s Braided Solo Loop for $1.88; another knocking off the Apple Watch Ultra Alpine Loop for $2.34.</li>
+<li>A pair of knock-off AirPods: $8.98.</li>
+<li>Another pair of wireless earbuds branded “Lenovo” but definitely not made by Lenovo: $10.25.</li>
+<li>A knock-off Apple Watch Ultra (“<em>Smart Watch Answer/Make Call 2.19&#34; HD Full Touch Screen Watch With BT Call, Fitness Tracker With Heart Monitor</em>”), which included both orange and black (misspelled “balck”) rip-offs of Apple’s Ocean Band, for $16.49.</li>
+<li>A “Magnetic Suction Anti-Lost Lanyard” for, I think, AirPods: $1.79.</li>
+<li>An iPhone case: $3.46.</li>
+</ul>
+
+<p>Grand total for all seven items: $48.81. I ordered it all on 20 August 2023, and it arrived at my P.O. box on 2 September. The contents of the box looked less like it had been “packed” than “picked out of the trash and hurriedly stuffed into a box”.</p>
+
+<p>The iPhone case was so flimsy it didn’t properly snap onto the phone. The Apple Watch straps were ... OK? They were about as good as you could hope given that they cost around $2 each. The knock-off Apple Watch Ultra actually did sort of work, insofar as it had a color screen that turned on and showed watch-like screens (that looked nothing at all like WatchOS). The watch case was made of plastic, and watch straps did not snap into place in the slide-in channel where they connect — they just permanently slid around. I couldn’t get either of the bluetooth earbuds to work but I didn’t spend more than a few minutes trying with each, because I realized I had no intention of putting them into my ears. The lanyard I don’t remember.</p>
+
+<p>Temu today no longer tops the U.S. App Store’s Top Free Apps list, but it remains in the top 25. (It was at #19 this morning, and #22 this afternoon.) Temu’s slogan remains unchanged: “Shop like a billionaire.” Who am I to argue with that? We know <a href="https://www.wsj.com/business/elon-musk-illegal-drugs-e826a9e1?st=rAN3Cp">one of them</a> is on a lot of drugs — maybe all of them are, and Temu is what it’s like.</p>
+
+<p>After I placed that initial order, I started getting emails from Temu. Seven of the emails pertained to my order: an order confirmation, a shipping notice, a shipping update, another shipping update, a “we noticed your order didn’t arrive on time so here’s a $5 coupon” update, a delivery confirmation, and then a prompt to leave “an honest review detailing our product quality and your overall experience”. The emails kept coming. I decided to leave them turned on until I wrote about my Temu experience on Daring Fireball. As I type this sentence, I’ve received a grand total of 916 emails. That’s just under one per day for the 1,076 days since I placed my one and only order from them. <a href="https://daringfireball.net/misc/2026/07/Temu-Email-Subjects-(916).text">Here’s a text file with the dates and Subject lines for all 916 emails</a>. In the early months after placing my order, they sent me multiple emails per day, every single day. I particularly enjoy how, in the Subject lines, they occasionally abbreviate my name as “John Gru...” (for privacy?), despite the fact that (a) the emails are all sent to me, and (b) in many of the other messages, they spell out my full name in the Subject.</p>
+
+<p>Don’t do what I did and actually try Temu. <a href="https://social.panic.com/@cabel/116987028774035194">Just watch Sasser’s video</a>. It tells you everything you need to know.</p>
+
+    ]]></content>
+  <title>★ Temu Is a Comically Bad App</title></entry><entry>
+    
+    <link rel="alternate" type="text/html" href="https://daringfireball.net/2026/07/ads_in_software_are_like_stickers_on_laptops" />
+	<link rel="shorturl" href="http://df4.us/xen" />
+	<id>tag:daringfireball.net,2026://1.43295</id>
+	<published>2026-07-27T16:32:51Z</published>
+	<updated>2026-07-27T16:32:51Z</updated>
+	<author>
+		<name>John Gruber</name>
+		<uri>http://daringfireball.net/</uri>
+	</author>
+	<summary type="text">Putting themselves in customers’ shoes today, how many ads do Apple’s executives want stuck in the results when they search for an app in the App Store?</summary>
+	<content type="html" xml:base="https://daringfireball.net/" xml:lang="en"><![CDATA[
+<p>Regarding my <a href="https://daringfireball.net/2026/07/ads_on_apple_news_suck">recent</a> <a href="https://daringfireball.net/2026/07/ternus_apple_slippery_slope">pieces</a> regarding Apple’s shitty ads in the App Store and Apple News (and, perhaps soon, Apple Maps), a friend sent me this pithy take:</p>
+
+<blockquote>
+  <p>The ads Apple is happy to inflict on us in its apps are the
+equivalent of the stickers it would never allow on its physical
+products.</p>
+</blockquote>
+
+<p><em>Bullseye.</em></p>
+
+<p>That’s what those stickers on PCs are: they’re ads. Intel pays for the “Intel Inside” stickers that booger up PC laptop palm rests. Longtime readers will recall that <a href="https://www.apple.com/newsroom/archive/2007/08/">back in August 2007</a>, Apple held a Town Hall event to introduce new iMacs and some iLife and iWork software updates. In a post-event Q&amp;A (imagine that), <a href="https://daringfireball.net/linked/2007/08/09/keefe">Bob Keefe of Cox Newspapers asked</a> “Can you say why you all are not participating in the Intel Inside program, putting the stickers on your new or previous Macs?” This question was so absurd <em>from the perspective of those who covered Apple closely</em> that it prompted outright laughter. <a href="https://www.macworld.com/article/186895/stickergate.html">Jason Snell wrote a great column</a> arguing that it was actually a good question.</p>
+
+<p>Here’s the whole exchange (<a href="https://web.archive.org/web/20080820104510/http://www.macuser.com/steve-jobs/world_exclusive_bob_keefe_is_n_1.php">via Dan Moren</a>, then at MacUser). Give it a listen, it’s only 100 seconds or so:</p>
+
+<p><audio
+    src = "https://daringfireball.net/misc/2007/08/stickerquestion.mp3"
+    controls
+    preload = "none"
+></p>
+
+<p>Keefe asks, Steve Jobs answers, Phil Schiller answers, and then Jobs closes it. Jobs broke the ice in his initial answer, with “What can I say? We like our own stickers better.” I was in the room, and that line killed. Jobs at his best. But you can tell that Jobs wasn’t really sure how to answer at first. He didn’t want to throw any shade at Intel, Apple’s partner, but he knew there was a key point to make here about Apple.</p>
+
+<p>The whole thing is funny because at a fundamental level we all just know in our bones that Apple never even considered putting “Intel Inside” stickers on Macs. But <em>why</em>? For eons, mankind knew that when you drop something, it will fall to the ground. But <em>why</em>? Gravity is worth asking about. Worth figuring out. I think that’s the point of Snell’s 2007 column arguing that people (like me) were wrong to mock Keefe for asking.</p>
+
+<p>It’s when Jobs comes back to the question, after Schiller, that we get the real answer:</p>
+
+<blockquote>
+  <p>You know, we put ourselves in the customers’ shoes and we say,
+what do <em>we</em> want stuck on our product when we take it out of the
+box? And the answer is, nothing.</p>
+</blockquote>
+
+<p><em>That’s</em> the answer. Apple still treats its hardware with that level of respect. With reverence. iPhones don’t even say “iPhone” on the hardware. No model or serial numbers. No small print. Just an Apple logo on the back.</p>
+
+<p>Putting themselves in customers’ shoes today, how many ads do Apple’s executives want stuck in the results when they search for an app in the App Store? We know the honest answer. But the answer <a href="https://daringfireball.net/misc/2026/07/app-store-ads-search-for-signal.png">evidenced by the actual App Store</a> is “Two really big ones, including one in the first spot.”</p>
+
+    ]]></content>
+  <title>★ Ads in Software Are Like Stickers on Laptops</title></entry></feed><!-- THE END -->

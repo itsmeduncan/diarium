@@ -1,0 +1,102 @@
+# Diarium edition configuration.
+#
+# This is the whole of the user-facing configuration. It lives on the microSD
+# card and is read at wake. Section order here is section order in the paper.
+#
+# This copy is a committed sample. The one the device reads is the one on the
+# card — and if you put wifi credentials in it, keep that copy off the card
+# only: `config/feeds.local.toml` is gitignored for exactly that reason.
+
+# Credentials for the one network this device ever joins. Omit the section
+# entirely and the device simply never fetches — it will still read whatever
+# edition is already on the card.
+#
+# NEVER commit real credentials. Edit config/feeds.local.toml instead and copy
+# that onto the card.
+[wifi]
+ssid = "YOUR-NETWORK"
+password = "YOUR-PASSWORD"
+
+[edition]
+# The nameplate across the top of page one.
+title = "Diarium"
+# Local time to wake, compose and go back to sleep. 24-hour.
+wake_at = "05:30"
+# "portrait" (the default, the panel stood on its short edge) or "landscape".
+# Portrait gives a taller page and a wider reading measure; landscape is the
+# older layout. Changing this takes effect on the next composed edition.
+orientation = "portrait"
+# Minutes east of UTC. The device has no network to ask and no keyboard to be
+# asked, so the offset travels with this file.
+utc_offset_minutes = 0
+# Ceiling on the whole edition. There isn't one by default: if you are a week
+# behind, a ceiling is what stops the paper catching you up. What bounds the
+# edition is the per-feed max_items below, and max_age_days further down.
+#
+# Set it to a whole number if you would rather have a paper of a predictable
+# length. When it bites, every section gets two stories before any section
+# gets more, so a busy section can't take the whole paper.
+# max_items = 40
+# "justified" or "ragged". Justified needs hyphenation to look right in the
+# narrow front-page columns; with it on, either reads well.
+body_alignment = "ragged"
+# Liang hyphenation. Evens the rag when ragged, and is what makes justified
+# text possible at all in a narrow column.
+hyphenate = true
+# Drop stories older than this many days, however recently they appeared.
+max_age_days = 3
+
+[[feed]]
+url = "https://daringfireball.net/feeds/main"
+section = "Technology"
+max_items = 6
+
+[[feed]]
+url = "https://www.theverge.com/rss/index.xml"
+section = "Technology"
+max_items = 5
+
+[[feed]]
+url = "https://feeds.arstechnica.com/arstechnica/index"
+section = "Technology"
+max_items = 5
+
+[[feed]]
+url = "https://simonwillison.net/atom/everything/"
+section = "Technology"
+max_items = 4
+
+[[feed]]
+url = "https://feeds.bbci.co.uk/news/rss.xml"
+section = "World"
+max_items = 8
+
+[[feed]]
+url = "https://www.theguardian.com/world/rss"
+section = "World"
+max_items = 6
+
+[[feed]]
+url = "https://www.nasa.gov/feed/"
+section = "Science"
+max_items = 4
+
+[[feed]]
+url = "https://astralcodexten.substack.com/feed"
+section = "Essays"
+max_items = 3
+
+[[feed]]
+url = "https://craigmod.com/index.xml"
+section = "Essays"
+max_items = 3
+
+[[feed]]
+url = "https://feeds.kottke.org/main"
+section = "Miscellany"
+max_items = 5
+
+[[feed]]
+url = "https://xkcd.com/rss.xml"
+section = "Miscellany"
+max_items = 2

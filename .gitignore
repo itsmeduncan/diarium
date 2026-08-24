@@ -1,0 +1,22 @@
+# >>> claude-agents managed (DO NOT EDIT THIS BLOCK) >>>
+.claude/.toolkit-last-seen-sha
+.claude/.toolkit-setup-done
+.claude/.claude-agents.conf
+# <<< claude-agents managed <<<
+
+# Build output
+build/
+bin/
+out/
+.pio/
+compile_commands.json
+
+# Editor / OS
+.DS_Store
+*.swp
+.cache/
+src/device/.pio/
+
+# A local config with real credentials. The committed config/feeds.toml is a
+# sample; anything with a password in it belongs on the card, never in git.
+config/feeds.local.toml
